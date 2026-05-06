@@ -12,6 +12,12 @@ Agent Runtime Layer helps developers answer:
 
 It runs locally by default with FastAPI, SQLite, and a Next.js dashboard.
 
+## Preview
+
+![Agent Runtime Layer dashboard](docs/assets/dashboard-overview.png)
+
+Import a trace, inspect bottlenecks, and generate optimization evidence from a self-hosted dashboard.
+
 ## Current Status
 
 Developer preview.
