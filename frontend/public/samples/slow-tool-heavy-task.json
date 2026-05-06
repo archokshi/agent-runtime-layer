@@ -1,0 +1,89 @@
+{
+  "project_id": "default",
+  "task": {
+    "task_id": "task_tool_wait_001",
+    "goal": "Diagnose flaky integration test",
+    "agent_type": "coding_agent",
+    "budget_dollars": 0.75,
+    "latency_slo_seconds": 420
+  },
+  "events": [
+    {
+      "event_id": "evt_tool_001",
+      "task_id": "task_tool_wait_001",
+      "timestamp": "2026-05-03T12:00:00.000Z",
+      "event_type": "task_start",
+      "span_id": "span_task_tool",
+      "parent_span_id": null,
+      "name": "task_start",
+      "attributes": {},
+      "payload": {"goal": "Diagnose flaky integration test", "agent_type": "coding_agent"}
+    },
+    {
+      "event_id": "evt_tool_002",
+      "task_id": "task_tool_wait_001",
+      "timestamp": "2026-05-03T12:00:02.000Z",
+      "event_type": "model_call_start",
+      "span_id": "span_model_tool",
+      "parent_span_id": "span_task_tool",
+      "name": "planner_call",
+      "attributes": {"model": "gpt-5-codex", "role": "planner", "estimated_input_tokens": 11000, "expected_output_tokens": 500, "prompt_hash": "sha256:integration_test"},
+      "payload": {}
+    },
+    {
+      "event_id": "evt_tool_003",
+      "task_id": "task_tool_wait_001",
+      "timestamp": "2026-05-03T12:00:05.200Z",
+      "event_type": "model_call_end",
+      "span_id": "span_model_tool",
+      "parent_span_id": "span_task_tool",
+      "name": "planner_call_end",
+      "attributes": {"input_tokens": 11000, "output_tokens": 410, "latency_ms": 3200, "cost_dollars": 0.031, "status": "success"},
+      "payload": {}
+    },
+    {
+      "event_id": "evt_tool_004",
+      "task_id": "task_tool_wait_001",
+      "timestamp": "2026-05-03T12:00:06.000Z",
+      "event_type": "tool_call_start",
+      "span_id": "span_tool_slow",
+      "parent_span_id": "span_task_tool",
+      "name": "run_integration_tests",
+      "attributes": {"tool_name": "terminal", "command": "pytest tests/integration -k checkout", "risk_level": "medium"},
+      "payload": {}
+    },
+    {
+      "event_id": "evt_tool_005",
+      "task_id": "task_tool_wait_001",
+      "timestamp": "2026-05-03T12:00:51.000Z",
+      "event_type": "tool_call_end",
+      "span_id": "span_tool_slow",
+      "parent_span_id": "span_task_tool",
+      "name": "run_integration_tests_end",
+      "attributes": {"latency_ms": 45000, "status": "failed", "exit_code": 1},
+      "payload": {"stderr_preview": "checkout integration timed out"}
+    },
+    {
+      "event_id": "evt_tool_006",
+      "task_id": "task_tool_wait_001",
+      "timestamp": "2026-05-03T12:00:53.000Z",
+      "event_type": "error_event",
+      "span_id": "span_error_tool",
+      "parent_span_id": "span_task_tool",
+      "name": "test_timeout",
+      "attributes": {"error_type": "tool_failure", "message": "pytest timed out", "recoverable": true},
+      "payload": {}
+    },
+    {
+      "event_id": "evt_tool_007",
+      "task_id": "task_tool_wait_001",
+      "timestamp": "2026-05-03T12:01:00.000Z",
+      "event_type": "task_end",
+      "span_id": "span_task_tool",
+      "parent_span_id": null,
+      "name": "task_end",
+      "attributes": {},
+      "payload": {"status": "completed", "summary": "Identified checkout test timeout and recommended isolating external dependency."}
+    }
+  ]
+}

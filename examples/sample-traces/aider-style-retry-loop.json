@@ -1,0 +1,133 @@
+{
+  "project_id": "validation",
+  "task": {
+    "task_id": "task_aider_retry_validation_001",
+    "project_id": "validation",
+    "goal": "Fix cart tax bug after failed test feedback",
+    "agent_type": "aider",
+    "benchmark_name": "local-realworld-mini",
+    "benchmark_task_id": "cart-tax-001",
+    "repo_name": "tmp/v1-realworld-aider-demo",
+    "issue_id": "cart-tax",
+    "agent_name": "aider",
+    "baseline_or_optimized": "baseline",
+    "task_success": true,
+    "tests_passed": 3,
+    "tests_failed": 0,
+    "patch_generated": true,
+    "files_changed_count": 1,
+    "retry_count": 1
+  },
+  "events": [
+    {
+      "event_id": "evt_retry_001",
+      "task_id": "task_aider_retry_validation_001",
+      "timestamp": "2026-05-04T13:00:00.000Z",
+      "event_type": "task_start",
+      "span_id": "span_task_retry",
+      "parent_span_id": null,
+      "name": "task_start",
+      "attributes": {},
+      "payload": {"goal": "Fix cart tax bug after failed test feedback", "agent_type": "aider"}
+    },
+    {
+      "event_id": "evt_retry_002",
+      "task_id": "task_aider_retry_validation_001",
+      "timestamp": "2026-05-04T13:00:01.000Z",
+      "event_type": "tool_call_start",
+      "span_id": "span_tool_retry_1",
+      "parent_span_id": "span_task_retry",
+      "name": "run_tests",
+      "attributes": {"tool_name": "terminal", "command": "pytest tests -q", "risk_level": "low"},
+      "payload": {}
+    },
+    {
+      "event_id": "evt_retry_003",
+      "task_id": "task_aider_retry_validation_001",
+      "timestamp": "2026-05-04T13:00:04.000Z",
+      "event_type": "tool_call_end",
+      "span_id": "span_tool_retry_1",
+      "parent_span_id": "span_task_retry",
+      "name": "run_tests_end",
+      "attributes": {"latency_ms": 3000, "status": "failed", "exit_code": 1},
+      "payload": {"stdout_preview": "1 failed, 2 passed"}
+    },
+    {
+      "event_id": "evt_retry_004",
+      "task_id": "task_aider_retry_validation_001",
+      "timestamp": "2026-05-04T13:00:05.000Z",
+      "event_type": "error_event",
+      "span_id": "span_error_retry_1",
+      "parent_span_id": "span_task_retry",
+      "name": "failed_test_feedback",
+      "attributes": {"error_type": "test_failure", "message": "total_with_tax returned 35 instead of 27.5", "recoverable": true},
+      "payload": {}
+    },
+    {
+      "event_id": "evt_retry_005",
+      "task_id": "task_aider_retry_validation_001",
+      "timestamp": "2026-05-04T13:00:06.000Z",
+      "event_type": "model_call_start",
+      "span_id": "span_model_retry_1",
+      "parent_span_id": "span_task_retry",
+      "name": "aider_model_call",
+      "attributes": {"model": "gpt-4o-mini", "role": "coding_agent", "estimated_input_tokens": 1100, "expected_output_tokens": 145},
+      "payload": {}
+    },
+    {
+      "event_id": "evt_retry_006",
+      "task_id": "task_aider_retry_validation_001",
+      "timestamp": "2026-05-04T13:00:15.000Z",
+      "event_type": "model_call_end",
+      "span_id": "span_model_retry_1",
+      "parent_span_id": "span_task_retry",
+      "name": "aider_model_call_end",
+      "attributes": {"input_tokens": 1100, "output_tokens": 145, "latency_ms": 9000, "cost_dollars": 0.00026, "status": "success"},
+      "payload": {}
+    },
+    {
+      "event_id": "evt_retry_007",
+      "task_id": "task_aider_retry_validation_001",
+      "timestamp": "2026-05-04T13:00:16.000Z",
+      "event_type": "file_event",
+      "span_id": "span_file_retry_1",
+      "parent_span_id": "span_task_retry",
+      "name": "aider_file_change",
+      "attributes": {"operation": "write", "path": "cart.py", "bytes": 260, "content_stored": false},
+      "payload": {}
+    },
+    {
+      "event_id": "evt_retry_008",
+      "task_id": "task_aider_retry_validation_001",
+      "timestamp": "2026-05-04T13:00:17.000Z",
+      "event_type": "tool_call_start",
+      "span_id": "span_tool_retry_2",
+      "parent_span_id": "span_task_retry",
+      "name": "run_tests_retry",
+      "attributes": {"tool_name": "terminal", "command": "pytest tests -q", "risk_level": "low"},
+      "payload": {}
+    },
+    {
+      "event_id": "evt_retry_009",
+      "task_id": "task_aider_retry_validation_001",
+      "timestamp": "2026-05-04T13:00:20.000Z",
+      "event_type": "tool_call_end",
+      "span_id": "span_tool_retry_2",
+      "parent_span_id": "span_task_retry",
+      "name": "run_tests_retry_end",
+      "attributes": {"latency_ms": 3000, "status": "success", "exit_code": 0},
+      "payload": {"stdout_preview": "3 passed"}
+    },
+    {
+      "event_id": "evt_retry_010",
+      "task_id": "task_aider_retry_validation_001",
+      "timestamp": "2026-05-04T13:00:21.000Z",
+      "event_type": "task_end",
+      "span_id": "span_task_retry",
+      "parent_span_id": null,
+      "name": "task_end",
+      "attributes": {},
+      "payload": {"status": "completed", "summary": "Failed test feedback led to a patch and passing retry."}
+    }
+  ]
+}

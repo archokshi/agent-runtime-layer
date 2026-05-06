@@ -1,0 +1,48 @@
+# Environment and local secrets
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+pytest-cache-files-*/
+**/pytest-cache-files-*/
+.coverage
+htmlcov/
+
+# Node / Next.js
+frontend/.next/
+frontend/node_modules/
+frontend/.turbo/
+npm-debug.log*
+
+# Local runtime data
+.agent-runtime/
+data/
+backend/data/
+*.sqlite3
+*.db
+*.log
+tmp/
+test-artifacts/
+packages/sdk-python/.agent-runtime/
+packages/sdk-python/test-artifacts/
+packages/sdk-python/pytest-cache-files-*/
+
+# Internal planning and assistant-only materials
+AGENTS.md
+README_FOR_CODEX.md
+docs/MASTER_PROMPT_CODEX.md
+docs/PHASE_PROMPTS.md
+docs/CODEX_POST_V1_PROMPTS.md
+docs/POST_V1_TECHNICAL_ROADMAP_SUMMARY.md
+docs/*.docx
+docs/mockups/
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/

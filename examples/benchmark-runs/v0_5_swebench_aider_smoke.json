@@ -1,0 +1,51 @@
+{
+  "suite_name": "swe-bench-lite",
+  "suite_version": "smoke-0",
+  "agent_name": "aider",
+  "agent_version": "local-adapter",
+  "run_mode": "smoke",
+  "source": "local imported benchmark smoke record",
+  "task_results": [
+    {
+      "benchmark_task_id": "django__django-0001",
+      "repo_name": "django/django",
+      "issue_id": "0001",
+      "task_id": "task_swebench_smoke_001",
+      "trace_complete": true,
+      "task_success": true,
+      "tests_passed": 3,
+      "tests_failed": 0,
+      "patch_generated": true,
+      "model_call_count": 2,
+      "tool_call_count": 4,
+      "retry_count": 1,
+      "total_cost_dollars": 0.0123,
+      "duration_seconds": 92.0,
+      "top_bottleneck": "Tool Wait",
+      "actionable_recommendation": true,
+      "notes": "Smoke fixture for validating benchmark record ingestion."
+    },
+    {
+      "benchmark_task_id": "sympy__sympy-0002",
+      "repo_name": "sympy/sympy",
+      "issue_id": "0002",
+      "trace_complete": false,
+      "task_success": false,
+      "tests_passed": 0,
+      "tests_failed": 1,
+      "patch_generated": false,
+      "model_call_count": 1,
+      "tool_call_count": 2,
+      "retry_count": 2,
+      "total_cost_dollars": 0.004,
+      "duration_seconds": 55.0,
+      "top_bottleneck": "Retry Loop",
+      "actionable_recommendation": true,
+      "notes": "Incomplete trace included to prove trace completion rate calculation."
+    }
+  ],
+  "limitations": [
+    "Smoke record only; not an official SWE-bench score.",
+    "Does not prove broad benchmark performance."
+  ]
+}

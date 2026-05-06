@@ -1,0 +1,294 @@
+{
+  "project_id": "demo",
+  "task": {
+    "task_id": "task_golden_coding_agent_demo",
+    "project_id": "demo",
+    "goal": "Golden demo: fix checkout tax calculation",
+    "agent_type": "coding_agent",
+    "budget_dollars": 1.0,
+    "latency_slo_seconds": 180,
+    "priority": "foreground",
+    "benchmark_name": "golden-demo",
+    "benchmark_task_id": "checkout-tax-001",
+    "repo_name": "local/shop-demo",
+    "issue_id": "checkout-tax-rounding",
+    "agent_name": "sample-coding-agent",
+    "baseline_or_optimized": "baseline",
+    "task_success": true,
+    "tests_passed": 8,
+    "tests_failed": 0,
+    "patch_generated": true,
+    "files_changed_count": 1,
+    "retry_count": 1,
+    "before_after_pair_id": "pair_golden_demo_001"
+  },
+  "events": [
+    {
+      "event_id": "golden_evt_001",
+      "task_id": "task_golden_coding_agent_demo",
+      "timestamp": "2026-05-05T16:00:00.000Z",
+      "event_type": "task_start",
+      "span_id": "golden_span_task",
+      "parent_span_id": null,
+      "name": "task_start",
+      "attributes": {},
+      "payload": {
+        "goal": "Fix checkout tax calculation and pass the related tests.",
+        "agent_type": "coding_agent"
+      }
+    },
+    {
+      "event_id": "golden_evt_002",
+      "task_id": "task_golden_coding_agent_demo",
+      "timestamp": "2026-05-05T16:00:01.000Z",
+      "event_type": "context_snapshot",
+      "span_id": "golden_span_context_1",
+      "parent_span_id": "golden_span_task",
+      "name": "stable_repo_tool_context",
+      "attributes": {
+        "context_id": "golden_context_stable_1",
+        "context_hash": "sha256:golden-stable-repo-tools-v1",
+        "context_kind": "system_prompt_tool_schema_repo_summary",
+        "size_tokens": 18000,
+        "repeated_tokens_estimate": 0,
+        "text": "system prompt plus tool schema plus repo summary for the checkout service"
+      },
+      "payload": {}
+    },
+    {
+      "event_id": "golden_evt_003",
+      "task_id": "task_golden_coding_agent_demo",
+      "timestamp": "2026-05-05T16:00:02.000Z",
+      "event_type": "model_call_start",
+      "span_id": "golden_span_model_plan",
+      "parent_span_id": "golden_span_task",
+      "name": "planner_model_call",
+      "attributes": {
+        "model": "demo-model",
+        "role": "planner",
+        "estimated_input_tokens": 21000,
+        "expected_output_tokens": 700,
+        "prompt_hash": "sha256:golden-plan-prompt"
+      },
+      "payload": {}
+    },
+    {
+      "event_id": "golden_evt_004",
+      "task_id": "task_golden_coding_agent_demo",
+      "timestamp": "2026-05-05T16:00:10.000Z",
+      "event_type": "model_call_end",
+      "span_id": "golden_span_model_plan",
+      "parent_span_id": "golden_span_task",
+      "name": "planner_model_call_end",
+      "attributes": {
+        "input_tokens": 21000,
+        "output_tokens": 680,
+        "latency_ms": 8000,
+        "cost_dollars": 0.064,
+        "status": "success"
+      },
+      "payload": {
+        "summary": "The checkout tax failure likely comes from rounding before quantity multiplication."
+      }
+    },
+    {
+      "event_id": "golden_evt_005",
+      "task_id": "task_golden_coding_agent_demo",
+      "timestamp": "2026-05-05T16:00:11.000Z",
+      "event_type": "tool_call_start",
+      "span_id": "golden_span_tool_test_1",
+      "parent_span_id": "golden_span_task",
+      "name": "run_checkout_tests",
+      "attributes": {
+        "tool_name": "terminal",
+        "command": "npm test -- checkout.test.ts",
+        "risk_level": "low"
+      },
+      "payload": {}
+    },
+    {
+      "event_id": "golden_evt_006",
+      "task_id": "task_golden_coding_agent_demo",
+      "timestamp": "2026-05-05T16:00:35.000Z",
+      "event_type": "tool_call_end",
+      "span_id": "golden_span_tool_test_1",
+      "parent_span_id": "golden_span_task",
+      "name": "run_checkout_tests_end",
+      "attributes": {
+        "latency_ms": 24000,
+        "status": "failed",
+        "exit_code": 1
+      },
+      "payload": {
+        "stderr_preview": "Expected checkout tax total 8.64 but received 8.63"
+      }
+    },
+    {
+      "event_id": "golden_evt_007",
+      "task_id": "task_golden_coding_agent_demo",
+      "timestamp": "2026-05-05T16:00:36.000Z",
+      "event_type": "terminal_event",
+      "span_id": "golden_span_terminal_1",
+      "parent_span_id": "golden_span_tool_test_1",
+      "name": "checkout_test_failure",
+      "attributes": {
+        "stream": "stderr",
+        "line_count": 12
+      },
+      "payload": {
+        "preview": "checkout.test.ts failed because tax rounding happened per line item before the cart total was calculated."
+      }
+    },
+    {
+      "event_id": "golden_evt_008",
+      "task_id": "task_golden_coding_agent_demo",
+      "timestamp": "2026-05-05T16:00:37.000Z",
+      "event_type": "context_snapshot",
+      "span_id": "golden_span_context_2",
+      "parent_span_id": "golden_span_task",
+      "name": "stable_repo_tool_context",
+      "attributes": {
+        "context_id": "golden_context_stable_2",
+        "context_hash": "sha256:golden-stable-repo-tools-v1",
+        "context_kind": "system_prompt_tool_schema_repo_summary",
+        "size_tokens": 18000,
+        "repeated_tokens_estimate": 18000,
+        "text": "system prompt plus tool schema plus repo summary for the checkout service"
+      },
+      "payload": {}
+    },
+    {
+      "event_id": "golden_evt_009",
+      "task_id": "task_golden_coding_agent_demo",
+      "timestamp": "2026-05-05T16:00:38.000Z",
+      "event_type": "context_snapshot",
+      "span_id": "golden_span_context_dynamic",
+      "parent_span_id": "golden_span_task",
+      "name": "latest_test_error",
+      "attributes": {
+        "context_id": "golden_context_dynamic_error",
+        "context_kind": "latest_test_error",
+        "size_tokens": 2400,
+        "repeated_tokens_estimate": 0,
+        "text": "latest failing checkout test output, current instruction, and relevant stack trace"
+      },
+      "payload": {}
+    },
+    {
+      "event_id": "golden_evt_010",
+      "task_id": "task_golden_coding_agent_demo",
+      "timestamp": "2026-05-05T16:00:39.000Z",
+      "event_type": "cache_event",
+      "span_id": "golden_span_cache",
+      "parent_span_id": "golden_span_task",
+      "name": "prefix_reuse_opportunity",
+      "attributes": {
+        "cache_kind": "prefix_or_context_estimate",
+        "cache_hit": false,
+        "reusable_tokens_estimate": 18000,
+        "reuse_reason": "system prompt, tool schema, and repo summary are repeated before the repair call"
+      },
+      "payload": {}
+    },
+    {
+      "event_id": "golden_evt_011",
+      "task_id": "task_golden_coding_agent_demo",
+      "timestamp": "2026-05-05T16:00:40.000Z",
+      "event_type": "model_call_start",
+      "span_id": "golden_span_model_repair",
+      "parent_span_id": "golden_span_task",
+      "name": "repair_model_call",
+      "attributes": {
+        "model": "demo-model",
+        "role": "repair",
+        "estimated_input_tokens": 24000,
+        "expected_output_tokens": 600,
+        "prompt_hash": "sha256:golden-repair-prompt"
+      },
+      "payload": {}
+    },
+    {
+      "event_id": "golden_evt_012",
+      "task_id": "task_golden_coding_agent_demo",
+      "timestamp": "2026-05-05T16:00:50.000Z",
+      "event_type": "model_call_end",
+      "span_id": "golden_span_model_repair",
+      "parent_span_id": "golden_span_task",
+      "name": "repair_model_call_end",
+      "attributes": {
+        "input_tokens": 24000,
+        "output_tokens": 560,
+        "latency_ms": 10000,
+        "cost_dollars": 0.073,
+        "status": "success"
+      },
+      "payload": {
+        "summary": "Move rounding to the final cart tax total and keep line item math in cents."
+      }
+    },
+    {
+      "event_id": "golden_evt_013",
+      "task_id": "task_golden_coding_agent_demo",
+      "timestamp": "2026-05-05T16:00:51.000Z",
+      "event_type": "file_event",
+      "span_id": "golden_span_file_1",
+      "parent_span_id": "golden_span_task",
+      "name": "write_checkout_tax_fix",
+      "attributes": {
+        "operation": "write",
+        "path": "src/checkout/tax.ts",
+        "bytes": 1840,
+        "content_stored": false
+      },
+      "payload": {
+        "summary": "Changed tax rounding to occur after cart-level aggregation."
+      }
+    },
+    {
+      "event_id": "golden_evt_014",
+      "task_id": "task_golden_coding_agent_demo",
+      "timestamp": "2026-05-05T16:00:52.000Z",
+      "event_type": "tool_call_start",
+      "span_id": "golden_span_tool_test_2",
+      "parent_span_id": "golden_span_task",
+      "name": "rerun_checkout_tests",
+      "attributes": {
+        "tool_name": "terminal",
+        "command": "npm test -- checkout.test.ts",
+        "risk_level": "low"
+      },
+      "payload": {}
+    },
+    {
+      "event_id": "golden_evt_015",
+      "task_id": "task_golden_coding_agent_demo",
+      "timestamp": "2026-05-05T16:01:12.000Z",
+      "event_type": "tool_call_end",
+      "span_id": "golden_span_tool_test_2",
+      "parent_span_id": "golden_span_task",
+      "name": "rerun_checkout_tests_end",
+      "attributes": {
+        "latency_ms": 20000,
+        "status": "success",
+        "exit_code": 0
+      },
+      "payload": {
+        "stdout_preview": "8 passed"
+      }
+    },
+    {
+      "event_id": "golden_evt_016",
+      "task_id": "task_golden_coding_agent_demo",
+      "timestamp": "2026-05-05T16:01:14.000Z",
+      "event_type": "task_end",
+      "span_id": "golden_span_task",
+      "parent_span_id": null,
+      "name": "task_end",
+      "attributes": {},
+      "payload": {
+        "status": "completed",
+        "summary": "Fixed checkout tax rounding, changed one file, and confirmed checkout tests pass."
+      }
+    }
+  ]
+}

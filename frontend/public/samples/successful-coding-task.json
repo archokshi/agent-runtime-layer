@@ -1,0 +1,100 @@
+{
+  "project_id": "default",
+  "task": {
+    "task_id": "task_success_001",
+    "goal": "Add validation to settings form",
+    "agent_type": "coding_agent",
+    "budget_dollars": 0.5,
+    "latency_slo_seconds": 300
+  },
+  "events": [
+    {
+      "event_id": "evt_success_001",
+      "task_id": "task_success_001",
+      "timestamp": "2026-05-03T11:00:00.000Z",
+      "event_type": "task_start",
+      "span_id": "span_task_success",
+      "parent_span_id": null,
+      "name": "task_start",
+      "attributes": {},
+      "payload": {"goal": "Add validation to settings form", "agent_type": "coding_agent"}
+    },
+    {
+      "event_id": "evt_success_002",
+      "task_id": "task_success_001",
+      "timestamp": "2026-05-03T11:00:01.000Z",
+      "event_type": "context_snapshot",
+      "span_id": "span_ctx_success",
+      "parent_span_id": "span_task_success",
+      "name": "initial_context",
+      "attributes": {"context_id": "ctx_success", "size_tokens": 9000, "repeated_tokens_estimate": 800, "context_kind": "focused_files_plus_tests"},
+      "payload": {}
+    },
+    {
+      "event_id": "evt_success_003",
+      "task_id": "task_success_001",
+      "timestamp": "2026-05-03T11:00:02.000Z",
+      "event_type": "model_call_start",
+      "span_id": "span_model_success",
+      "parent_span_id": "span_task_success",
+      "name": "planner_executor_call",
+      "attributes": {"model": "gpt-5-codex", "role": "executor", "estimated_input_tokens": 9000, "expected_output_tokens": 500, "prompt_hash": "sha256:settings_form"},
+      "payload": {}
+    },
+    {
+      "event_id": "evt_success_004",
+      "task_id": "task_success_001",
+      "timestamp": "2026-05-03T11:00:05.100Z",
+      "event_type": "model_call_end",
+      "span_id": "span_model_success",
+      "parent_span_id": "span_task_success",
+      "name": "planner_executor_call_end",
+      "attributes": {"input_tokens": 9000, "output_tokens": 430, "latency_ms": 3100, "cost_dollars": 0.027, "status": "success"},
+      "payload": {}
+    },
+    {
+      "event_id": "evt_success_005",
+      "task_id": "task_success_001",
+      "timestamp": "2026-05-03T11:00:06.000Z",
+      "event_type": "file_event",
+      "span_id": "span_file_success",
+      "parent_span_id": "span_task_success",
+      "name": "write_settings_form",
+      "attributes": {"operation": "write", "path": "src/settings/Form.tsx", "bytes": 5214, "content_stored": false},
+      "payload": {}
+    },
+    {
+      "event_id": "evt_success_006",
+      "task_id": "task_success_001",
+      "timestamp": "2026-05-03T11:00:07.000Z",
+      "event_type": "tool_call_start",
+      "span_id": "span_tool_success",
+      "parent_span_id": "span_task_success",
+      "name": "run_unit_tests",
+      "attributes": {"tool_name": "terminal", "command": "npm test -- settings", "risk_level": "low"},
+      "payload": {}
+    },
+    {
+      "event_id": "evt_success_007",
+      "task_id": "task_success_001",
+      "timestamp": "2026-05-03T11:00:13.000Z",
+      "event_type": "tool_call_end",
+      "span_id": "span_tool_success",
+      "parent_span_id": "span_task_success",
+      "name": "run_unit_tests_end",
+      "attributes": {"latency_ms": 6000, "status": "success", "exit_code": 0},
+      "payload": {"stdout_preview": "settings tests passed"}
+    },
+    {
+      "event_id": "evt_success_008",
+      "task_id": "task_success_001",
+      "timestamp": "2026-05-03T11:00:15.000Z",
+      "event_type": "task_end",
+      "span_id": "span_task_success",
+      "parent_span_id": null,
+      "name": "task_end",
+      "attributes": {},
+      "payload": {"status": "completed", "summary": "Added validation and confirmed settings tests pass."}
+    }
+  ]
+}

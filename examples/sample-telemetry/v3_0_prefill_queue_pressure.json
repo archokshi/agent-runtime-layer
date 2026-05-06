@@ -1,0 +1,57 @@
+{
+  "task_id": "task_v1_5_repeated_context_baseline",
+  "samples": [
+    {
+      "sample_id": "hw_v30_001",
+      "task_id": "task_v1_5_repeated_context_baseline",
+      "timestamp": "2026-05-04T14:00:03.000Z",
+      "backend_id": "backend_a",
+      "gpu_utilization_percent": 91,
+      "cpu_utilization_percent": 64,
+      "gpu_memory_used_percent": 89,
+      "queue_depth": 5,
+      "prefill_ms": 4300,
+      "decode_ms": 700,
+      "kv_cache_hit_rate": 0.18
+    },
+    {
+      "sample_id": "hw_v30_002",
+      "task_id": "task_v1_5_repeated_context_baseline",
+      "timestamp": "2026-05-04T14:00:07.000Z",
+      "backend_id": "backend_a",
+      "gpu_utilization_percent": 94,
+      "cpu_utilization_percent": 68,
+      "gpu_memory_used_percent": 91,
+      "queue_depth": 6,
+      "prefill_ms": 4600,
+      "decode_ms": 760,
+      "kv_cache_hit_rate": 0.16
+    },
+    {
+      "sample_id": "hw_v30_003",
+      "task_id": "task_v1_5_repeated_context_baseline",
+      "timestamp": "2026-05-04T14:00:15.000Z",
+      "backend_id": "backend_a",
+      "gpu_utilization_percent": 88,
+      "cpu_utilization_percent": 61,
+      "gpu_memory_used_percent": 87,
+      "queue_depth": 4,
+      "prefill_ms": 3900,
+      "decode_ms": 680,
+      "kv_cache_hit_rate": 0.22
+    },
+    {
+      "sample_id": "hw_v30_004",
+      "task_id": "task_v1_5_repeated_context_baseline",
+      "timestamp": "2026-05-04T14:00:18.000Z",
+      "backend_id": "backend_a",
+      "gpu_utilization_percent": 90,
+      "cpu_utilization_percent": 63,
+      "gpu_memory_used_percent": 90,
+      "queue_depth": 5,
+      "prefill_ms": 4100,
+      "decode_ms": 720,
+      "kv_cache_hit_rate": 0.19
+    }
+  ]
+}

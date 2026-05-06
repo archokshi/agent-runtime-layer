@@ -1,0 +1,134 @@
+{
+  "project_id": "validation",
+  "task": {
+    "task_id": "task_swebench_baseline_001",
+    "project_id": "validation",
+    "goal": "Fix Django-style query validation issue",
+    "agent_type": "coding_agent",
+    "benchmark_name": "swebench-lite-mini",
+    "benchmark_task_id": "django__django-0001",
+    "repo_name": "django/django",
+    "issue_id": "0001",
+    "agent_name": "custom-langgraph-agent",
+    "baseline_or_optimized": "baseline",
+    "task_success": true,
+    "tests_passed": 42,
+    "tests_failed": 0,
+    "patch_generated": true,
+    "files_changed_count": 2,
+    "retry_count": 1,
+    "before_after_pair_id": "pair_swebench_001"
+  },
+  "events": [
+    {
+      "event_id": "evt_base_001",
+      "task_id": "task_swebench_baseline_001",
+      "timestamp": "2026-05-04T12:00:00.000Z",
+      "event_type": "task_start",
+      "span_id": "span_task_base",
+      "parent_span_id": null,
+      "name": "task_start",
+      "attributes": {},
+      "payload": {"goal": "Fix Django-style query validation issue", "agent_type": "coding_agent"}
+    },
+    {
+      "event_id": "evt_base_002",
+      "task_id": "task_swebench_baseline_001",
+      "timestamp": "2026-05-04T12:00:01.000Z",
+      "event_type": "context_snapshot",
+      "span_id": "span_context_base_1",
+      "parent_span_id": "span_task_base",
+      "name": "initial_context",
+      "attributes": {"context_id": "ctx_base_1", "size_tokens": 18000, "repeated_tokens_estimate": 8000, "context_kind": "repo_summary_issue_tool_schema"},
+      "payload": {}
+    },
+    {
+      "event_id": "evt_base_003",
+      "task_id": "task_swebench_baseline_001",
+      "timestamp": "2026-05-04T12:00:02.000Z",
+      "event_type": "model_call_start",
+      "span_id": "span_model_base_1",
+      "parent_span_id": "span_task_base",
+      "name": "planner_model_call",
+      "attributes": {"model": "gpt-4o-mini", "role": "planner", "estimated_input_tokens": 18000, "expected_output_tokens": 700},
+      "payload": {}
+    },
+    {
+      "event_id": "evt_base_004",
+      "task_id": "task_swebench_baseline_001",
+      "timestamp": "2026-05-04T12:00:10.000Z",
+      "event_type": "model_call_end",
+      "span_id": "span_model_base_1",
+      "parent_span_id": "span_task_base",
+      "name": "planner_model_call_end",
+      "attributes": {"input_tokens": 18000, "output_tokens": 700, "latency_ms": 8000, "cost_dollars": 0.034, "status": "success"},
+      "payload": {}
+    },
+    {
+      "event_id": "evt_base_005",
+      "task_id": "task_swebench_baseline_001",
+      "timestamp": "2026-05-04T12:00:11.000Z",
+      "event_type": "tool_call_start",
+      "span_id": "span_tool_base_1",
+      "parent_span_id": "span_task_base",
+      "name": "run_tests",
+      "attributes": {"tool_name": "terminal", "command": "pytest tests/queries/test_validation.py", "risk_level": "medium"},
+      "payload": {}
+    },
+    {
+      "event_id": "evt_base_006",
+      "task_id": "task_swebench_baseline_001",
+      "timestamp": "2026-05-04T12:00:31.000Z",
+      "event_type": "tool_call_end",
+      "span_id": "span_tool_base_1",
+      "parent_span_id": "span_task_base",
+      "name": "run_tests_end",
+      "attributes": {"latency_ms": 20000, "status": "failed", "exit_code": 1},
+      "payload": {}
+    },
+    {
+      "event_id": "evt_base_007",
+      "task_id": "task_swebench_baseline_001",
+      "timestamp": "2026-05-04T12:00:32.000Z",
+      "event_type": "model_call_start",
+      "span_id": "span_model_base_2",
+      "parent_span_id": "span_task_base",
+      "name": "repair_model_call",
+      "attributes": {"model": "gpt-4o-mini", "role": "repair", "estimated_input_tokens": 16000, "expected_output_tokens": 500},
+      "payload": {}
+    },
+    {
+      "event_id": "evt_base_008",
+      "task_id": "task_swebench_baseline_001",
+      "timestamp": "2026-05-04T12:00:39.000Z",
+      "event_type": "model_call_end",
+      "span_id": "span_model_base_2",
+      "parent_span_id": "span_task_base",
+      "name": "repair_model_call_end",
+      "attributes": {"input_tokens": 16000, "output_tokens": 500, "latency_ms": 7000, "cost_dollars": 0.026, "status": "success"},
+      "payload": {}
+    },
+    {
+      "event_id": "evt_base_009",
+      "task_id": "task_swebench_baseline_001",
+      "timestamp": "2026-05-04T12:00:40.000Z",
+      "event_type": "file_event",
+      "span_id": "span_file_base_1",
+      "parent_span_id": "span_task_base",
+      "name": "patch_generated",
+      "attributes": {"operation": "write", "path": "django/db/models/sql/query.py", "bytes": 4200, "content_stored": false},
+      "payload": {}
+    },
+    {
+      "event_id": "evt_base_010",
+      "task_id": "task_swebench_baseline_001",
+      "timestamp": "2026-05-04T12:00:45.000Z",
+      "event_type": "task_end",
+      "span_id": "span_task_base",
+      "parent_span_id": null,
+      "name": "task_end",
+      "attributes": {},
+      "payload": {"status": "completed", "summary": "Patch generated and validation tests pass after one failed attempt."}
+    }
+  ]
+}

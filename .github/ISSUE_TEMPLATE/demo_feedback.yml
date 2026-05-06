@@ -1,0 +1,23 @@
+name: Demo feedback
+description: Share feedback on the golden demo or first-run experience
+title: "[Demo]: "
+labels: ["demo", "feedback"]
+body:
+  - type: textarea
+    id: experience
+    attributes:
+      label: What did you try?
+      description: Tell us what happened when you ran the demo.
+    validations:
+      required: true
+  - type: textarea
+    id: confusing
+    attributes:
+      label: What was confusing?
+      description: Where did the product or docs lose you?
+  - type: textarea
+    id: valuable
+    attributes:
+      label: What felt valuable?
+      description: Which result, page, or metric helped you most?
+

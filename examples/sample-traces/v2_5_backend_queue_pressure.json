@@ -1,0 +1,112 @@
+{
+  "project_id": "validation",
+  "task": {
+    "task_id": "task_v2_5_backend_queue_pressure",
+    "project_id": "validation",
+    "goal": "Backend queue pressure validation",
+    "agent_type": "custom_agent",
+    "benchmark_name": "v2.5-controlled",
+    "benchmark_task_id": "backend-queue-001",
+    "agent_name": "backend-aware-validation-agent",
+    "task_success": true,
+    "tests_passed": 2,
+    "tests_failed": 0,
+    "patch_generated": true,
+    "files_changed_count": 1,
+    "retry_count": 0
+  },
+  "events": [
+    {
+      "event_id": "evt_v25_queue_001",
+      "task_id": "task_v2_5_backend_queue_pressure",
+      "timestamp": "2026-05-04T17:00:00.000Z",
+      "event_type": "task_start",
+      "span_id": "span_task_v25_queue",
+      "parent_span_id": null,
+      "name": "task_start",
+      "attributes": {},
+      "payload": {
+        "goal": "Backend queue pressure validation"
+      }
+    },
+    {
+      "event_id": "evt_v25_queue_002",
+      "task_id": "task_v2_5_backend_queue_pressure",
+      "timestamp": "2026-05-04T17:00:01.000Z",
+      "event_type": "model_call_start",
+      "span_id": "span_model_v25_queue_1",
+      "parent_span_id": "span_task_v25_queue",
+      "name": "planner_model_call",
+      "attributes": {
+        "model": "gpt-4o-mini",
+        "role": "planner",
+        "estimated_input_tokens": 1200,
+        "expected_output_tokens": 350,
+        "backend_queue_depth": 7,
+        "backend_id": "local_default"
+      },
+      "payload": {}
+    },
+    {
+      "event_id": "evt_v25_queue_003",
+      "task_id": "task_v2_5_backend_queue_pressure",
+      "timestamp": "2026-05-04T17:00:07.000Z",
+      "event_type": "model_call_end",
+      "span_id": "span_model_v25_queue_1",
+      "parent_span_id": "span_task_v25_queue",
+      "name": "planner_model_call_end",
+      "attributes": {
+        "input_tokens": 1200,
+        "output_tokens": 350,
+        "latency_ms": 6000,
+        "cost_dollars": 0.001,
+        "backend_queue_depth": 7,
+        "status": "success"
+      },
+      "payload": {}
+    },
+    {
+      "event_id": "evt_v25_queue_004",
+      "task_id": "task_v2_5_backend_queue_pressure",
+      "timestamp": "2026-05-04T17:00:08.000Z",
+      "event_type": "tool_call_start",
+      "span_id": "span_tool_v25_queue",
+      "parent_span_id": "span_task_v25_queue",
+      "name": "run_tests",
+      "attributes": {
+        "tool_name": "terminal",
+        "command": "pytest tests/test_backend_queue.py -q"
+      },
+      "payload": {}
+    },
+    {
+      "event_id": "evt_v25_queue_005",
+      "task_id": "task_v2_5_backend_queue_pressure",
+      "timestamp": "2026-05-04T17:00:10.000Z",
+      "event_type": "tool_call_end",
+      "span_id": "span_tool_v25_queue",
+      "parent_span_id": "span_task_v25_queue",
+      "name": "run_tests_end",
+      "attributes": {
+        "latency_ms": 2000,
+        "status": "success",
+        "exit_code": 0
+      },
+      "payload": {}
+    },
+    {
+      "event_id": "evt_v25_queue_006",
+      "task_id": "task_v2_5_backend_queue_pressure",
+      "timestamp": "2026-05-04T17:00:11.000Z",
+      "event_type": "task_end",
+      "span_id": "span_task_v25_queue",
+      "parent_span_id": null,
+      "name": "task_end",
+      "attributes": {},
+      "payload": {
+        "status": "completed",
+        "summary": "Queue pressure trace completed."
+      }
+    }
+  ]
+}

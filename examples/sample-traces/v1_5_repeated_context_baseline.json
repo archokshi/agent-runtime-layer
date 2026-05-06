@@ -1,0 +1,165 @@
+{
+  "project_id": "validation",
+  "task": {
+    "task_id": "task_v1_5_repeated_context_baseline",
+    "project_id": "validation",
+    "goal": "Controlled repeated-context optimization baseline",
+    "agent_type": "custom_agent",
+    "benchmark_name": "v1.5-controlled",
+    "benchmark_task_id": "repeated-context-001",
+    "repo_name": "local/demo",
+    "issue_id": "context-001",
+    "agent_name": "sdk-controlled-agent",
+    "baseline_or_optimized": "baseline",
+    "task_success": true,
+    "tests_passed": 6,
+    "tests_failed": 0,
+    "patch_generated": true,
+    "files_changed_count": 1,
+    "retry_count": 0,
+    "before_after_pair_id": "pair_v1_5_context_001"
+  },
+  "events": [
+    {
+      "event_id": "evt_v15_001",
+      "task_id": "task_v1_5_repeated_context_baseline",
+      "timestamp": "2026-05-04T14:00:00.000Z",
+      "event_type": "task_start",
+      "span_id": "span_task_v15",
+      "parent_span_id": null,
+      "name": "task_start",
+      "attributes": {},
+      "payload": {"goal": "Controlled repeated-context optimization baseline", "agent_type": "custom_agent"}
+    },
+    {
+      "event_id": "evt_v15_002",
+      "task_id": "task_v1_5_repeated_context_baseline",
+      "timestamp": "2026-05-04T14:00:01.000Z",
+      "event_type": "context_snapshot",
+      "span_id": "span_ctx_v15_1",
+      "parent_span_id": "span_task_v15",
+      "name": "stable_system_prompt",
+      "attributes": {
+        "context_id": "ctx_v15_system_1",
+        "context_hash": "sha256:stable-system-tool-repo",
+        "context_kind": "system_prompt_tool_schema_repo_summary",
+        "size_tokens": 12000,
+        "repeated_tokens_estimate": 0,
+        "text": "system prompt plus tool schema plus repo summary"
+      },
+      "payload": {}
+    },
+    {
+      "event_id": "evt_v15_003",
+      "task_id": "task_v1_5_repeated_context_baseline",
+      "timestamp": "2026-05-04T14:00:02.000Z",
+      "event_type": "model_call_start",
+      "span_id": "span_model_v15_1",
+      "parent_span_id": "span_task_v15",
+      "name": "planner_model_call",
+      "attributes": {"model": "gpt-4o-mini", "role": "planner", "estimated_input_tokens": 20000, "expected_output_tokens": 700, "prompt_hash": "sha256:planner-baseline"},
+      "payload": {}
+    },
+    {
+      "event_id": "evt_v15_004",
+      "task_id": "task_v1_5_repeated_context_baseline",
+      "timestamp": "2026-05-04T14:00:10.000Z",
+      "event_type": "model_call_end",
+      "span_id": "span_model_v15_1",
+      "parent_span_id": "span_task_v15",
+      "name": "planner_model_call_end",
+      "attributes": {"input_tokens": 20000, "output_tokens": 700, "latency_ms": 8000, "cost_dollars": 0.0615, "status": "success"},
+      "payload": {}
+    },
+    {
+      "event_id": "evt_v15_005",
+      "task_id": "task_v1_5_repeated_context_baseline",
+      "timestamp": "2026-05-04T14:00:11.000Z",
+      "event_type": "context_snapshot",
+      "span_id": "span_ctx_v15_2",
+      "parent_span_id": "span_task_v15",
+      "name": "stable_system_prompt",
+      "attributes": {
+        "context_id": "ctx_v15_system_2",
+        "context_hash": "sha256:stable-system-tool-repo",
+        "context_kind": "system_prompt_tool_schema_repo_summary",
+        "size_tokens": 12000,
+        "repeated_tokens_estimate": 12000,
+        "text": "system prompt plus tool schema plus repo summary"
+      },
+      "payload": {}
+    },
+    {
+      "event_id": "evt_v15_006",
+      "task_id": "task_v1_5_repeated_context_baseline",
+      "timestamp": "2026-05-04T14:00:12.000Z",
+      "event_type": "context_snapshot",
+      "span_id": "span_ctx_v15_dynamic",
+      "parent_span_id": "span_task_v15",
+      "name": "latest_test_error",
+      "attributes": {
+        "context_id": "ctx_v15_error",
+        "context_kind": "latest_test_error",
+        "size_tokens": 2000,
+        "repeated_tokens_estimate": 0,
+        "text": "latest failing test output and current instruction"
+      },
+      "payload": {}
+    },
+    {
+      "event_id": "evt_v15_007",
+      "task_id": "task_v1_5_repeated_context_baseline",
+      "timestamp": "2026-05-04T14:00:13.000Z",
+      "event_type": "model_call_start",
+      "span_id": "span_model_v15_2",
+      "parent_span_id": "span_task_v15",
+      "name": "repair_model_call",
+      "attributes": {"model": "gpt-4o-mini", "role": "repair", "estimated_input_tokens": 20000, "expected_output_tokens": 500, "prompt_hash": "sha256:repair-baseline"},
+      "payload": {}
+    },
+    {
+      "event_id": "evt_v15_008",
+      "task_id": "task_v1_5_repeated_context_baseline",
+      "timestamp": "2026-05-04T14:00:20.000Z",
+      "event_type": "model_call_end",
+      "span_id": "span_model_v15_2",
+      "parent_span_id": "span_task_v15",
+      "name": "repair_model_call_end",
+      "attributes": {"input_tokens": 20000, "output_tokens": 500, "latency_ms": 7000, "cost_dollars": 0.0615, "status": "success"},
+      "payload": {}
+    },
+    {
+      "event_id": "evt_v15_009",
+      "task_id": "task_v1_5_repeated_context_baseline",
+      "timestamp": "2026-05-04T14:00:22.000Z",
+      "event_type": "tool_call_start",
+      "span_id": "span_tool_v15",
+      "parent_span_id": "span_task_v15",
+      "name": "run_tests",
+      "attributes": {"tool_name": "terminal", "command": "pytest tests -q", "risk_level": "low"},
+      "payload": {}
+    },
+    {
+      "event_id": "evt_v15_010",
+      "task_id": "task_v1_5_repeated_context_baseline",
+      "timestamp": "2026-05-04T14:00:28.000Z",
+      "event_type": "tool_call_end",
+      "span_id": "span_tool_v15",
+      "parent_span_id": "span_task_v15",
+      "name": "run_tests_end",
+      "attributes": {"latency_ms": 6000, "status": "success", "exit_code": 0},
+      "payload": {}
+    },
+    {
+      "event_id": "evt_v15_011",
+      "task_id": "task_v1_5_repeated_context_baseline",
+      "timestamp": "2026-05-04T14:00:30.000Z",
+      "event_type": "task_end",
+      "span_id": "span_task_v15",
+      "parent_span_id": null,
+      "name": "task_end",
+      "attributes": {},
+      "payload": {"status": "completed", "summary": "Controlled task succeeded with repeated stable context."}
+    }
+  ]
+}

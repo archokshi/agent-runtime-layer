@@ -1,0 +1,144 @@
+{
+  "project_id": "default",
+  "task": {
+    "task_id": "task_repeated_context_001",
+    "goal": "Fix the failing auth.test.ts test",
+    "agent_type": "coding_agent",
+    "budget_dollars": 1.0,
+    "latency_slo_seconds": 600
+  },
+  "events": [
+    {
+      "event_id": "evt_001",
+      "task_id": "task_repeated_context_001",
+      "timestamp": "2026-05-03T10:00:00.000Z",
+      "event_type": "task_start",
+      "span_id": "span_task_001",
+      "parent_span_id": null,
+      "name": "task_start",
+      "attributes": {},
+      "payload": {"goal": "Fix the failing auth.test.ts test", "agent_type": "coding_agent"}
+    },
+    {
+      "event_id": "evt_002",
+      "task_id": "task_repeated_context_001",
+      "timestamp": "2026-05-03T10:00:02.000Z",
+      "event_type": "context_snapshot",
+      "span_id": "span_ctx_001",
+      "parent_span_id": "span_task_001",
+      "name": "initial_context",
+      "attributes": {"context_id": "ctx_001", "size_tokens": 18000, "repeated_tokens_estimate": 0, "context_kind": "repo_summary_plus_tool_schema"},
+      "payload": {}
+    },
+    {
+      "event_id": "evt_003",
+      "task_id": "task_repeated_context_001",
+      "timestamp": "2026-05-03T10:00:03.000Z",
+      "event_type": "model_call_start",
+      "span_id": "span_model_001",
+      "parent_span_id": "span_task_001",
+      "name": "planner_model_call",
+      "attributes": {"model": "gpt-5-codex", "role": "planner", "estimated_input_tokens": 18000, "expected_output_tokens": 600, "prompt_hash": "sha256:repo_prompt_v1"},
+      "payload": {}
+    },
+    {
+      "event_id": "evt_004",
+      "task_id": "task_repeated_context_001",
+      "timestamp": "2026-05-03T10:00:07.200Z",
+      "event_type": "model_call_end",
+      "span_id": "span_model_001",
+      "parent_span_id": "span_task_001",
+      "name": "planner_model_call_end",
+      "attributes": {"input_tokens": 18000, "output_tokens": 520, "latency_ms": 4200, "cost_dollars": 0.052, "status": "success"},
+      "payload": {}
+    },
+    {
+      "event_id": "evt_005",
+      "task_id": "task_repeated_context_001",
+      "timestamp": "2026-05-03T10:00:08.000Z",
+      "event_type": "tool_call_start",
+      "span_id": "span_tool_001",
+      "parent_span_id": "span_task_001",
+      "name": "run_tests",
+      "attributes": {"tool_name": "terminal", "command": "npm test -- auth.test.ts", "risk_level": "medium"},
+      "payload": {}
+    },
+    {
+      "event_id": "evt_006",
+      "task_id": "task_repeated_context_001",
+      "timestamp": "2026-05-03T10:00:28.000Z",
+      "event_type": "tool_call_end",
+      "span_id": "span_tool_001",
+      "parent_span_id": "span_task_001",
+      "name": "run_tests_end",
+      "attributes": {"latency_ms": 20000, "status": "failed", "exit_code": 1},
+      "payload": {"stderr_preview": "Expected token to equal refreshed token"}
+    },
+    {
+      "event_id": "evt_007",
+      "task_id": "task_repeated_context_001",
+      "timestamp": "2026-05-03T10:00:29.000Z",
+      "event_type": "context_snapshot",
+      "span_id": "span_ctx_002",
+      "parent_span_id": "span_task_001",
+      "name": "second_context",
+      "attributes": {"context_id": "ctx_002", "size_tokens": 22000, "repeated_tokens_estimate": 16000, "context_kind": "repo_summary_plus_tool_schema_plus_test_log"},
+      "payload": {}
+    },
+    {
+      "event_id": "evt_008",
+      "task_id": "task_repeated_context_001",
+      "timestamp": "2026-05-03T10:00:30.000Z",
+      "event_type": "cache_event",
+      "span_id": "span_cache_001",
+      "parent_span_id": "span_task_001",
+      "name": "prefix_reuse_opportunity",
+      "attributes": {"cache_kind": "prefix_or_kv_estimate", "cache_hit": false, "reusable_tokens_estimate": 16000, "reuse_reason": "repo summary and tool schema repeated"},
+      "payload": {}
+    },
+    {
+      "event_id": "evt_009",
+      "task_id": "task_repeated_context_001",
+      "timestamp": "2026-05-03T10:00:31.000Z",
+      "event_type": "model_call_start",
+      "span_id": "span_model_002",
+      "parent_span_id": "span_task_001",
+      "name": "executor_model_call",
+      "attributes": {"model": "gpt-5-codex", "role": "executor", "estimated_input_tokens": 22000, "expected_output_tokens": 900, "prompt_hash": "sha256:repo_prompt_v1_plus_log"},
+      "payload": {}
+    },
+    {
+      "event_id": "evt_010",
+      "task_id": "task_repeated_context_001",
+      "timestamp": "2026-05-03T10:00:37.500Z",
+      "event_type": "model_call_end",
+      "span_id": "span_model_002",
+      "parent_span_id": "span_task_001",
+      "name": "executor_model_call_end",
+      "attributes": {"input_tokens": 22000, "output_tokens": 760, "latency_ms": 6500, "cost_dollars": 0.071, "status": "success"},
+      "payload": {}
+    },
+    {
+      "event_id": "evt_011",
+      "task_id": "task_repeated_context_001",
+      "timestamp": "2026-05-03T10:00:38.000Z",
+      "event_type": "file_event",
+      "span_id": "span_file_001",
+      "parent_span_id": "span_task_001",
+      "name": "write_auth_file",
+      "attributes": {"operation": "write", "path": "src/auth.ts", "bytes": 4021, "content_stored": false},
+      "payload": {}
+    },
+    {
+      "event_id": "evt_012",
+      "task_id": "task_repeated_context_001",
+      "timestamp": "2026-05-03T10:00:45.000Z",
+      "event_type": "task_end",
+      "span_id": "span_task_001",
+      "parent_span_id": null,
+      "name": "task_end",
+      "attributes": {},
+      "payload": {"status": "completed", "summary": "Updated token refresh parsing and fixed auth test."}
+    }
+  ]
+}
