@@ -46,3 +46,5 @@ docs/mockups/
 Thumbs.db
 .idea/
 .vscode/
+.edge-screenshot-profile/
+docs/assets/*-full.png
