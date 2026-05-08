@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 from uuid import uuid4
 
+import agent_runtime_layer.integrations.codex as codex_module
 from agent_runtime_layer.integrations.codex import (
     CODEX_HOOK_EVENTS,
     CodexHookCollector,
@@ -84,6 +85,31 @@ def test_global_install_status_and_uninstall_codex_hooks():
 
 
 def test_global_install_uses_source_tree_launcher_when_available():
+    home = artifact_dir()
+    repo = Path.cwd()
+    config_path = install_codex_hooks(
+        repo,
+        base_url="http://localhost:8000/api",
+        project_id="demo",
+        global_install=True,
+        home_dir=home,
+    )
+    config = json.loads(config_path.read_text(encoding="utf-8"))
+
+    command = config["hooks"]["UserPromptSubmit"][0]["hooks"][0]["command"]
+    assert "packages\\sdk-python" in command or "packages/sdk-python" in command
+    assert "-m agent_runtime_layer.cli" in command
+    assert "codex-hook" in command
+    if codex_module.is_windows():
+        assert "powershell.exe" in command
+        assert "--event 'UserPromptSubmit'" in command
+    else:
+        assert "PYTHONPATH=" in command
+        assert "--event UserPromptSubmit" in command
+
+
+def test_global_install_uses_windows_launcher_when_available(monkeypatch):
+    monkeypatch.setattr(codex_module, "is_windows", lambda: True)
     home = artifact_dir()
     repo = Path.cwd()
     config_path = install_codex_hooks(
