@@ -216,7 +216,6 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 - [Quickstart](docs/QUICKSTART.md)
 - [Architecture](docs/ARCHITECTURE.md)
-- [Agentium phase roadmap](docs/AGENTIUM_PHASE_ROADMAP.md)
 - [Codex Native Capture](docs/integrations/codex.md)
 - [Claude Code Native Capture](docs/integrations/claude-code.md)
 - [Cursor Agent Capture](docs/integrations/cursor.md)
