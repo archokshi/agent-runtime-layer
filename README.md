@@ -38,6 +38,46 @@ Open:
 http://localhost:3000
 ```
 
+## Use With Codex
+
+Install repo-local Codex hooks in the repository where you run Codex:
+
+```bash
+agent-runtime integrations install codex --repo .
+```
+
+Then run Codex normally. Agent Runtime Layer captures Codex hook events into the local dashboard when the backend is running.
+
+For live validation when project-local hooks are not loading, use global Codex hooks:
+
+```bash
+agent-runtime integrations install codex --global
+```
+
+If a Codex CLI mode does not fire hooks on your platform, import the completed Codex session JSONL after the run:
+
+```bash
+agent-runtime codex-session ~/.codex/sessions/YYYY/MM/DD/rollout-....jsonl --project codex-live --upload
+```
+
+See [Codex Native Capture](docs/integrations/codex.md) and the [Codex Validation Demo](docs/integrations/codex-validation-demo.md).
+
+## Use With Claude Code Or Cursor
+
+Claude Code:
+
+```bash
+agent-runtime integrations install claude-code --repo .
+```
+
+Cursor Agent:
+
+```bash
+cursor-agent --print --output-format stream-json | agent-runtime cursor-stream --repo .
+```
+
+See [Claude Code Native Capture](docs/integrations/claude-code.md) and [Cursor Agent Capture](docs/integrations/cursor.md).
+
 Backend docs:
 
 ```text
@@ -176,6 +216,10 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 - [Quickstart](docs/QUICKSTART.md)
 - [Architecture](docs/ARCHITECTURE.md)
+- [Agentium phase roadmap](docs/AGENTIUM_PHASE_ROADMAP.md)
+- [Codex Native Capture](docs/integrations/codex.md)
+- [Claude Code Native Capture](docs/integrations/claude-code.md)
+- [Cursor Agent Capture](docs/integrations/cursor.md)
 - [Limitations](docs/LIMITATIONS.md)
 - [API spec](docs/API_SPEC.md)
 - [Trace schema](docs/TRACE_SCHEMA.md)

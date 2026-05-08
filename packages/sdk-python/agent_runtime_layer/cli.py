@@ -1,10 +1,30 @@
 import argparse
 import json
+import sys
 from pathlib import Path
 
 from agent_runtime_layer.capture import capture_command
 from agent_runtime_layer.client import AgentRuntimeClient
 from agent_runtime_layer.integrations.aider import capture_aider
+from agent_runtime_layer.integrations.codex import (
+    capture_codex_session_jsonl,
+    codex_hook_status,
+    install_codex_hooks,
+    run_codex_hook,
+    uninstall_codex_hooks,
+)
+from agent_runtime_layer.integrations.claude_code import (
+    claude_hook_status,
+    install_claude_hooks,
+    run_claude_hook,
+    uninstall_claude_hooks,
+)
+from agent_runtime_layer.integrations.cursor_agent import (
+    cursor_capture_status,
+    install_cursor_capture,
+    run_cursor_stream,
+    uninstall_cursor_capture,
+)
 from agent_runtime_layer.otel import otel_to_trace, trace_to_otel
 
 
@@ -43,6 +63,38 @@ def main() -> None:
     aider_parser.add_argument("--capture-full-logs", action="store_true")
     aider_parser.add_argument("--trace-dir", default=".agent-runtime/traces")
     aider_parser.add_argument("wrapped_command", nargs=argparse.REMAINDER)
+    integrations_parser = subparsers.add_parser("integrations")
+    integrations_subparsers = integrations_parser.add_subparsers(dest="action", required=True)
+    for action in ("install", "uninstall", "status"):
+        action_parser = integrations_subparsers.add_parser(action)
+        action_subparsers = action_parser.add_subparsers(dest="integration", required=True)
+        codex_parser = action_subparsers.add_parser("codex")
+        codex_parser.add_argument("--repo", default=".")
+        codex_parser.add_argument("--project", default=None)
+        codex_parser.add_argument("--global", dest="global_install", action="store_true")
+        claude_parser = action_subparsers.add_parser("claude-code")
+        claude_parser.add_argument("--repo", default=".")
+        claude_parser.add_argument("--project", default=None)
+        cursor_parser = action_subparsers.add_parser("cursor")
+        cursor_parser.add_argument("--repo", default=".")
+        cursor_parser.add_argument("--project", default=None)
+    codex_hook_parser = subparsers.add_parser("codex-hook")
+    codex_hook_parser.add_argument("--event", required=True)
+    codex_hook_parser.add_argument("--repo", default=".")
+    codex_hook_parser.add_argument("--project", default=None)
+    codex_session_parser = subparsers.add_parser("codex-session")
+    codex_session_parser.add_argument("session_file")
+    codex_session_parser.add_argument("--project", default="default")
+    codex_session_parser.add_argument("--upload", action="store_true")
+    codex_session_parser.add_argument("--trace-dir", default=".agent-runtime/traces")
+    claude_hook_parser = subparsers.add_parser("claude-hook")
+    claude_hook_parser.add_argument("--event", required=True)
+    claude_hook_parser.add_argument("--repo", default=".")
+    claude_hook_parser.add_argument("--project", default=None)
+    cursor_stream_parser = subparsers.add_parser("cursor-stream")
+    cursor_stream_parser.add_argument("--repo", default=".")
+    cursor_stream_parser.add_argument("--project", default=None)
+    cursor_stream_parser.add_argument("--name", default=None)
     args = parser.parse_args()
 
     client = AgentRuntimeClient(args.base_url)
@@ -102,6 +154,103 @@ def main() -> None:
         print(f"Aider command exit code: {result.exit_code}")
         if result.uploaded:
             print(f"Uploaded {result.upload_response['event_count']} events for task {result.upload_response['task_id']}")
+    if args.command == "integrations" and args.integration == "codex":
+        repo_path = Path(args.repo)
+        if args.action == "install":
+            config_path = install_codex_hooks(
+                repo_path=repo_path,
+                base_url=args.base_url,
+                project_id=args.project,
+                global_install=args.global_install,
+            )
+            scope = "global" if args.global_install else "repo-local"
+            print(f"Installed {scope} Codex hooks at {config_path}")
+        if args.action == "uninstall":
+            config_path = uninstall_codex_hooks(repo_path=repo_path, global_install=args.global_install)
+            scope = "global" if args.global_install else "repo-local"
+            print(f"Removed Agent Runtime {scope} Codex hooks from {config_path}")
+        if args.action == "status":
+            status = codex_hook_status(repo_path=repo_path, global_install=args.global_install)
+            print(json.dumps(status, indent=2))
+    if args.command == "integrations" and args.integration == "claude-code":
+        repo_path = Path(args.repo)
+        if args.action == "install":
+            config_path = install_claude_hooks(repo_path=repo_path, base_url=args.base_url, project_id=args.project)
+            print(f"Installed Claude Code hooks at {config_path}")
+        if args.action == "uninstall":
+            config_path = uninstall_claude_hooks(repo_path=repo_path)
+            print(f"Removed Agent Runtime Claude Code hooks from {config_path}")
+        if args.action == "status":
+            status = claude_hook_status(repo_path=repo_path)
+            print(json.dumps(status, indent=2))
+    if args.command == "integrations" and args.integration == "cursor":
+        repo_path = Path(args.repo)
+        if args.action == "install":
+            config_path = install_cursor_capture(repo_path=repo_path, project_id=args.project)
+            print(f"Installed Cursor capture helper at {config_path}")
+            print("Run Cursor with: cursor-agent --print --output-format stream-json | agent-runtime cursor-stream")
+        if args.action == "uninstall":
+            config_path = uninstall_cursor_capture(repo_path=repo_path)
+            print(f"Removed Agent Runtime Cursor capture helper from {config_path}")
+        if args.action == "status":
+            status = cursor_capture_status(repo_path=repo_path)
+            print(json.dumps(status, indent=2))
+    if args.command == "codex-hook":
+        result = run_codex_hook(
+            event_name=args.event,
+            repo_path=Path(args.repo),
+            base_url=args.base_url,
+            project_id=args.project,
+        )
+        if result.reason:
+            print(f"Agent Runtime Codex hook skipped: {result.reason}", file=sys.stderr)
+        else:
+            print(
+                f"Agent Runtime Codex hook handled {result.event_name}"
+                f" task={result.task_id or 'none'} events={result.emitted_events}",
+                file=sys.stderr,
+            )
+    if args.command == "codex-session":
+        result = capture_codex_session_jsonl(
+            session_file=Path(args.session_file),
+            project_id=args.project,
+            trace_dir=Path(args.trace_dir),
+            upload=args.upload,
+            base_url=args.base_url,
+        )
+        print(f"Wrote Codex session trace {result.trace_path} for task {result.task_id}")
+        print(f"Captured {result.event_count} events from Codex session JSONL")
+        if result.uploaded and result.upload_response:
+            print(f"Uploaded {result.upload_response['event_count']} events for task {result.upload_response['task_id']}")
+    if args.command == "claude-hook":
+        result = run_claude_hook(
+            event_name=args.event,
+            repo_path=Path(args.repo),
+            base_url=args.base_url,
+            project_id=args.project,
+        )
+        if result.reason:
+            print(f"Agent Runtime Claude Code hook skipped: {result.reason}", file=sys.stderr)
+        else:
+            print(
+                f"Agent Runtime Claude Code hook handled {result.event_name}"
+                f" task={result.task_id or 'none'} events={result.emitted_events}",
+                file=sys.stderr,
+            )
+    if args.command == "cursor-stream":
+        result = run_cursor_stream(
+            repo_path=Path(args.repo),
+            base_url=args.base_url,
+            project_id=args.project,
+            name=args.name,
+        )
+        if result.reason:
+            print(f"Agent Runtime Cursor stream skipped: {result.reason}", file=sys.stderr)
+        else:
+            print(
+                f"Agent Runtime Cursor stream handled task={result.task_id or 'none'} events={result.emitted_events}",
+                file=sys.stderr,
+            )
 
 
 if __name__ == "__main__":
