@@ -10,7 +10,7 @@ Agent Runtime Layer helps developers answer:
 - Are tools, retries, or orchestration causing idle time?
 - Which optimization should I try next, and what evidence supports it?
 
-It runs locally with FastAPI, SQLite, and two Next.js dashboards — a developer dashboard on port 3000 and a clean product dashboard on port 4000.
+It runs locally with FastAPI, SQLite, and a Next.js dashboard.
 
 ## Preview
 
@@ -32,16 +32,16 @@ This project does **not** claim real KV-cache control, production scheduler beha
 docker compose up --build
 ```
 
-Open the developer dashboard:
-
-```text
-http://localhost:3000
-```
-
-Open the product dashboard:
+Open the dashboard:
 
 ```text
 http://localhost:4000
+```
+
+Backend API:
+
+```text
+http://localhost:8000/docs
 ```
 
 ## Supported Integrations
@@ -116,7 +116,7 @@ with AgentRuntimeTracer(task_name="custom agent task") as trace:
 
 ## Golden Demo
 
-Click **Start demo** on the homepage at `http://localhost:3000`.
+Click **Start demo** on the homepage at `http://localhost:4000`.
 
 The demo imports a bundled coding-agent trace where an agent:
 
@@ -183,49 +183,28 @@ curl -X POST http://localhost:8000/api/phase-1-exit/generate
 Open:
 
 ```text
-http://localhost:3000/workload-report
+http://localhost:4000/recommendations
 ```
 
 The Workload Report summarizes local evidence, recommendations, metric quality, cost and savings, and next validation steps.
 
-## Dashboards
+## Dashboard
 
-### Developer Dashboard — `http://localhost:3000`
-
-Full profiler for developers. All trace data, analysis, and evidence views.
-
-| Route | What it shows |
-|---|---|
-| `/` | Overview and golden demo |
-| `/runs` | All traced agent runs |
-| `/tasks/<id>` | Task detail — waterfall, events, analysis |
-| `/bottlenecks` | Time and cost split across all runs |
-| `/context` | Repeated token inspector — stable vs dynamic blocks |
-| `/cost` | Cost per task, cost per failure, before/after comparison |
-| `/recommendations` | Ranked action list with evidence and confidence |
-| `/benchmarks` | Benchmark evidence records |
-| `/corpus` | Trace corpus manager |
-| `/evidence` | Evidence quality report |
-| `/evidence-campaign` | Phase 1.6 evidence campaign tracker |
-| `/workload-report` | Evaluation and recommendation report |
-
-### Product Dashboard — `http://localhost:4000`
-
-Clean customer-facing dashboard. Same live data, no internal tooling.
+Open `http://localhost:4000` after starting with Docker Compose.
 
 | Route | What it shows |
 |---|---|
 | `/` | Landing page — what Agentium does and how to get started |
 | `/overview` | Live agent health — hero metrics, time split, detected patterns |
-| `/runs` | Run table with status, cost, retries, and repeated context % |
+| `/runs` | All traced runs with status, cost, retries, and repeated context % |
 | `/runs/<id>` | Run detail — waterfall timeline, context growth, event feed |
 | `/bottlenecks` | Time and cost bottleneck analysis with plain-English pattern cards |
-| `/context` | Context inspector — stable and dynamic token breakdown |
-| `/cost` | Cost explorer — cost per task, cost per failure, scatter view |
-| `/recommendations` | Ranked recommendations with impact, confidence, and effort scores |
-| `/import` | Get started — integration guides and import instructions |
+| `/context` | Context inspector — stable vs dynamic token breakdown per run |
+| `/cost` | Cost explorer — cost per task, cost per failure, before/after comparison |
+| `/recommendations` | Ranked action list with impact, confidence, and effort scores |
+| `/import` | Integration guides and trace import instructions |
 
-The product dashboard auto-refreshes every 30 seconds and shows a live indicator.
+The dashboard auto-refreshes every 30 seconds with a live indicator.
 
 ## Architecture
 
@@ -241,9 +220,8 @@ FastAPI backend + SQLite
   http://localhost:8000
         |
         v
-Developer dashboard          Product dashboard
-http://localhost:3000        http://localhost:4000
-(full profiler)              (customer-facing, live data)
+  Agentium dashboard
+  http://localhost:4000
 ```
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
