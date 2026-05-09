@@ -1,0 +1,236 @@
+{
+  "project_id": "phase-1-6-campaign",
+  "task": {
+    "task_id": "task_p16_base_010",
+    "project_id": "phase-1-6-campaign",
+    "goal": "Phase 1.6 controlled coding task 10",
+    "agent_type": "controlled_sdk_coding_agent",
+    "benchmark_name": "phase-1-6-controlled-corpus",
+    "benchmark_task_id": "controlled-010",
+    "repo_name": "controlled/repo-2",
+    "issue_id": "issue-010",
+    "agent_name": "controlled-sdk-agent",
+    "baseline_or_optimized": null,
+    "task_success": true,
+    "tests_passed": 4,
+    "tests_failed": 0,
+    "patch_generated": true,
+    "files_changed_count": 1,
+    "retry_count": 0,
+    "before_after_pair_id": null
+  },
+  "events": [
+    {
+      "event_id": "evt_9245412fd608",
+      "task_id": "task_p16_base_010",
+      "timestamp": "2026-05-07T17:20:22.240Z",
+      "event_type": "task_start",
+      "span_id": "span_task_010",
+      "parent_span_id": null,
+      "name": "task_start",
+      "attributes": {},
+      "payload": {
+        "goal": "Phase 1.6 controlled coding task 10",
+        "agent_type": "controlled_sdk_coding_agent"
+      }
+    },
+    {
+      "event_id": "evt_813279fbd5ce",
+      "task_id": "task_p16_base_010",
+      "timestamp": "2026-05-07T17:20:22.340Z",
+      "event_type": "context_snapshot",
+      "span_id": "span_ctx_initial_010",
+      "parent_span_id": "span_task_010",
+      "name": "context_snapshot",
+      "attributes": {
+        "context_id": "ctx_initial_010",
+        "size_tokens": 5200,
+        "repeated_tokens_estimate": 0,
+        "context_kind": "system_prompt_tool_schema_repo_summary",
+        "context_hash": "sha256:stable-0"
+      },
+      "payload": {}
+    },
+    {
+      "event_id": "evt_34c5c0465401",
+      "task_id": "task_p16_base_010",
+      "timestamp": "2026-05-07T17:20:22.440Z",
+      "event_type": "model_call_start",
+      "span_id": "span_model_010",
+      "parent_span_id": "span_task_010",
+      "name": "planner_model_call",
+      "attributes": {
+        "model": "controlled-coding-model",
+        "role": "planner",
+        "estimated_input_tokens": 5200,
+        "expected_output_tokens": 410,
+        "prompt_hash": "sha256:prompt-010"
+      },
+      "payload": {}
+    },
+    {
+      "event_id": "evt_a24846c9952d",
+      "task_id": "task_p16_base_010",
+      "timestamp": "2026-05-07T17:20:22.640Z",
+      "event_type": "model_call_end",
+      "span_id": "span_model_010",
+      "parent_span_id": "span_task_010",
+      "name": "planner_model_call_end",
+      "attributes": {
+        "input_tokens": 5200,
+        "output_tokens": 410,
+        "latency_ms": 2820,
+        "cost_dollars": 0.0106,
+        "status": "success"
+      },
+      "payload": {}
+    },
+    {
+      "event_id": "evt_13a749fada9d",
+      "task_id": "task_p16_base_010",
+      "timestamp": "2026-05-07T17:20:22.740Z",
+      "event_type": "file_event",
+      "span_id": "span_file_010",
+      "parent_span_id": "span_task_010",
+      "name": "write_patch",
+      "attributes": {
+        "path": "src/module_4.py",
+        "operation": "modify",
+        "files_changed_count": 1,
+        "patch_generated": true
+      },
+      "payload": {
+        "summary": "Applied controlled patch for validation workflow."
+      }
+    },
+    {
+      "event_id": "evt_b117839d8c1e",
+      "task_id": "task_p16_base_010",
+      "timestamp": "2026-05-07T17:20:22.840Z",
+      "event_type": "tool_call_start",
+      "span_id": "span_tool_010",
+      "parent_span_id": "span_task_010",
+      "name": "run_tests",
+      "attributes": {
+        "tool_name": "terminal",
+        "command": "pytest tests/test_controlled_task.py",
+        "risk_level": "medium"
+      },
+      "payload": {}
+    },
+    {
+      "event_id": "evt_7a3148fb4011",
+      "task_id": "task_p16_base_010",
+      "timestamp": "2026-05-07T17:20:23.040Z",
+      "event_type": "terminal_event",
+      "span_id": "span_terminal_010",
+      "parent_span_id": "span_tool_010",
+      "name": "pytest_output",
+      "attributes": {
+        "command": "pytest tests/test_controlled_task.py",
+        "duration_ms": 1200,
+        "exit_code": 0
+      },
+      "payload": {
+        "stdout_preview": "4 passed, 0 failed",
+        "stderr_preview": ""
+      }
+    },
+    {
+      "event_id": "evt_62de9b5fe10b",
+      "task_id": "task_p16_base_010",
+      "timestamp": "2026-05-07T17:20:23.140Z",
+      "event_type": "tool_call_end",
+      "span_id": "span_tool_010",
+      "parent_span_id": "span_task_010",
+      "name": "run_tests_end",
+      "attributes": {
+        "latency_ms": 1200,
+        "status": "success",
+        "exit_code": 0
+      },
+      "payload": {}
+    },
+    {
+      "event_id": "evt_7676095e8226",
+      "task_id": "task_p16_base_010",
+      "timestamp": "2026-05-07T17:20:23.240Z",
+      "event_type": "context_snapshot",
+      "span_id": "span_ctx_retry_010",
+      "parent_span_id": "span_task_010",
+      "name": "context_snapshot",
+      "attributes": {
+        "context_id": "ctx_retry_010",
+        "size_tokens": 5800,
+        "repeated_tokens_estimate": 2200,
+        "context_kind": "repo_summary_tool_schema_test_output",
+        "context_hash": "sha256:stable-0"
+      },
+      "payload": {}
+    },
+    {
+      "event_id": "evt_fc2d9300c4e6",
+      "task_id": "task_p16_base_010",
+      "timestamp": "2026-05-07T17:20:23.340Z",
+      "event_type": "model_call_start",
+      "span_id": "span_repair_010",
+      "parent_span_id": "span_task_010",
+      "name": "repair_model_call",
+      "attributes": {
+        "model": "controlled-coding-model",
+        "role": "repair",
+        "estimated_input_tokens": 5800,
+        "expected_output_tokens": 220,
+        "prompt_hash": "sha256:repair-010"
+      },
+      "payload": {}
+    },
+    {
+      "event_id": "evt_dc3e43d71f66",
+      "task_id": "task_p16_base_010",
+      "timestamp": "2026-05-07T17:20:23.540Z",
+      "event_type": "model_call_end",
+      "span_id": "span_repair_010",
+      "parent_span_id": "span_task_010",
+      "name": "repair_model_call_end",
+      "attributes": {
+        "input_tokens": 5800,
+        "output_tokens": 220,
+        "latency_ms": 3120,
+        "cost_dollars": 0.00945,
+        "status": "success"
+      },
+      "payload": {}
+    },
+    {
+      "event_id": "evt_20e463af8742",
+      "task_id": "task_p16_base_010",
+      "timestamp": "2026-05-07T17:20:23.640Z",
+      "event_type": "cache_event",
+      "span_id": "span_cache_010",
+      "parent_span_id": "span_task_010",
+      "name": "cache_event",
+      "attributes": {
+        "cache_kind": "prefix_or_kv_estimate",
+        "cache_hit": false,
+        "reusable_tokens_estimate": 2200,
+        "reuse_reason": "stable repo/tool context repeats across turns; this is an opportunity estimate only"
+      },
+      "payload": {}
+    },
+    {
+      "event_id": "evt_0400bfec1f72",
+      "task_id": "task_p16_base_010",
+      "timestamp": "2026-05-07T17:20:23.740Z",
+      "event_type": "task_end",
+      "span_id": "span_task_010",
+      "parent_span_id": null,
+      "name": "task_end",
+      "attributes": {},
+      "payload": {
+        "status": "completed",
+        "summary": "Controlled campaign task 10 completed with 4 passed / 0 failed."
+      }
+    }
+  ]
+}
