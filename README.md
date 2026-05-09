@@ -6,11 +6,11 @@ Agent Runtime Layer helps developers answer:
 
 - Why is this coding agent slow?
 - Where did model cost go?
-- How much context is repeated?
+- How much context is repeated on every model call?
 - Are tools, retries, or orchestration causing idle time?
 - Which optimization should I try next, and what evidence supports it?
 
-It runs locally by default with FastAPI, SQLite, and a Next.js dashboard.
+It runs locally with FastAPI, SQLite, and two Next.js dashboards — a developer dashboard on port 3000 and a clean product dashboard on port 4000.
 
 ## Preview
 
@@ -22,7 +22,7 @@ Import a trace, inspect bottlenecks, and generate optimization evidence from a s
 
 Developer preview.
 
-The core local product works end to end: trace import, command capture, SDK instrumentation, dashboard, analysis, optimization recommendations, context optimizer, benchmark evidence records, and Workload Reports.
+The core local product works end to end: trace import, command capture, SDK instrumentation, Codex native capture, Claude Code native capture, dashboard analysis, bottleneck detection, context inspector, cost explorer, optimization recommendations, context optimizer, benchmark evidence records, and Workload Reports.
 
 This project does **not** claim real KV-cache control, production scheduler behavior, hardware simulation, or measured hardware speedups.
 
@@ -32,13 +32,21 @@ This project does **not** claim real KV-cache control, production scheduler beha
 docker compose up --build
 ```
 
-Open:
+Open the developer dashboard:
 
 ```text
 http://localhost:3000
 ```
 
-## Use With Codex
+Open the product dashboard:
+
+```text
+http://localhost:4000
+```
+
+## Supported Integrations
+
+### Codex
 
 Install repo-local Codex hooks in the repository where you run Codex:
 
@@ -62,38 +70,60 @@ agent-runtime codex-session ~/.codex/sessions/YYYY/MM/DD/rollout-....jsonl --pro
 
 See [Codex Native Capture](docs/integrations/codex.md) and the [Codex Validation Demo](docs/integrations/codex-validation-demo.md).
 
-## Use With Claude Code Or Cursor
+### Claude Code
 
-Claude Code:
+Install Claude Code hooks in the repository where you run Claude Code:
 
 ```bash
 agent-runtime integrations install claude-code --repo .
 ```
 
-Cursor Agent:
+Then run Claude Code normally. Each turn is captured as a task trace including prompt, tool calls, file changes, terminal output, and stop events.
+
+Check status or remove:
 
 ```bash
-cursor-agent --print --output-format stream-json | agent-runtime cursor-stream --repo .
+agent-runtime integrations status claude-code --repo .
+agent-runtime integrations uninstall claude-code --repo .
 ```
 
-See [Claude Code Native Capture](docs/integrations/claude-code.md) and [Cursor Agent Capture](docs/integrations/cursor.md).
+See [Claude Code Native Capture](docs/integrations/claude-code.md).
 
-Backend docs:
+### Custom Agents — Python SDK
 
-```text
-http://localhost:8000/docs
+```python
+from agent_runtime_layer import AgentRuntimeTracer, prompt_hash
+
+with AgentRuntimeTracer(task_name="custom agent task") as trace:
+    trace.log_context_snapshot(
+        size_tokens=12000,
+        repeated_tokens_estimate=3000,
+        context_kind="repo_summary_plus_tool_schema",
+    )
+
+    with trace.model_call(
+        model="claude-3-5-sonnet",
+        role="planner",
+        estimated_input_tokens=12000,
+        expected_output_tokens=600,
+        prompt_hash_value=prompt_hash("plan the fix"),
+    ) as call:
+        call.finish(input_tokens=12000, output_tokens=520, cost_dollars=0.02)
+
+    with trace.tool_call(tool_name="terminal", command="pytest tests/") as tool:
+        tool.finish(status="success", exit_code=0, payload={"stdout_preview": "passed"})
 ```
 
 ## Golden Demo
 
-Click **Start demo** on the homepage.
+Click **Start demo** on the homepage at `http://localhost:3000`.
 
 The demo imports a bundled coding-agent trace where an agent:
 
 1. plans a checkout tax fix
 2. runs a failing test
 3. observes terminal output
-4. repeats stable repo/tool context
+4. repeats stable repo and tool context
 5. calls the model again to repair the issue
 6. edits one file
 7. reruns tests successfully
@@ -135,31 +165,6 @@ Upload in one step:
 python -m agent_runtime_layer.cli trace --name "hello test" --upload -- python -c "print('hello')"
 ```
 
-### Instrument Custom Agents
-
-```python
-from agent_runtime_layer import AgentRuntimeTracer, prompt_hash
-
-with AgentRuntimeTracer(task_name="custom agent task") as trace:
-    trace.log_context_snapshot(
-        size_tokens=12000,
-        repeated_tokens_estimate=3000,
-        context_kind="repo_summary_plus_tool_schema",
-    )
-
-    with trace.model_call(
-        model="gpt-5-codex",
-        role="planner",
-        estimated_input_tokens=12000,
-        expected_output_tokens=600,
-        prompt_hash_value=prompt_hash("plan the fix"),
-    ) as call:
-        call.finish(input_tokens=12000, output_tokens=520, cost_dollars=0.02)
-
-    with trace.tool_call(tool_name="terminal", command="pytest tests/") as tool:
-        tool.finish(status="success", exit_code=0, payload={"stdout_preview": "passed"})
-```
-
 ### Generate Optimization Evidence
 
 ```bash
@@ -167,7 +172,7 @@ curl http://localhost:8000/api/tasks/<task_id>/optimizations
 curl -X POST http://localhost:8000/api/tasks/<task_id>/optimize-context
 ```
 
-The dashboard shows stable context blocks, dynamic context blocks, estimated token reduction, estimated cost reduction, and an optimized prompt/context package.
+The dashboard shows stable context blocks, dynamic context blocks, estimated token reduction, estimated cost reduction, and an optimized prompt and context package.
 
 ### Generate a Workload Report
 
@@ -181,33 +186,64 @@ Open:
 http://localhost:3000/workload-report
 ```
 
-The Workload Report summarizes local evidence, recommendations, metric quality, cost/savings, and next validation steps.
+The Workload Report summarizes local evidence, recommendations, metric quality, cost and savings, and next validation steps.
 
-## Dashboard
+## Dashboards
 
-Main pages:
+### Developer Dashboard — `http://localhost:3000`
 
-- `/` overview and golden demo
-- `/runs` traced agent runs
-- `/tasks/<task_id>` task detail
-- `/benchmarks` benchmark evidence records
-- `/workload-report` evaluation and recommendation report
-- `/advanced` advanced evidence views
+Full profiler for developers. All trace data, analysis, and evidence views.
+
+| Route | What it shows |
+|---|---|
+| `/` | Overview and golden demo |
+| `/runs` | All traced agent runs |
+| `/tasks/<id>` | Task detail — waterfall, events, analysis |
+| `/bottlenecks` | Time and cost split across all runs |
+| `/context` | Repeated token inspector — stable vs dynamic blocks |
+| `/cost` | Cost per task, cost per failure, before/after comparison |
+| `/recommendations` | Ranked action list with evidence and confidence |
+| `/benchmarks` | Benchmark evidence records |
+| `/corpus` | Trace corpus manager |
+| `/evidence` | Evidence quality report |
+| `/evidence-campaign` | Phase 1.6 evidence campaign tracker |
+| `/workload-report` | Evaluation and recommendation report |
+
+### Product Dashboard — `http://localhost:4000`
+
+Clean customer-facing dashboard. Same live data, no internal tooling.
+
+| Route | What it shows |
+|---|---|
+| `/` | Landing page — what Agentium does and how to get started |
+| `/overview` | Live agent health — hero metrics, time split, detected patterns |
+| `/runs` | Run table with status, cost, retries, and repeated context % |
+| `/runs/<id>` | Run detail — waterfall timeline, context growth, event feed |
+| `/bottlenecks` | Time and cost bottleneck analysis with plain-English pattern cards |
+| `/context` | Context inspector — stable and dynamic token breakdown |
+| `/cost` | Cost explorer — cost per task, cost per failure, scatter view |
+| `/recommendations` | Ranked recommendations with impact, confidence, and effort scores |
+| `/import` | Get started — integration guides and import instructions |
+
+The product dashboard auto-refreshes every 30 seconds and shows a live indicator.
 
 ## Architecture
 
 ```text
-Trace sources
-  - sample traces
-  - CLI command wrapper
-  - Python SDK
-  - coding-agent adapters
+Coding agents
+  - Codex (hooks)
+  - Claude Code (hooks)
+  - Custom agents (Python SDK)
+  - Imported traces (JSON)
         |
         v
 FastAPI backend + SQLite
+  http://localhost:8000
         |
         v
-Next.js dashboard
+Developer dashboard          Product dashboard
+http://localhost:3000        http://localhost:4000
+(full profiler)              (customer-facing, live data)
 ```
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
@@ -217,13 +253,12 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 - [Quickstart](docs/QUICKSTART.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [Codex Native Capture](docs/integrations/codex.md)
+- [Codex Validation Demo](docs/integrations/codex-validation-demo.md)
 - [Claude Code Native Capture](docs/integrations/claude-code.md)
-- [Cursor Agent Capture](docs/integrations/cursor.md)
 - [Limitations](docs/LIMITATIONS.md)
 - [API spec](docs/API_SPEC.md)
 - [Trace schema](docs/TRACE_SCHEMA.md)
 - [Security and privacy](docs/SECURITY_PRIVACY.md)
-- [Release checklist](docs/RELEASE_CHECKLIST.md)
 
 ## Validation
 
