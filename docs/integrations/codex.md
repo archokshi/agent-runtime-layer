@@ -4,6 +4,25 @@ Agent Runtime Layer can capture Codex coding-agent runs through Codex hooks.
 
 This integration is part of Phase 1.6A: Codex Native Capture. It is designed to collect real coding-agent evidence for the Phase 1.6 Evidence Campaign and Phase 2 handoff package.
 
+## Prerequisites
+
+- Docker Desktop running (backend on port 8000, dashboards on ports 3000 and 4000)
+- Python 3.10+
+- [Codex CLI](https://github.com/openai/codex) installed
+- `agent-runtime` CLI installed:
+
+```bash
+cd packages/sdk-python
+pip install -e .
+```
+
+On Windows (PowerShell):
+
+```powershell
+cd packages\sdk-python
+pip install -e .
+```
+
 ## What It Captures
 
 - Codex session metadata
@@ -15,6 +34,8 @@ This integration is part of Phase 1.6A: Codex Native Capture. It is designed to 
 - post-run Codex session JSONL when live hooks are unavailable
 
 ## Quickstart
+
+### macOS / Linux
 
 Start Agent Runtime Layer:
 
@@ -34,28 +55,60 @@ For live validation, global install is often more reliable because it does not d
 agent-runtime integrations install codex --global
 ```
 
-Run Codex normally in that repository.
+Run Codex normally in that repository. Open the customer dashboard:
 
-Open the dashboard:
+```text
+http://localhost:4000
+```
+
+Each captured Codex turn appears as a task trace. The developer dashboard (with full analysis) is at:
 
 ```text
 http://localhost:3000
 ```
 
-Each captured Codex turn should appear as a task trace.
+### Windows
+
+Start Agent Runtime Layer (PowerShell):
+
+```powershell
+docker compose up --build
+```
+
+Install repo-local Codex hooks:
+
+```powershell
+agent-runtime integrations install codex --repo .
+```
+
+For global install (recommended on Windows):
+
+```powershell
+agent-runtime integrations install codex --global
+```
+
+Run Codex normally. Open the dashboard:
+
+```text
+http://localhost:4000
+```
+
+On Windows, the global hook command is automatically generated as a PowerShell command so no additional shell configuration is needed.
 
 ## Reliable Fallback: Import Codex Session JSONL
 
 Some Codex CLI modes may not fire hooks on every platform. If a real Codex run completes but no task appears in the dashboard, import the Codex session JSONL after the run:
 
+**macOS / Linux:**
+
 ```bash
 agent-runtime codex-session ~/.codex/sessions/YYYY/MM/DD/rollout-....jsonl --project codex-live --upload
 ```
 
-On Windows, the session files are usually under:
+**Windows:**
 
-```text
-C:\Users\<you>\.codex\sessions\YYYY\MM\DD\
+```powershell
+agent-runtime codex-session C:\Users\<you>\.codex\sessions\YYYY\MM\DD\rollout-....jsonl --project codex-live --upload
 ```
 
 The fallback importer converts the completed Codex session into an Agent Runtime trace, writes it to `.agent-runtime/traces/`, and uploads it when `--upload` is provided. This is post-run capture, not live streaming.
@@ -97,30 +150,41 @@ The installer writes Agent Runtime managed entries into:
 With `--global`, it writes to:
 
 ```text
-~/.codex/hooks.json
+~/.codex/hooks.json          # macOS / Linux
+C:\Users\<you>\.codex\hooks.json   # Windows
 ```
 
-If `--global` is run from an Agent Runtime Layer source checkout, the hook command uses the checkout's Python SDK directly. That makes live validation work before `agent-runtime` is installed globally on `PATH`.
+The hooks cover these Codex hook events:
 
-It also enables Codex hooks with:
+- `SessionStart`
+- `UserPromptSubmit`
+- `PreToolUse`
+- `PostToolUse`
+- `Stop`
+
+**macOS / Linux hook command** (generated automatically):
+
+```bash
+PYTHONPATH=/path/to/packages/sdk-python python3 -m agent_runtime_layer.cli --base-url http://localhost:8000/api codex-hook --event <EVENT_NAME>
+```
+
+**Windows hook command** (generated automatically as PowerShell):
+
+```powershell
+"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -ExecutionPolicy Bypass -Command "`$env:PYTHONPATH='...packages\sdk-python'; & 'C:\path\to\python.exe' -m agent_runtime_layer.cli --base-url 'http://localhost:8000/api' codex-hook --event 'SessionStart'"
+```
+
+If `agent-runtime` is already on PATH (not a source-checkout), the hook uses the simpler form:
+
+```bash
+agent-runtime --base-url http://localhost:8000/api codex-hook --event <EVENT_NAME>
+```
+
+It also enables Codex hooks via:
 
 ```toml
 [features]
 hooks = true
-```
-
-Older Codex builds referenced `codex_hooks`; current Codex CLI reports that key as deprecated and uses `hooks`.
-
-The hooks call:
-
-```bash
-agent-runtime codex-hook --event <EVENT_NAME>
-```
-
-For source-checkout global installs, the generated command is equivalent to:
-
-```bash
-python -m agent_runtime_layer.cli codex-hook --event <EVENT_NAME>
 ```
 
 The hook collector reads Codex hook JSON from stdin, maps it into the Agent Runtime trace schema, and sends events to the local FastAPI backend.

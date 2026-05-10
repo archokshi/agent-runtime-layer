@@ -529,3 +529,216 @@ export type Phase1ExitPackage = {
   do_not_do_yet: string[];
   created_at?: string | null;
 };
+
+// TraceCorpus types
+export type TraceCorpusTaskSummary = {
+  task_id: string;
+  goal?: string | null;
+  agent_name?: string | null;
+  agent_type?: string | null;
+  repo_name?: string | null;
+  benchmark_name?: string | null;
+  event_count: number;
+  has_model_events: boolean;
+  has_tool_events: boolean;
+  has_file_events: boolean;
+  has_terminal_events: boolean;
+  has_context_snapshots: boolean;
+  has_outcome_metadata: boolean;
+  retry_count?: number | null;
+  task_success?: boolean | null;
+  before_after_pair_id?: string | null;
+  phase2_value: string;
+};
+
+export type CorpusCoverageItem = {
+  category: string;
+  count: number;
+  percent: number;
+  target?: number | null;
+  status: "ready" | "partial" | "missing";
+  phase2_consumes: string;
+  next_step: string;
+};
+
+export type CorpusMetricCard = {
+  label: string;
+  value: string;
+  quality: "measured" | "estimated" | "inferred" | "missing";
+  source: string;
+  detail?: string | null;
+};
+
+export type Phase2EvidenceNeed = {
+  need_id: string;
+  label: string;
+  status: "ready" | "partial" | "missing";
+  evidence: string;
+  source: string;
+  phase2_use: string;
+  next_step: string;
+};
+
+export type TraceCorpusReport = {
+  generated_at: string;
+  metrics: CorpusMetricCard[];
+  coverage: CorpusCoverageItem[];
+  phase2_evidence_needs: Phase2EvidenceNeed[];
+  top_agents: Record<string, number>;
+  top_repos: Record<string, number>;
+  task_summaries: TraceCorpusTaskSummary[];
+  readiness_score: number;
+  readiness_status: "ready" | "partial" | "missing";
+  limitations: string[];
+  next_steps: string[];
+};
+
+// EvidenceQuality types
+export type EvidenceQualityMetric = {
+  metric_id: string;
+  label: string;
+  value: string;
+  quality: "measured" | "estimated" | "inferred" | "missing";
+  source: string;
+  phase2_use: string;
+  risk_if_overclaimed: string;
+  next_validation_step: string;
+};
+
+export type EvidenceQualityCategory = {
+  category: string;
+  measured_count: number;
+  estimated_count: number;
+  inferred_count: number;
+  missing_count: number;
+  score: number;
+  status: "ready" | "partial" | "missing";
+  metrics: EvidenceQualityMetric[];
+};
+
+export type EvidenceQualityReport = {
+  generated_at: string;
+  overall_score: number;
+  overall_status: "ready" | "partial" | "missing";
+  categories: EvidenceQualityCategory[];
+  missing_evidence: string[];
+  phase2_safety_rules: string[];
+  limitations: string[];
+  next_steps: string[];
+};
+
+// EvidenceCampaign types
+export type EvidenceCampaignTarget = {
+  target_id: string;
+  label: string;
+  current: number;
+  target: number;
+  percent: number;
+  status: "ready" | "partial" | "missing";
+  phase2_use: string;
+  next_step: string;
+};
+
+export type EvidenceCampaignTrack = {
+  track_id: string;
+  name: string;
+  summary: string;
+  status: "ready" | "partial" | "missing";
+  targets: EvidenceCampaignTarget[];
+  phase2_consumes: string[];
+  missing_items: string[];
+  next_steps: string[];
+};
+
+export type EvidenceCampaignReport = {
+  campaign_id?: string | null;
+  generated_at: string;
+  executive_summary: string;
+  campaign_status: "ready" | "partial" | "missing";
+  campaign_score: number;
+  ready_for_phase2_workload_model: boolean;
+  ready_for_phase2_backend_validation: boolean;
+  tracks: EvidenceCampaignTrack[];
+  required_trace_fields: string[];
+  minimum_exit_criteria: string[];
+  strong_exit_criteria: string[];
+  regenerated_phase2_handoff_id?: string | null;
+  regenerated_phase2_entry_score?: number | null;
+  no_claims: string[];
+  next_actions: string[];
+  source_reports: Record<string, unknown>;
+  created_at?: string | null;
+};
+
+// Phase2Handoff types
+export type Phase2HandoffSection = {
+  title: string;
+  summary: string;
+  status: "ready" | "partial" | "missing";
+  evidence: Record<string, unknown>;
+  phase2_consumes: string[];
+  missing_items: string[];
+  next_steps: string[];
+};
+
+export type Phase2HandoffPackage = {
+  handoff_id?: string | null;
+  generated_at: string;
+  executive_summary: string;
+  phase2_entry_criteria_status: "ready" | "partial" | "missing";
+  phase2_entry_criteria_score: number;
+  workload_model_input?: Phase2HandoffSection | null;
+  backend_gap_analysis_input?: Phase2HandoffSection | null;
+  runtime_hardware_interface_input?: Phase2HandoffSection | null;
+  memory_context_architecture_input?: Phase2HandoffSection | null;
+  compiler_execution_graph_input?: Phase2HandoffSection | null;
+  evidence_quality_gate?: Phase2HandoffSection | null;
+  missing_evidence_checklist: string[];
+  phase2_test_plan: { platform: string; test: string; success_criteria: string }[];
+  phase2_do_not_claim: string[];
+  source_reports: Record<string, unknown>;
+  created_at?: string | null;
+};
+
+// Telemetry types
+export type TelemetryFieldCoverageItem = {
+  field: string;
+  task_count: number;
+  sample_count: number;
+  percent_of_telemetry_tasks: number;
+  status: "ready" | "partial" | "missing";
+  phase2_use: string;
+  next_step: string;
+};
+
+export type TelemetryTaskSummary = {
+  task_id: string;
+  goal?: string | null;
+  sample_count: number;
+  backend_ids: string[];
+  has_gpu_utilization: boolean;
+  has_cpu_utilization: boolean;
+  has_memory_pressure: boolean;
+  has_queue_depth: boolean;
+  has_prefill_decode: boolean;
+  has_cache_hit_rate: boolean;
+  detected_bottlenecks: string[];
+  top_bottleneck?: string | null;
+};
+
+export type TelemetryCorpusReport = {
+  generated_at: string;
+  task_count: number;
+  telemetry_task_count: number;
+  sample_count: number;
+  backend_count: number;
+  telemetry_task_coverage_percent: number;
+  field_coverage: TelemetryFieldCoverageItem[];
+  phase2_evidence_value: Phase2EvidenceNeed[];
+  bottleneck_counts: Record<string, number>;
+  task_summaries: TelemetryTaskSummary[];
+  readiness_score: number;
+  readiness_status: "ready" | "partial" | "missing";
+  limitations: string[];
+  next_steps: string[];
+};

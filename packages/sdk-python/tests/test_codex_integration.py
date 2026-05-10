@@ -84,8 +84,10 @@ def test_global_install_status_and_uninstall_codex_hooks():
 
 
 def test_global_install_uses_source_tree_launcher_when_available():
+    import sys
     home = artifact_dir()
-    repo = Path.cwd()
+    # repo root is two levels above the sdk-python package directory
+    repo = Path(__file__).resolve().parent.parent.parent.parent
     config_path = install_codex_hooks(
         repo,
         base_url="http://localhost:8000/api",
@@ -96,11 +98,15 @@ def test_global_install_uses_source_tree_launcher_when_available():
     config = json.loads(config_path.read_text(encoding="utf-8"))
 
     command = config["hooks"]["UserPromptSubmit"][0]["hooks"][0]["command"]
-    assert "powershell.exe" in command
-    assert "packages\\sdk-python" in command or "packages/sdk-python" in command
+    assert "packages/sdk-python" in command or "packages\\sdk-python" in command
     assert "-m agent_runtime_layer.cli" in command
     assert "codex-hook" in command
-    assert "--event 'UserPromptSubmit'" in command
+    if sys.platform == "win32":
+        assert "powershell.exe" in command
+        assert "--event 'UserPromptSubmit'" in command
+    else:
+        assert "PYTHONPATH=" in command
+        assert "--event UserPromptSubmit" in command
 
 
 def test_codex_hook_sequence_creates_trace_events():

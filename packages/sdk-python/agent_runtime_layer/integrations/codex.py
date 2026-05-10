@@ -1,5 +1,6 @@
 import json
 import re
+import shlex
 import sys
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -111,23 +112,37 @@ def source_tree_codex_hook_command(
     if not sdk_path:
         return None
     python_path = Path(sys.executable).resolve()
-    python_args = [
-        "-m agent_runtime_layer.cli",
-        f"--base-url {ps_single_quote(base_url)}",
-        "codex-hook",
-        f"--event {ps_single_quote(event_name)}",
-    ]
-    if project_id:
-        python_args.append(f"--project {ps_single_quote(project_id)}")
-    command_parts = [
-        f"`$env:PYTHONPATH={ps_single_quote(str(sdk_path))}",
-        f"& {ps_single_quote(str(python_path))} {' '.join(python_args)}",
-    ]
-    powershell = r"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
-    return (
-        f"\"{powershell}\" -NoProfile -ExecutionPolicy Bypass "
-        f"-Command \"{'; '.join(command_parts)}\""
-    )
+    if sys.platform == "win32":
+        python_args = [
+            "-m agent_runtime_layer.cli",
+            f"--base-url {ps_single_quote(base_url)}",
+            "codex-hook",
+            f"--event {ps_single_quote(event_name)}",
+        ]
+        if project_id:
+            python_args.append(f"--project {ps_single_quote(project_id)}")
+        command_parts = [
+            f"`$env:PYTHONPATH={ps_single_quote(str(sdk_path))}",
+            f"& {ps_single_quote(str(python_path))} {' '.join(python_args)}",
+        ]
+        powershell = r"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
+        return (
+            f"\"{powershell}\" -NoProfile -ExecutionPolicy Bypass "
+            f"-Command \"{'; '.join(command_parts)}\""
+        )
+    else:
+        # macOS / Linux: use bash with PYTHONPATH set inline
+        parts = [
+            f"PYTHONPATH={shlex.quote(str(sdk_path))}",
+            shlex.quote(str(python_path)),
+            "-m agent_runtime_layer.cli",
+            f"--base-url {shlex.quote(base_url)}",
+            "codex-hook",
+            f"--event {shlex.quote(event_name)}",
+        ]
+        if project_id:
+            parts.append(f"--project {shlex.quote(project_id)}")
+        return " ".join(parts)
 
 
 def codex_hook_command(

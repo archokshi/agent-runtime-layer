@@ -166,6 +166,16 @@ CREATE TABLE IF NOT EXISTS phase1_exit_packages (
   report_json TEXT NOT NULL,
   created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS phase2_handoff_packages (
+  handoff_id TEXT PRIMARY KEY,
+  report_json TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS evidence_campaign_reports (
+  campaign_id TEXT PRIMARY KEY,
+  report_json TEXT NOT NULL
+);
 """
 
 

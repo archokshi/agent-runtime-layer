@@ -9,11 +9,13 @@ from app.schemas import (
     BenchmarkSuiteRun,
     BlueprintPreview,
     ContextOptimizationReport,
+    EvidenceCampaignReport,
     Event,
     HardwareAnalysisReport,
     HardwareTelemetrySample,
     MeasuredValidationExperiment,
     Phase1ExitPackage,
+    Phase2HandoffPackage,
     SchedulerReport,
     SiliconBlueprintReport,
     Task,
@@ -309,6 +311,13 @@ def list_hardware_telemetry_samples(conn: Connection, task_id: str) -> list[Hard
     return [row_to_hardware_sample(row) for row in rows]
 
 
+def list_all_hardware_telemetry_samples(conn: Connection) -> list[HardwareTelemetrySample]:
+    rows = conn.execute(
+        "SELECT * FROM hardware_telemetry_samples ORDER BY timestamp ASC",
+    ).fetchall()
+    return [row_to_hardware_sample(row) for row in rows]
+
+
 def save_hardware_analysis_report(conn: Connection, report: HardwareAnalysisReport) -> None:
     conn.execute(
         """
@@ -452,3 +461,63 @@ def list_phase1_exit_packages(conn: Connection) -> list[Phase1ExitPackage]:
         "SELECT report_json FROM phase1_exit_packages ORDER BY created_at DESC"
     ).fetchall()
     return [Phase1ExitPackage.model_validate_json(row["report_json"]) for row in rows]
+
+
+def save_phase2_handoff_package(conn: Connection, report: Phase2HandoffPackage) -> Phase2HandoffPackage:
+    handoff_id = report.handoff_id or f"phase2_handoff_{uuid.uuid4().hex[:12]}"
+    saved = report.model_copy(update={"handoff_id": handoff_id})
+    conn.execute(
+        """
+        INSERT OR REPLACE INTO phase2_handoff_packages(handoff_id, report_json)
+        VALUES (?, ?)
+        """,
+        (handoff_id, saved.model_dump_json()),
+    )
+    return saved
+
+
+def get_phase2_handoff_package(conn: Connection, handoff_id: str) -> Phase2HandoffPackage | None:
+    row = conn.execute(
+        "SELECT report_json FROM phase2_handoff_packages WHERE handoff_id = ?",
+        (handoff_id,),
+    ).fetchone()
+    if row is None:
+        return None
+    return Phase2HandoffPackage.model_validate_json(row["report_json"])
+
+
+def list_phase2_handoff_packages(conn: Connection) -> list[Phase2HandoffPackage]:
+    rows = conn.execute(
+        "SELECT report_json FROM phase2_handoff_packages ORDER BY rowid DESC"
+    ).fetchall()
+    return [Phase2HandoffPackage.model_validate_json(row["report_json"]) for row in rows]
+
+
+def save_evidence_campaign_report(conn: Connection, report: EvidenceCampaignReport) -> EvidenceCampaignReport:
+    campaign_id = report.campaign_id or f"campaign_{uuid.uuid4().hex[:12]}"
+    saved = report.model_copy(update={"campaign_id": campaign_id})
+    conn.execute(
+        """
+        INSERT OR REPLACE INTO evidence_campaign_reports(campaign_id, report_json)
+        VALUES (?, ?)
+        """,
+        (campaign_id, saved.model_dump_json()),
+    )
+    return saved
+
+
+def get_evidence_campaign_report(conn: Connection, campaign_id: str) -> EvidenceCampaignReport | None:
+    row = conn.execute(
+        "SELECT report_json FROM evidence_campaign_reports WHERE campaign_id = ?",
+        (campaign_id,),
+    ).fetchone()
+    if row is None:
+        return None
+    return EvidenceCampaignReport.model_validate_json(row["report_json"])
+
+
+def list_evidence_campaign_reports(conn: Connection) -> list[EvidenceCampaignReport]:
+    rows = conn.execute(
+        "SELECT report_json FROM evidence_campaign_reports ORDER BY rowid DESC"
+    ).fetchall()
+    return [EvidenceCampaignReport.model_validate_json(row["report_json"]) for row in rows]

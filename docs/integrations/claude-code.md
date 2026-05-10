@@ -4,6 +4,25 @@ Agent Runtime Layer can capture Claude Code coding-agent runs through Claude Cod
 
 This integration is part of Phase 1.6B: Claude Code Native Capture. It collects real coding-agent evidence for the Phase 1.6 Evidence Campaign and Phase 2 handoff package.
 
+## Prerequisites
+
+- Docker Desktop running (backend on port 8000, dashboards on ports 3000 and 4000)
+- Python 3.10+
+- [Claude Code](https://claude.ai/code) installed
+- `agent-runtime` CLI installed:
+
+```bash
+cd packages/sdk-python
+pip install -e .
+```
+
+On Windows (PowerShell):
+
+```powershell
+cd packages\sdk-python
+pip install -e .
+```
+
 ## What It Captures
 
 - Claude Code session metadata
@@ -15,6 +34,8 @@ This integration is part of Phase 1.6B: Claude Code Native Capture. It collects 
 - task end / stop event
 
 ## Quickstart
+
+### macOS / Linux
 
 Start Agent Runtime Layer:
 
@@ -28,15 +49,37 @@ Install repo-local Claude Code hooks inside the repository where you run Claude 
 agent-runtime integrations install claude-code --repo .
 ```
 
-Run Claude Code normally in that repository.
+Run Claude Code normally in that repository. Open the customer dashboard:
 
-Open the dashboard:
+```text
+http://localhost:4000
+```
+
+Each captured Claude Code turn appears as a task trace. The developer dashboard (with full analysis) is at:
 
 ```text
 http://localhost:3000
 ```
 
-Each captured Claude Code turn should appear as a task trace.
+### Windows
+
+Start Agent Runtime Layer (PowerShell):
+
+```powershell
+docker compose up --build
+```
+
+Install Claude Code hooks:
+
+```powershell
+agent-runtime integrations install claude-code --repo .
+```
+
+Run Claude Code normally. Open the dashboard:
+
+```text
+http://localhost:4000
+```
 
 ## Status
 
@@ -49,6 +92,34 @@ agent-runtime integrations status claude-code --repo .
 ```bash
 agent-runtime integrations uninstall claude-code --repo .
 ```
+
+## How It Works
+
+The installer writes Agent Runtime managed hook entries into:
+
+```text
+.claude/settings.local.json
+```
+
+The hooks cover all 7 Claude Code hook events:
+
+- `SessionStart`
+- `UserPromptSubmit`
+- `PreToolUse`
+- `PostToolUse`
+- `PostToolUseFailure`
+- `Stop`
+- `SessionEnd`
+
+Each hook calls:
+
+```bash
+agent-runtime --base-url http://localhost:8000/api claude-hook --event <EVENT_NAME>
+```
+
+The hook collector reads the Claude Code hook JSON payload from stdin, maps it into the Agent Runtime trace schema, and sends events to the local FastAPI backend at `http://localhost:8000/api`.
+
+One task trace is created per Claude Code turn (each `UserPromptSubmit`). Tool calls, file changes, terminal commands, and failures are all captured as child events within that trace.
 
 ## Limitations
 

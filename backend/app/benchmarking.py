@@ -1,6 +1,7 @@
 from collections import Counter
+from dataclasses import dataclass, field
 
-from app.schemas import BenchmarkSuiteMetrics, BenchmarkSuiteRun, BenchmarkSuiteRunCreate, BenchmarkSuiteSummary
+from app.schemas import BenchmarkSuiteMetrics, BenchmarkSuiteRun, BenchmarkSuiteRunCreate, BenchmarkSuiteSummary, Task
 
 
 def _percent(part: int, total: int) -> float:
@@ -84,3 +85,18 @@ def summarize_benchmark_runs(runs: list[BenchmarkSuiteRun], limit: int = 5) -> B
             "Do not claim broad benchmark performance from smoke or dry-run records.",
         ],
     )
+
+
+@dataclass
+class BenchmarkValidationReport:
+    task_result_count: int = 0
+    before_after_pairs: list[str] = field(default_factory=list)
+
+
+def build_benchmark_validation_report(runs: list[BenchmarkSuiteRun], tasks: list[Task]) -> BenchmarkValidationReport:
+    task_result_count = sum(run.metrics.task_count for run in runs)
+    pair_ids: set[str] = set()
+    for task in tasks:
+        if task.before_after_pair_id:
+            pair_ids.add(task.before_after_pair_id)
+    return BenchmarkValidationReport(task_result_count=task_result_count, before_after_pairs=list(pair_ids))

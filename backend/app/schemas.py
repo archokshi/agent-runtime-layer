@@ -705,3 +705,216 @@ class PlatformSummary(BaseModel):
     latest_blueprint_id: str | None = None
     latest_replay_id: str | None = None
     limitations: list[str] = Field(default_factory=list)
+
+
+# --- Phase 1.6 schemas ---
+
+class TraceCorpusTaskSummary(BaseModel):
+    task_id: str
+    goal: str | None = None
+    agent_name: str | None = None
+    agent_type: str | None = None
+    repo_name: str | None = None
+    benchmark_name: str | None = None
+    event_count: int = 0
+    has_model_events: bool = False
+    has_tool_events: bool = False
+    has_file_events: bool = False
+    has_terminal_events: bool = False
+    has_context_snapshots: bool = False
+    has_outcome_metadata: bool = False
+    retry_count: int | None = None
+    task_success: bool | None = None
+    before_after_pair_id: str | None = None
+    phase2_value: str = ""
+
+
+class CorpusCoverageItem(BaseModel):
+    category: str
+    count: int
+    percent: float
+    target: int | None = None
+    status: Literal["ready", "partial", "missing"]
+    phase2_consumes: str = ""
+    next_step: str = ""
+
+
+class CorpusMetricCard(BaseModel):
+    label: str
+    value: str
+    quality: Literal["measured", "estimated", "inferred", "missing"]
+    source: str = ""
+    detail: str | None = None
+
+
+class Phase2EvidenceNeed(BaseModel):
+    need_id: str
+    label: str
+    status: Literal["ready", "partial", "missing"] = "missing"
+    evidence: str = ""
+    source: str = ""
+    phase2_use: str = ""
+    next_step: str = ""
+
+
+class TraceCorpusReport(BaseModel):
+    generated_at: str
+    metrics: list[CorpusMetricCard] = Field(default_factory=list)
+    coverage: list[CorpusCoverageItem] = Field(default_factory=list)
+    phase2_evidence_needs: list[Phase2EvidenceNeed] = Field(default_factory=list)
+    top_agents: dict[str, Any] = Field(default_factory=dict)
+    top_repos: dict[str, Any] = Field(default_factory=dict)
+    task_summaries: list[TraceCorpusTaskSummary] = Field(default_factory=list)
+    readiness_score: int = 0
+    readiness_status: Literal["ready", "partial", "missing"] = "missing"
+    limitations: list[str] = Field(default_factory=list)
+    next_steps: list[str] = Field(default_factory=list)
+
+
+class EvidenceQualityMetric(BaseModel):
+    metric_id: str
+    label: str
+    value: str
+    quality: Literal["measured", "estimated", "inferred", "missing"]
+    source: str
+    phase2_use: str
+    risk_if_overclaimed: str
+    next_validation_step: str
+
+
+class EvidenceQualityCategory(BaseModel):
+    category: str
+    measured_count: int = 0
+    estimated_count: int = 0
+    inferred_count: int = 0
+    missing_count: int = 0
+    score: int = 0
+    status: Literal["ready", "partial", "missing"] = "missing"
+    metrics: list[EvidenceQualityMetric] = Field(default_factory=list)
+
+
+class EvidenceQualityReport(BaseModel):
+    generated_at: str
+    overall_score: int = 0
+    overall_status: Literal["ready", "partial", "missing"] = "missing"
+    categories: list[EvidenceQualityCategory] = Field(default_factory=list)
+    missing_evidence: list[str] = Field(default_factory=list)
+    phase2_safety_rules: list[str] = Field(default_factory=list)
+    limitations: list[str] = Field(default_factory=list)
+    next_steps: list[str] = Field(default_factory=list)
+
+
+class EvidenceCampaignTarget(BaseModel):
+    target_id: str
+    label: str
+    current: int = 0
+    target: int = 0
+    percent: float = 0.0
+    status: Literal["ready", "partial", "missing"] = "missing"
+    phase2_use: str = ""
+    next_step: str = ""
+
+
+class EvidenceCampaignTrack(BaseModel):
+    track_id: str
+    name: str
+    summary: str
+    status: Literal["ready", "partial", "missing"] = "missing"
+    targets: list[EvidenceCampaignTarget] = Field(default_factory=list)
+    phase2_consumes: list[str] = Field(default_factory=list)
+    missing_items: list[str] = Field(default_factory=list)
+    next_steps: list[str] = Field(default_factory=list)
+
+
+class EvidenceCampaignReport(BaseModel):
+    campaign_id: str | None = None
+    generated_at: str
+    executive_summary: str = ""
+    campaign_status: Literal["ready", "partial", "missing"] = "missing"
+    campaign_score: int = 0
+    ready_for_phase2_workload_model: bool = False
+    ready_for_phase2_backend_validation: bool = False
+    tracks: list[EvidenceCampaignTrack] = Field(default_factory=list)
+    required_trace_fields: list[str] = Field(default_factory=list)
+    minimum_exit_criteria: list[str] = Field(default_factory=list)
+    strong_exit_criteria: list[str] = Field(default_factory=list)
+    regenerated_phase2_handoff_id: str | None = None
+    regenerated_phase2_entry_score: int | None = None
+    no_claims: list[str] = Field(default_factory=list)
+    next_actions: list[str] = Field(default_factory=list)
+    source_reports: dict[str, Any] = Field(default_factory=dict)
+    created_at: str | None = None
+
+
+class Phase2HandoffSection(BaseModel):
+    title: str
+    summary: str
+    status: Literal["ready", "partial", "missing"] = "missing"
+    evidence: dict[str, Any] = Field(default_factory=dict)
+    phase2_consumes: list[str] = Field(default_factory=list)
+    missing_items: list[str] = Field(default_factory=list)
+    next_steps: list[str] = Field(default_factory=list)
+
+
+class Phase2HandoffPackage(BaseModel):
+    handoff_id: str | None = None
+    generated_at: str
+    executive_summary: str = ""
+    phase2_entry_criteria_status: Literal["ready", "partial", "missing"] = "missing"
+    phase2_entry_criteria_score: int = 0
+    workload_model_input: Phase2HandoffSection | None = None
+    backend_gap_analysis_input: Phase2HandoffSection | None = None
+    runtime_hardware_interface_input: Phase2HandoffSection | None = None
+    memory_context_architecture_input: Phase2HandoffSection | None = None
+    compiler_execution_graph_input: Phase2HandoffSection | None = None
+    evidence_quality_gate: Phase2HandoffSection | None = None
+    missing_evidence_checklist: list[str] = Field(default_factory=list)
+    phase2_test_plan: list[Phase1TestPlanItem] = Field(default_factory=list)
+    phase2_do_not_claim: list[str] = Field(default_factory=list)
+    source_reports: dict[str, Any] = Field(default_factory=dict)
+    created_at: str | None = None
+
+
+class TelemetryFieldCoverageItem(BaseModel):
+    field: str
+    task_count: int = 0
+    sample_count: int = 0
+    percent_of_telemetry_tasks: float = 0.0
+    status: Literal["ready", "partial", "missing"] = "missing"
+    phase2_use: str = ""
+    next_step: str = ""
+
+
+TelemetryFieldCoverage = TelemetryFieldCoverageItem
+
+
+class TelemetryTaskSummary(BaseModel):
+    task_id: str
+    goal: str | None = None
+    sample_count: int = 0
+    backend_ids: list[str] = Field(default_factory=list)
+    has_gpu_utilization: bool = False
+    has_cpu_utilization: bool = False
+    has_memory_pressure: bool = False
+    has_queue_depth: bool = False
+    has_prefill_decode: bool = False
+    has_cache_hit_rate: bool = False
+    detected_bottlenecks: list[str] = Field(default_factory=list)
+    top_bottleneck: str | None = None
+
+
+class TelemetryCorpusReport(BaseModel):
+    generated_at: str
+    task_count: int = 0
+    telemetry_task_count: int = 0
+    sample_count: int = 0
+    backend_count: int = 0
+    telemetry_task_coverage_percent: float = 0.0
+    field_coverage: list[TelemetryFieldCoverageItem] = Field(default_factory=list)
+    phase2_evidence_value: list[Phase2EvidenceNeed] = Field(default_factory=list)
+    bottleneck_counts: dict[str, Any] = Field(default_factory=dict)
+    task_summaries: list[TelemetryTaskSummary] = Field(default_factory=list)
+    readiness_score: int = 0
+    readiness_status: Literal["ready", "partial", "missing"] = "missing"
+    limitations: list[str] = Field(default_factory=list)
+    next_steps: list[str] = Field(default_factory=list)

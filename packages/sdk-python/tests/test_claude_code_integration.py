@@ -1,4 +1,5 @@
 import json
+import sys
 from pathlib import Path
 from uuid import uuid4
 
@@ -6,6 +7,7 @@ from agent_runtime_layer.integrations.claude_code import (
     CLAUDE_HOOK_EVENTS,
     ClaudeHookCollector,
     claude_hook_status,
+    hook_command,
     install_claude_hooks,
     uninstall_claude_hooks,
 )
@@ -83,3 +85,30 @@ def test_claude_failed_tool_adds_error_event():
     error = next(event for event in client.events if event["event_type"] == "error_event")
     assert error["attributes"]["integration"] == "claude-code"
     assert error["attributes"]["tool_name"] == "Bash"
+
+
+def test_hook_command_is_quoted_for_platform():
+    cmd = hook_command("PreToolUse", "http://localhost:8000/api", project_id="my project")
+    assert "claude-hook" in cmd
+    assert "--event" in cmd
+    assert "PreToolUse" in cmd
+    assert "--project" in cmd
+    assert "my project" in cmd
+    if sys.platform == "win32":
+        assert "'http://localhost:8000/api'" in cmd
+        assert "'PreToolUse'" in cmd
+        assert "'my project'" in cmd
+    else:
+        # shlex.quote wraps strings containing spaces in single quotes
+        assert "http://localhost:8000/api" in cmd
+        assert "PreToolUse" in cmd
+
+
+def test_install_hooks_command_uses_correct_quoting():
+    repo = artifact_dir()
+    config_path = install_claude_hooks(repo, base_url="http://localhost:8000/api", project_id="demo")
+    config = json.loads(config_path.read_text(encoding="utf-8"))
+    cmd = config["hooks"]["PreToolUse"][0]["hooks"][0]["command"]
+    assert "claude-hook" in cmd
+    assert "--event" in cmd
+    assert "PreToolUse" in cmd

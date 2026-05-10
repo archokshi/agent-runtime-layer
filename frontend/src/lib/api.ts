@@ -1,4 +1,4 @@
-import type { AnalysisReport, BackendAwareReport, BenchmarkSuiteSummary, BlueprintPreview, ContextOptimizationReport, HardwareAnalysisReport, OptimizationReport, Phase1ExitPackage, PlatformSummary, SchedulerReport, SiliconBlueprintReport, Task, TraceEvent, TraceReplayReport, ValidationReport } from "./types";
+import type { AnalysisReport, BackendAwareReport, BenchmarkSuiteSummary, BlueprintPreview, ContextOptimizationReport, EvidenceCampaignReport, EvidenceQualityReport, HardwareAnalysisReport, OptimizationReport, Phase1ExitPackage, Phase2HandoffPackage, PlatformSummary, SchedulerReport, SiliconBlueprintReport, Task, TelemetryCorpusReport, TraceCorpusReport, TraceEvent, TraceReplayReport, ValidationReport } from "./types";
 
 const serverBaseUrl = process.env.INTERNAL_API_BASE_URL ?? process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000/api";
 export const browserBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000/api";
@@ -108,4 +108,24 @@ export function getBenchmarkSuiteSummary() {
 
 export function getPhase1ExitPackages() {
   return getJson<Phase1ExitPackage[]>("/phase-1-exit");
+}
+
+export function getTraceCorpusSummary() {
+  return getJson<TraceCorpusReport>("/corpus/summary");
+}
+
+export function getEvidenceQuality() {
+  return getJson<EvidenceQualityReport>("/evidence/quality");
+}
+
+export function getEvidenceCampaignReports() {
+  return getJson<EvidenceCampaignReport[]>("/evidence-campaign");
+}
+
+export function getPhase2HandoffPackages() {
+  return getJson<Phase2HandoffPackage[]>("/phase-2-handoff");
+}
+
+export function getTelemetrySummary() {
+  return getJson<TelemetryCorpusReport>("/telemetry/summary");
 }

@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import analysis, benchmarks, blueprints, events, health, phase1_exit, platform, tasks, traces, validation
+from app.api import analysis, benchmarks, blueprints, corpus, events, evidence, evidence_campaign, health, phase1_exit, phase2_handoff, platform, tasks, telemetry, traces, validation
 from app.db import init_db
 
 
@@ -32,6 +32,11 @@ def create_app() -> FastAPI:
     app.include_router(validation.router, prefix="/api")
     app.include_router(benchmarks.router, prefix="/api")
     app.include_router(phase1_exit.router, prefix="/api")
+    app.include_router(corpus.router, prefix="/api")
+    app.include_router(evidence.router, prefix="/api")
+    app.include_router(evidence_campaign.router, prefix="/api")
+    app.include_router(phase2_handoff.router, prefix="/api")
+    app.include_router(telemetry.router, prefix="/api")
 
     return app
 

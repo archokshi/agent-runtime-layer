@@ -19,6 +19,7 @@ services:
     environment:
       NEXT_PUBLIC_API_BASE_URL: http://localhost:8000/api
       INTERNAL_API_BASE_URL: http://backend:8000/api
+      HOSTNAME: "0.0.0.0"
     ports:
       - "3000:3000"
     depends_on:
@@ -32,6 +33,7 @@ services:
       NEXT_PUBLIC_API_BASE_URL: http://localhost:8000/api
       INTERNAL_API_BASE_URL: http://backend:8000/api
       PORT: 4000
+      HOSTNAME: "0.0.0.0"
     ports:
       - "4000:4000"
     depends_on:

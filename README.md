@@ -26,6 +26,26 @@ The core local product works end to end: trace import, command capture, SDK inst
 
 This project does **not** claim real KV-cache control, production scheduler behavior, hardware simulation, or measured hardware speedups.
 
+## Prerequisites
+
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (for the backend and dashboards)
+- Python 3.10+ (for the `agent-runtime` CLI and SDK)
+- [Codex CLI](https://github.com/openai/codex) or [Claude Code](https://claude.ai/code) (for the respective integrations)
+
+Install the `agent-runtime` CLI:
+
+```bash
+cd packages/sdk-python
+pip install -e .
+```
+
+On Windows (PowerShell):
+
+```powershell
+cd packages\sdk-python
+pip install -e .
+```
+
 ## Quickstart
 
 ```bash

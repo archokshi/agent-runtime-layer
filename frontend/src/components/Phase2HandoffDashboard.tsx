@@ -9,7 +9,8 @@ function StatusBadge({ status }: { status: "ready" | "partial" | "missing" }) {
   return <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold capitalize text-muted">{status}</span>;
 }
 
-function SectionCard({ section }: { section: Phase2HandoffSection }) {
+function SectionCard({ section }: { section: Phase2HandoffSection | null | undefined }) {
+  if (!section) return null;
   return (
     <div className="rounded-lg border border-line bg-white p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">

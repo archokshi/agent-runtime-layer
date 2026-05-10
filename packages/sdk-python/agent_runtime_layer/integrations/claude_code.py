@@ -1,4 +1,5 @@
 import json
+import shlex
 import sys
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -62,9 +63,14 @@ def compact_preview(value: object, limit: int = 4000) -> object:
 
 
 def hook_command(event_name: str, base_url: str, project_id: str | None = None) -> str:
-    parts = ["agent-runtime", "--base-url", base_url, "claude-hook", "--event", event_name]
-    if project_id:
-        parts.extend(["--project", project_id])
+    if sys.platform == "win32":
+        parts = ["agent-runtime", "--base-url", f"'{base_url}'", "claude-hook", "--event", f"'{event_name}'"]
+        if project_id:
+            parts.extend(["--project", f"'{project_id}'"])
+    else:
+        parts = ["agent-runtime", "--base-url", shlex.quote(base_url), "claude-hook", "--event", shlex.quote(event_name)]
+        if project_id:
+            parts.extend(["--project", shlex.quote(project_id)])
     return " ".join(parts)
 
 
