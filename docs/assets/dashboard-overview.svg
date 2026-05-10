@@ -1,0 +1,283 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="640" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 640">
+  <defs>
+    <linearGradient id="headerGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#18212f"/>
+      <stop offset="100%" stop-color="#1e2d3d"/>
+    </linearGradient>
+    <linearGradient id="tealGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#22957f"/>
+      <stop offset="100%" stop-color="#1a7265"/>
+    </linearGradient>
+    <filter id="cardshadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="5" flood-color="#00000015"/>
+    </filter>
+    <filter id="callout">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#00000020"/>
+    </filter>
+  </defs>
+
+  <!-- â•â•â•â•â•â•â• BACKGROUND â•â•â•â•â•â•â• -->
+  <rect width="1200" height="640" fill="#f7f4ef"/>
+
+  <!-- â•â•â•â•â•â•â• HEADER BAND â•â•â•â•â•â•â• -->
+  <rect width="1200" height="92" fill="url(#headerGrad)"/>
+
+  <!-- Hexagon: single clean flat-top polygon, consistent with Agentium brand -->
+  <polygon points="52,30 67,38.5 67,55.5 52,64 37,55.5 37,38.5" fill="#1d7f70"/>
+  <polygon points="52,36 62,41.7 62,53.3 52,59 42,53.3 42,41.7" fill="none" stroke="#5eead4" stroke-width="1.5"/>
+
+  <!-- Agentium wordmark -->
+  <text x="82" y="53" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="22" font-weight="700" fill="#ffffff" letter-spacing="-0.3">Agentium</text>
+  <text x="82" y="72" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="12.5" fill="#94a3b8">Self-hosted profiler for coding agents</text>
+
+  <!-- Header right: what this shows label + badges -->
+  <text x="580" y="42" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13" fill="#64748b" font-style="italic">What happens inside a real coding agent run:</text>
+  <text x="580" y="62" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="12" fill="#475569">32.1s total Â· 3 model calls Â· 8 tool calls Â· $0.051</text>
+
+  <!-- Integration badges -->
+  <rect x="850" y="22" width="82" height="24" rx="12" fill="#1d7f70" opacity="0.25" stroke="#1d7f70" stroke-width="1"/>
+  <text x="891" y="38" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11.5" fill="#5eead4" text-anchor="middle" font-weight="600">Codex</text>
+  <rect x="944" y="22" width="108" height="24" rx="12" fill="#1d7f70" opacity="0.25" stroke="#1d7f70" stroke-width="1"/>
+  <text x="998" y="38" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11.5" fill="#5eead4" text-anchor="middle" font-weight="600">Claude Code</text>
+  <rect x="1063" y="22" width="100" height="24" rx="12" fill="#334155" stroke="#475569" stroke-width="1"/>
+  <text x="1113" y="38" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11.5" fill="#94a3b8" text-anchor="middle" font-weight="600">Python SDK</text>
+
+  <!-- Header bottom text -->
+  <rect x="850" y="55" width="82" height="22" rx="11" fill="none" stroke="#334155" stroke-width="1"/>
+  <text x="891" y="70" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10.5" fill="#64748b" text-anchor="middle">â— Live Â· 30s</text>
+
+  <!-- â•â•â•â•â•â•â• CALLOUT ANNOTATIONS (clean zone above waterfall) â•â•â•â•â•â•â• -->
+
+  <!-- Callout 1: 43% repeated tokens -->
+  <rect x="42" y="106" width="208" height="40" rx="7" fill="#f0fdf9" stroke="#1d7f70" stroke-width="1.5" filter="url(#callout)"/>
+  <line x1="146" y1="146" x2="146" y2="162" stroke="#1d7f70" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <text x="146" y="123" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11.5" font-weight="700" fill="#1d7f70" text-anchor="middle">43% tokens repeated</text>
+  <text x="146" y="139" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10.5" fill="#0f766e" text-anchor="middle">same context re-sent every call</text>
+
+  <!-- Callout 2: Tool wait -->
+  <rect x="490" y="100" width="220" height="40" rx="7" fill="#fffbeb" stroke="#f59e0b" stroke-width="1.5" filter="url(#callout)"/>
+  <line x1="600" y1="140" x2="600" y2="162" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <text x="600" y="117" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11.5" font-weight="700" fill="#b45309" text-anchor="middle">âš  Tool wait: 52% of elapsed time</text>
+  <text x="600" y="133" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10.5" fill="#92400e" text-anchor="middle">GPU likely idle during this window</text>
+
+  <!-- Callout 3: Retry -->
+  <rect x="938" y="106" width="218" height="40" rx="7" fill="#fff1f2" stroke="#fca5a5" stroke-width="1.5" filter="url(#callout)"/>
+  <line x1="1047" y1="146" x2="1047" y2="162" stroke="#ef4444" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <text x="1047" y="123" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11.5" font-weight="700" fill="#dc2626" text-anchor="middle">Retry â†’ full context re-sent</text>
+  <text x="1047" y="139" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10.5" fill="#b91c1c" text-anchor="middle">2.3 retries / task Â· cost compounds</text>
+
+  <!-- â•â•â•â•â•â•â• WATERFALL TIMELINE â•â•â•â•â•â•â• -->
+
+  <!-- Track bg -->
+  <rect x="40" y="162" width="1120" height="56" rx="8" fill="#e8e4de" opacity="0.5"/>
+
+  <!-- Model call 1 (38% = 426px) -->
+  <rect x="40" y="162" width="426" height="56" rx="8" fill="url(#tealGrad)"/>
+  <text x="66" y="186" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" font-weight="600" fill="#ffffff">model call 1</text>
+  <text x="66" y="202" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="#a7f3d0">48,200 tok Â· 12.4s</text>
+
+  <!-- Tool wait / bash (27% = 302px) with diagonal lines -->
+  <rect x="470" y="162" width="302" height="56" fill="#d1d5db" opacity="0.9"/>
+  <clipPath id="toolClip"><rect x="470" y="162" width="302" height="56"/></clipPath>
+  <g clip-path="url(#toolClip)" opacity="0.4">
+    <line x1="470" y1="162" x2="450" y2="218" stroke="#9ca3af" stroke-width="1.2"/>
+    <line x1="490" y1="162" x2="470" y2="218" stroke="#9ca3af" stroke-width="1.2"/>
+    <line x1="510" y1="162" x2="490" y2="218" stroke="#9ca3af" stroke-width="1.2"/>
+    <line x1="530" y1="162" x2="510" y2="218" stroke="#9ca3af" stroke-width="1.2"/>
+    <line x1="550" y1="162" x2="530" y2="218" stroke="#9ca3af" stroke-width="1.2"/>
+    <line x1="570" y1="162" x2="550" y2="218" stroke="#9ca3af" stroke-width="1.2"/>
+    <line x1="590" y1="162" x2="570" y2="218" stroke="#9ca3af" stroke-width="1.2"/>
+    <line x1="610" y1="162" x2="590" y2="218" stroke="#9ca3af" stroke-width="1.2"/>
+    <line x1="630" y1="162" x2="610" y2="218" stroke="#9ca3af" stroke-width="1.2"/>
+    <line x1="650" y1="162" x2="630" y2="218" stroke="#9ca3af" stroke-width="1.2"/>
+    <line x1="670" y1="162" x2="650" y2="218" stroke="#9ca3af" stroke-width="1.2"/>
+    <line x1="690" y1="162" x2="670" y2="218" stroke="#9ca3af" stroke-width="1.2"/>
+    <line x1="710" y1="162" x2="690" y2="218" stroke="#9ca3af" stroke-width="1.2"/>
+    <line x1="730" y1="162" x2="710" y2="218" stroke="#9ca3af" stroke-width="1.2"/>
+    <line x1="750" y1="162" x2="730" y2="218" stroke="#9ca3af" stroke-width="1.2"/>
+    <line x1="770" y1="162" x2="750" y2="218" stroke="#9ca3af" stroke-width="1.2"/>
+  </g>
+  <text x="621" y="186" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" font-weight="600" fill="#4b5563" text-anchor="middle">bash: pytest</text>
+  <text x="621" y="202" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="#6b7280" text-anchor="middle">8.1s Â· exit 1 âœ—</text>
+
+  <!-- Retry badge -->
+  <circle cx="790" cy="190" r="16" fill="#fff1f2" stroke="#fca5a5" stroke-width="2"/>
+  <text x="790" y="195" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="14" fill="#ef4444" text-anchor="middle" font-weight="800">â†º</text>
+
+  <!-- Model call 2 -->
+  <rect x="810" y="162" width="190" height="56" fill="url(#tealGrad)"/>
+  <rect x="810" y="162" width="10" height="56" fill="#1d7f70"/>
+  <text x="836" y="186" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" font-weight="600" fill="#ffffff">model call 2</text>
+  <text x="836" y="202" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="#a7f3d0">51,400 +3.2k Â· 6.2s</text>
+
+  <!-- File write (tiny gap) -->
+  <rect x="1004" y="162" width="14" height="56" fill="#e2e8f0"/>
+
+  <!-- Model call 3 -->
+  <rect x="1018" y="162" width="142" height="56" rx="0" fill="url(#tealGrad)"/>
+  <rect x="1148" y="162" width="12" height="56" rx="8" fill="#1a7265"/>
+  <text x="1040" y="186" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" font-weight="600" fill="#ffffff">model call 3</text>
+  <text x="1040" y="202" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="#a7f3d0">54,800 Â· 4.8s âœ“</text>
+
+  <!-- Timeline border -->
+  <rect x="40" y="162" width="1120" height="56" rx="8" fill="none" stroke="#d9d3c8" stroke-width="1.5"/>
+
+  <!-- Time axis -->
+  <line x1="40" y1="222" x2="1160" y2="222" stroke="#d9d3c8" stroke-width="1"/>
+  <text x="40" y="237" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" fill="#94a3b8" text-anchor="middle">0s</text>
+  <text x="320" y="237" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" fill="#94a3b8" text-anchor="middle">8s</text>
+  <text x="600" y="237" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" fill="#94a3b8" text-anchor="middle">16s</text>
+  <text x="880" y="237" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" fill="#94a3b8" text-anchor="middle">24s</text>
+  <text x="1160" y="237" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" fill="#94a3b8" text-anchor="middle">32s</text>
+
+  <!-- Legend -->
+  <rect x="42" y="247" width="11" height="9" rx="2" fill="#1d7f70"/>
+  <text x="59" y="256" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10.5" fill="#64748b">Model inference</text>
+  <rect x="162" y="247" width="11" height="9" rx="2" fill="#d1d5db"/>
+  <text x="179" y="256" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10.5" fill="#64748b">Tool / I-O wait</text>
+  <circle cx="285" cy="252" r="5.5" fill="#fff1f2" stroke="#fca5a5" stroke-width="1.5"/>
+  <text x="285" y="256" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="9" fill="#ef4444" text-anchor="middle" font-weight="700">â†º</text>
+  <text x="297" y="256" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10.5" fill="#64748b">Retry</text>
+
+  <!-- â•â•â•â•â•â•â• DIVIDER â•â•â•â•â•â•â• -->
+  <line x1="40" y1="272" x2="1160" y2="272" stroke="#d9d3c8" stroke-width="1"/>
+  <text x="600" y="293" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13" font-weight="600" fill="#64748b" text-anchor="middle">Agentium turns this into three actionable views:</text>
+
+  <!-- â•â•â•â•â•â•â• THREE CARDS â•â•â•â•â•â•â• -->
+
+  <!-- CARD 1: BOTTLENECKS -->
+  <rect x="40" y="308" width="352" height="292" rx="10" fill="#ffffff" stroke="#d9d3c8" stroke-width="1.5" filter="url(#cardshadow)"/>
+  <rect x="40" y="308" width="352" height="48" rx="10" fill="#18212f"/>
+  <rect x="40" y="344" width="352" height="12" fill="#18212f"/>
+
+  <!-- Card 1 icon: same hexagon style -->
+  <polygon points="62,322 72,327.8 72,339.2 62,345 52,339.2 52,327.8" fill="#1d7f70"/>
+  <polygon points="62,326 69.6,330.4 69.6,337.6 62,342 54.4,337.6 54.4,330.4" fill="none" stroke="#5eead4" stroke-width="1.2"/>
+
+  <text x="80" y="330" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="12" font-weight="700" fill="#ffffff">Bottlenecks</text>
+  <text x="80" y="347" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="#94a3b8">Where does your agent's time go?</text>
+
+  <!-- Time bars -->
+  <text x="58" y="383" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="#374151">Model inference</text>
+  <rect x="170" y="370" width="200" height="16" rx="8" fill="#f1f5f9"/>
+  <rect x="170" y="370" width="76" height="16" rx="8" fill="#1d7f70"/>
+  <text x="378" y="383" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="#1d7f70" text-anchor="end" font-weight="600">38%</text>
+
+  <text x="58" y="409" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="#b45309" font-weight="600">Tool wait âš </text>
+  <rect x="170" y="396" width="200" height="16" rx="8" fill="#f1f5f9"/>
+  <rect x="170" y="396" width="104" height="16" rx="8" fill="#fbbf24"/>
+  <text x="378" y="409" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="#b45309" text-anchor="end" font-weight="700">52% âš </text>
+
+  <text x="58" y="435" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="#6b7280">CPU / idle</text>
+  <rect x="170" y="422" width="200" height="16" rx="8" fill="#f1f5f9"/>
+  <rect x="170" y="422" width="20" height="16" rx="8" fill="#cbd5e1"/>
+  <text x="378" y="435" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="#9ca3af" text-anchor="end">10%</text>
+
+  <line x1="58" y1="452" x2="378" y2="452" stroke="#f0ede8" stroke-width="1"/>
+
+  <text x="58" y="474" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="#6b7280">Retries / task</text>
+  <text x="378" y="474" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13" fill="#ef4444" text-anchor="end" font-weight="700">2.3 avg</text>
+
+  <text x="58" y="497" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="#6b7280">Task success rate</text>
+  <text x="378" y="497" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13" fill="#1d7f70" text-anchor="end" font-weight="700">85%</text>
+
+  <text x="58" y="520" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="#6b7280">Cost / successful task</text>
+  <text x="378" y="520" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="13" fill="#18212f" text-anchor="end" font-weight="700">$0.043</text>
+
+  <rect x="58" y="536" width="323" height="48" rx="7" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="219" y="554" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10.5" fill="#64748b" text-anchor="middle">Detected automatically across all runs.</text>
+  <text x="219" y="570" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10.5" fill="#1d7f70" text-anchor="middle" font-weight="600">â†’ localhost:4000/bottlenecks</text>
+
+  <!-- CARD 2: CONTEXT INSPECTOR -->
+  <rect x="424" y="308" width="352" height="292" rx="10" fill="#ffffff" stroke="#d9d3c8" stroke-width="1.5" filter="url(#cardshadow)"/>
+  <rect x="424" y="308" width="352" height="48" rx="10" fill="#18212f"/>
+  <rect x="424" y="344" width="352" height="12" fill="#18212f"/>
+
+  <polygon points="446,322 456,327.8 456,339.2 446,345 436,339.2 436,327.8" fill="#1d7f70"/>
+  <polygon points="446,326 453.6,330.4 453.6,337.6 446,342 438.4,337.6 438.4,330.4" fill="none" stroke="#5eead4" stroke-width="1.2"/>
+
+  <text x="464" y="330" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="12" font-weight="700" fill="#ffffff">Context Inspector</text>
+  <text x="464" y="347" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="#94a3b8">Which tokens are you re-sending every call?</text>
+
+  <text x="442" y="380" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="#374151">Total input tokens</text>
+  <text x="762" y="380" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="12" fill="#18212f" text-anchor="end" font-weight="700">144,600</text>
+
+  <!-- Token stacked bar -->
+  <rect x="442" y="388" width="320" height="26" rx="5" fill="#f1f5f9"/>
+  <rect x="442" y="388" width="138" height="26" rx="5" fill="#1d7f70"/>
+  <text x="511" y="405" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" fill="#ffffff" text-anchor="middle" font-weight="600">Repeated 43%</text>
+  <rect x="582" y="388" width="180" height="26" rx="0" fill="#5eead4"/>
+  <rect x="748" y="388" width="14" height="26" rx="5" fill="#5eead4"/>
+  <text x="670" y="405" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" fill="#0f766e" text-anchor="middle" font-weight="600">Unique 57%</text>
+
+  <text x="442" y="436" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="#374151" font-weight="600">Stable blocks â€” same on every call:</text>
+
+  <text x="442" y="458" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="#374151">System prompt</text>
+  <rect x="544" y="446" width="190" height="12" rx="4" fill="#f1f5f9"/>
+  <rect x="544" y="446" width="73" height="12" rx="4" fill="#1d7f70" opacity="0.75"/>
+  <text x="762" y="458" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="#374151" text-anchor="end">8,200 tok</text>
+
+  <text x="442" y="479" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="#374151">Tool definitions</text>
+  <rect x="544" y="467" width="190" height="12" rx="4" fill="#f1f5f9"/>
+  <rect x="544" y="467" width="84" height="12" rx="4" fill="#1d7f70" opacity="0.75"/>
+  <text x="762" y="479" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="#374151" text-anchor="end">9,400 tok</text>
+
+  <text x="442" y="500" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="#374151">Repo summary</text>
+  <rect x="544" y="488" width="190" height="12" rx="4" fill="#f1f5f9"/>
+  <rect x="544" y="488" width="58" height="12" rx="4" fill="#1d7f70" opacity="0.75"/>
+  <text x="762" y="500" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="#374151" text-anchor="end">6,500 tok</text>
+
+  <rect x="442" y="516" width="320" height="48" rx="7" fill="#fef9c3" stroke="#fde68a" stroke-width="1"/>
+  <text x="602" y="534" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="#92400e" text-anchor="middle" font-weight="700">If cached: âˆ’43% input tokens per call</text>
+  <text x="602" y="550" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10.5" fill="#92400e" text-anchor="middle">~$0.018 recoverable / run Â· localhost:4000/context</text>
+
+  <!-- CARD 3: RECOMMENDATIONS -->
+  <rect x="808" y="308" width="352" height="292" rx="10" fill="#ffffff" stroke="#d9d3c8" stroke-width="1.5" filter="url(#cardshadow)"/>
+  <rect x="808" y="308" width="352" height="48" rx="10" fill="#18212f"/>
+  <rect x="808" y="344" width="352" height="12" fill="#18212f"/>
+
+  <polygon points="830,322 840,327.8 840,339.2 830,345 820,339.2 820,327.8" fill="#1d7f70"/>
+  <polygon points="830,326 837.6,330.4 837.6,337.6 830,342 822.4,337.6 822.4,330.4" fill="none" stroke="#5eead4" stroke-width="1.2"/>
+
+  <text x="848" y="330" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="12" font-weight="700" fill="#ffffff">Recommendations</text>
+  <text x="848" y="347" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="#94a3b8">Ranked Â· impact Ã— confidence Ã· effort</text>
+
+  <!-- Rec 1 -->
+  <rect x="826" y="368" width="318" height="90" rx="8" fill="#f0fdf9" stroke="#1d7f70" stroke-width="1.5"/>
+  <rect x="826" y="368" width="4" height="90" rx="2" fill="#1d7f70"/>
+  <rect x="834" y="376" width="36" height="18" rx="4" fill="#fef2f2" stroke="#fca5a5" stroke-width="1"/>
+  <text x="852" y="389" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" fill="#dc2626" text-anchor="middle" font-weight="700">#1 P0</text>
+  <text x="878" y="389" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="#18212f" font-weight="700">Separate stable context</text>
+  <text x="834" y="407" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10.5" fill="#374151">Move system prompt + tool defs out of the</text>
+  <text x="834" y="421" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10.5" fill="#374151">per-call payload. Send dynamic diff only.</text>
+  <rect x="834" y="432" width="66" height="18" rx="4" fill="#fff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="867" y="445" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" fill="#374151" text-anchor="middle">Impact 90</text>
+  <rect x="906" y="432" width="66" height="18" rx="4" fill="#fff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="939" y="445" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" fill="#374151" text-anchor="middle">Effort LOW</text>
+  <rect x="978" y="432" width="62" height="18" rx="4" fill="#f0fdf9" stroke="#1d7f70" stroke-width="1"/>
+  <text x="1009" y="445" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" fill="#1d7f70" text-anchor="middle" font-weight="700">Score 92</text>
+
+  <!-- Rec 2 -->
+  <rect x="826" y="466" width="318" height="62" rx="8" fill="#fffbeb" stroke="#fde68a" stroke-width="1"/>
+  <rect x="826" y="466" width="4" height="62" rx="2" fill="#fbbf24"/>
+  <rect x="834" y="474" width="36" height="18" rx="4" fill="#fff" stroke="#fde68a" stroke-width="1"/>
+  <text x="852" y="487" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" fill="#b45309" text-anchor="middle" font-weight="700">#2 P1</text>
+  <text x="878" y="487" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="#18212f" font-weight="700">Reduce retry depth</text>
+  <text x="834" y="505" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10.5" fill="#374151">Add early exit after 3 failures. Failed runs</text>
+  <text x="834" y="519" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10.5" fill="#374151">cost 1.65Ã— more. Score: 78</text>
+
+  <!-- Rec 3 -->
+  <rect x="826" y="536" width="318" height="48" rx="8" fill="#f8fafc" stroke="#e2e8f0" stroke-width="1"/>
+  <rect x="826" y="536" width="4" height="48" rx="2" fill="#94a3b8"/>
+  <rect x="834" y="544" width="36" height="18" rx="4" fill="#fff" stroke="#e2e8f0" stroke-width="1"/>
+  <text x="852" y="557" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10" fill="#64748b" text-anchor="middle" font-weight="700">#3 P1</text>
+  <text x="878" y="557" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="#18212f" font-weight="700">Overlap tool wait with prefetch</text>
+  <text x="834" y="574" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="10.5" fill="#64748b">âˆ’30% wall-clock latency Â· Score: 60</text>
+
+  <!-- â•â•â•â•â•â•â• FOOTER â•â•â•â•â•â•â• -->
+  <rect x="0" y="612" width="1200" height="28" fill="#18212f"/>
+  <text x="600" y="630" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="11" fill="#475569" text-anchor="middle">
+    localhost:4000  Â·  FastAPI + SQLite + Next.js  Â·  Self-hosted  Â·  Private  Â·  No telemetry  Â·  AGPL-3.0
+  </text>
+</svg>

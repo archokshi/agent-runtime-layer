@@ -14,7 +14,7 @@ It runs locally with FastAPI, SQLite, and a Next.js dashboard.
 
 ## Preview
 
-![Agent Runtime Layer dashboard](docs/assets/dashboard-overview.png)
+![Agentium — what happens inside a real coding agent run](docs/assets/dashboard-overview.svg)
 
 Import a trace, inspect bottlenecks, and generate optimization evidence from a self-hosted dashboard.
 
