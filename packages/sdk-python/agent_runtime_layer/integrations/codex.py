@@ -1,5 +1,7 @@
 import json
+import os
 import re
+import shlex
 import sys
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -95,6 +97,14 @@ def ps_single_quote(value: str) -> str:
     return "'" + value.replace("'", "''") + "'"
 
 
+def shell_single_quote(value: str) -> str:
+    return shlex.quote(value)
+
+
+def is_windows() -> bool:
+    return os.name == "nt"
+
+
 def source_tree_sdk_path(repo_path: Path) -> Path | None:
     sdk_path = repo_path.resolve() / "packages" / "sdk-python"
     cli_path = sdk_path / "agent_runtime_layer" / "cli.py"
@@ -111,23 +121,39 @@ def source_tree_codex_hook_command(
     if not sdk_path:
         return None
     python_path = Path(sys.executable).resolve()
-    python_args = [
-        "-m agent_runtime_layer.cli",
-        f"--base-url {ps_single_quote(base_url)}",
+    if is_windows():
+        python_args = [
+            "-m agent_runtime_layer.cli",
+            f"--base-url {ps_single_quote(base_url)}",
+            "codex-hook",
+            f"--event {ps_single_quote(event_name)}",
+        ]
+        if project_id:
+            python_args.append(f"--project {ps_single_quote(project_id)}")
+        command_parts = [
+            f"`$env:PYTHONPATH={ps_single_quote(str(sdk_path))}",
+            f"& {ps_single_quote(str(python_path))} {' '.join(python_args)}",
+        ]
+        powershell = r"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
+        return (
+            f"\"{powershell}\" -NoProfile -ExecutionPolicy Bypass "
+            f"-Command \"{'; '.join(command_parts)}\""
+        )
+
+    parts = [
+        f"PYTHONPATH={shell_single_quote(str(sdk_path))}",
+        shell_single_quote(str(python_path)),
+        "-m",
+        "agent_runtime_layer.cli",
+        "--base-url",
+        shell_single_quote(base_url),
         "codex-hook",
-        f"--event {ps_single_quote(event_name)}",
+        "--event",
+        shell_single_quote(event_name),
     ]
     if project_id:
-        python_args.append(f"--project {ps_single_quote(project_id)}")
-    command_parts = [
-        f"`$env:PYTHONPATH={ps_single_quote(str(sdk_path))}",
-        f"& {ps_single_quote(str(python_path))} {' '.join(python_args)}",
-    ]
-    powershell = r"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe"
-    return (
-        f"\"{powershell}\" -NoProfile -ExecutionPolicy Bypass "
-        f"-Command \"{'; '.join(command_parts)}\""
-    )
+        parts.extend(["--project", shell_single_quote(project_id)])
+    return " ".join(parts)
 
 
 def codex_hook_command(
