@@ -16,6 +16,9 @@ htmlcov/
 frontend/.next/
 frontend/node_modules/
 frontend/.turbo/
+customer-dashboard/.next/
+customer-dashboard/node_modules/
+customer-dashboard/.turbo/
 npm-debug.log*
 
 # Local runtime data

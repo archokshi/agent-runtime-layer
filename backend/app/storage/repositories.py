@@ -494,7 +494,7 @@ def list_phase2_handoff_packages(conn: Connection) -> list[Phase2HandoffPackage]
 
 
 def save_evidence_campaign_report(conn: Connection, report: EvidenceCampaignReport) -> EvidenceCampaignReport:
-    campaign_id = report.campaign_id or f"campaign_{uuid.uuid4().hex[:12]}"
+    campaign_id = report.campaign_id or f"phase16_campaign_{uuid.uuid4().hex[:12]}"
     saved = report.model_copy(update={"campaign_id": campaign_id})
     conn.execute(
         """

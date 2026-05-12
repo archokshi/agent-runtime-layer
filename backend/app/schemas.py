@@ -620,6 +620,36 @@ class BenchmarkSuiteSummary(BaseModel):
     limitations: list[str] = Field(default_factory=list)
 
 
+class BenchmarkBeforeAfterPair(BaseModel):
+    before_after_pair_id: str
+    baseline_task_id: str | None = None
+    optimized_task_id: str | None = None
+    baseline_success: bool | None = None
+    optimized_success: bool | None = None
+    success_preserved: bool | None = None
+    evidence: str = ""
+
+
+class BenchmarkValidationReport(BaseModel):
+    report_version: str = "phase-1.2"
+    mode: str = "benchmark_validation_corpus_readiness"
+    generated_at: str
+    run_count: int = 0
+    task_result_count: int = 0
+    official_task_count: int = 0
+    local_or_imported_task_count: int = 0
+    suite_coverage: list["CorpusCoverageItem"] = Field(default_factory=list)
+    run_mode_coverage: list["CorpusCoverageItem"] = Field(default_factory=list)
+    outcome_coverage: list["CorpusCoverageItem"] = Field(default_factory=list)
+    trace_completion: "CorpusCoverageItem | None" = None
+    before_after_pairs: list[BenchmarkBeforeAfterPair] = Field(default_factory=list)
+    phase2_evidence_value: list["Phase2EvidenceNeed"] = Field(default_factory=list)
+    readiness_score: int = 0
+    readiness_status: Literal["ready", "partial", "missing"] = "missing"
+    limitations: list[str] = Field(default_factory=list)
+    next_steps: list[str] = Field(default_factory=list)
+
+
 class Phase1Metric(BaseModel):
     name: str
     value: str
@@ -758,7 +788,10 @@ class Phase2EvidenceNeed(BaseModel):
 
 
 class TraceCorpusReport(BaseModel):
+    report_version: str = "phase-1.1"
+    mode: str = "phase_2_evidence_corpus_readiness"
     generated_at: str
+    target_trace_count: int = 100
     metrics: list[CorpusMetricCard] = Field(default_factory=list)
     coverage: list[CorpusCoverageItem] = Field(default_factory=list)
     phase2_evidence_needs: list[Phase2EvidenceNeed] = Field(default_factory=list)
@@ -794,6 +827,8 @@ class EvidenceQualityCategory(BaseModel):
 
 
 class EvidenceQualityReport(BaseModel):
+    report_version: str = "phase-1.4"
+    mode: str = "metric_confidence_and_no_overclaiming"
     generated_at: str
     overall_score: int = 0
     overall_status: Literal["ready", "partial", "missing"] = "missing"
@@ -828,6 +863,8 @@ class EvidenceCampaignTrack(BaseModel):
 
 class EvidenceCampaignReport(BaseModel):
     campaign_id: str | None = None
+    campaign_version: str = "phase-1.6"
+    mode: str = "evidence_campaign_readiness_report"
     generated_at: str
     executive_summary: str = ""
     campaign_status: Literal["ready", "partial", "missing"] = "missing"
@@ -836,8 +873,8 @@ class EvidenceCampaignReport(BaseModel):
     ready_for_phase2_backend_validation: bool = False
     tracks: list[EvidenceCampaignTrack] = Field(default_factory=list)
     required_trace_fields: list[str] = Field(default_factory=list)
-    minimum_exit_criteria: list[str] = Field(default_factory=list)
-    strong_exit_criteria: list[str] = Field(default_factory=list)
+    minimum_exit_criteria: list[EvidenceCampaignTarget] = Field(default_factory=list)
+    strong_exit_criteria: list[EvidenceCampaignTarget] = Field(default_factory=list)
     regenerated_phase2_handoff_id: str | None = None
     regenerated_phase2_entry_score: int | None = None
     no_claims: list[str] = Field(default_factory=list)
@@ -858,6 +895,8 @@ class Phase2HandoffSection(BaseModel):
 
 class Phase2HandoffPackage(BaseModel):
     handoff_id: str | None = None
+    package_version: str = "phase-1.5"
+    mode: str = "phase_2_handoff_artifact"
     generated_at: str
     executive_summary: str = ""
     phase2_entry_criteria_status: Literal["ready", "partial", "missing"] = "missing"
@@ -904,6 +943,8 @@ class TelemetryTaskSummary(BaseModel):
 
 
 class TelemetryCorpusReport(BaseModel):
+    report_version: str = "phase-1.3"
+    mode: str = "backend_telemetry_evidence_readiness"
     generated_at: str
     task_count: int = 0
     telemetry_task_count: int = 0

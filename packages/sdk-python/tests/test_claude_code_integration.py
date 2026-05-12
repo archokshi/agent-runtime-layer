@@ -42,7 +42,15 @@ def test_install_status_and_uninstall_claude_hooks():
     assert set(config["hooks"]) == set(CLAUDE_HOOK_EVENTS)
     assert claude_hook_status(repo)["installed"] is True
     assert config["hooks"]["PreToolUse"][0]["matcher"] == "*"
-    assert "agent-runtime --base-url http://localhost:8000/api claude-hook --event PreToolUse" in config["hooks"]["PreToolUse"][0]["hooks"][0]["command"]
+    command = config["hooks"]["PreToolUse"][0]["hooks"][0]["command"]
+    assert "agent-runtime" in command
+    assert "--base-url" in command
+    assert "http://localhost:8000/api" in command
+    assert "claude-hook" in command
+    assert "--event" in command
+    assert "PreToolUse" in command
+    assert "--project" in command
+    assert "demo" in command
 
     uninstall_claude_hooks(repo)
     status = claude_hook_status(repo)
