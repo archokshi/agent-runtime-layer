@@ -320,7 +320,7 @@ def build_trace_corpus_report(conn: Connection) -> TraceCorpusReport:
         phase2_evidence_needs=phase2_evidence_needs,
         top_agents=dict(agents.most_common(5)),
         top_repos=dict(repos.most_common(5)),
-        task_summaries=task_summaries[:25],
+        task_summaries=task_summaries,
         readiness_score=readiness_score,
         readiness_status=readiness_status,
         limitations=limitations,
