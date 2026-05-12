@@ -172,6 +172,11 @@ Phase 1 sub-phases:
   - repeated context, tool wait, retry, or queue/cache-locality patterns recur across the corpus
   - Phase 2 handoff score materially improves and explains remaining evidence gaps
 
+  Backlog:
+
+  - **Phase 1.6 Strong Real-World Evidence Expansion**
+    Optional/future expansion after the minimum Phase 1.6 gate. Capture 100+ real external coding-agent traces, 25+ externally repeatable benchmark traces, 10+ before/after pairs, real backend telemetry from vLLM/SGLang/LMCache/Dynamo-style systems where available, official benchmark records where externally executed, and real hardware measurements. This strengthens Phase 2 claims but does not block Phase 2.0 kickoff.
+
   Phase 1.6 must not:
 
   - add unrelated product features
