@@ -1,0 +1,18 @@
+Phase 1.6B Claude Code Native Capture — Hook Validation
+==========================================================
+Date: 2026-05-08
+Integration: claude-code
+Project: agentium-codex-dev
+Backend: http://localhost:8000/api
+
+This file was created by Claude Code during Phase 1.6B hook validation.
+The hooks should have captured:
+  - task_start (UserPromptSubmit)
+  - context_snapshot (user prompt)
+  - tool_call_start + tool_call_end (Bash)
+  - terminal_event (Bash output)
+  - tool_call_start + tool_call_end (Write/Edit)
+  - file_event (this file)
+  - task_end (Stop)
+
+Acceptance criteria: see AGENTIUM_PHASE_ROADMAP.md Phase 1.6B

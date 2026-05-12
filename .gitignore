@@ -48,3 +48,6 @@ Thumbs.db
 .vscode/
 .edge-screenshot-profile/
 docs/assets/*-full.png
+
+# Python build artifacts
+*.egg-info/

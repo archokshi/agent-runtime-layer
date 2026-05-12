@@ -20,7 +20,7 @@ function Bar({ label, pct, avg, color, warn }: { label: string; pct: number; avg
       <div className={`w-32 text-right text-sm font-medium ${warn ? "text-amber-700" : "text-slate-600"}`}>{label}{warn ? " ⚠" : ""}</div>
       <div className="flex-1">
         <div className="h-4 overflow-hidden rounded-full bg-slate-100">
-          <div className={`h-full rounded-full ${color}`} style={{ width: `${pct}%` }} />
+          <div className="h-full rounded-full" style={{ width: `${Math.max(pct, 0)}%`, backgroundColor: color }} />
         </div>
       </div>
       <div className={`w-32 text-sm font-semibold ${warn ? "text-amber-700" : "text-ink"}`}>{pct.toFixed(0)}% · {avg}</div>
@@ -113,9 +113,9 @@ export default async function BottlenecksPage() {
             </div>
             {n === 0 ? <p className="text-sm text-slate-400">No analysis data yet.</p> : (
               <div className="space-y-4">
-                <Bar label="Model inference" pct={modelPct} avg={avgModelSec} color="bg-mint" />
-                <Bar label="Tool wait" pct={toolPct} avg={avgToolSec} color="bg-amber-400" warn={toolPct >= 40} />
-                <Bar label="CPU / idle" pct={idlePct} avg={avgIdleSec} color="bg-slate-300" />
+                <Bar label="Model inference" pct={modelPct} avg={avgModelSec} color="#1d7f70" />
+                <Bar label="Tool wait" pct={toolPct} avg={avgToolSec} color="#f59e0b" warn={toolPct >= 40} />
+                <Bar label="CPU / idle" pct={idlePct} avg={avgIdleSec} color="#94a3b8" />
                 {toolPct >= 40 && (
                   <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
                     ⚠ Tool wait dominates {toolPct.toFixed(0)}% of elapsed time. GPU likely idle during this window.
@@ -132,10 +132,10 @@ export default async function BottlenecksPage() {
             </div>
             {n === 0 ? <p className="text-sm text-slate-400">No token data yet.</p> : (
               <div className="space-y-4">
-                <Bar label="Repeated input ⚠" pct={repeatedCtxPct} avg={`${repeatedCtxPct.toFixed(0)}% of input`} color="bg-red-300" warn={repeatedCtxPct >= 30} />
-                <Bar label="Unique input" pct={Math.max(0, 100 - repeatedCtxPct)} avg="necessary" color="bg-mint" />
-                <Bar label="Output tokens" pct={totalInputTokens > 0 ? Math.min((totalOutputTokens / totalInputTokens) * 100, 20) : 0} avg="~9% of input cost" color="bg-teal-300" />
-                <Bar label="Retry overhead" pct={Math.min(avgRetries * 10, 40)} avg={`${avgRetries.toFixed(1)} retr/run avg`} color="bg-red-200" warn={avgRetries > 3} />
+                <Bar label="Repeated input ⚠" pct={repeatedCtxPct} avg={`${repeatedCtxPct.toFixed(0)}% of input`} color="#fca5a5" warn={repeatedCtxPct >= 30} />
+                <Bar label="Unique input" pct={Math.max(0, 100 - repeatedCtxPct)} avg="necessary" color="#1d7f70" />
+                <Bar label="Output tokens" pct={totalInputTokens > 0 ? Math.min((totalOutputTokens / totalInputTokens) * 100, 20) : 0} avg="~9% of input cost" color="#5eead4" />
+                <Bar label="Retry overhead" pct={Math.min(avgRetries * 10, 40)} avg={`${avgRetries.toFixed(1)} retr/run avg`} color="#fecaca" warn={avgRetries > 3} />
                 {repeatedCtxPct >= 30 && (
                   <div className="flex items-center justify-between rounded-lg border border-red-200 bg-red-50 px-3 py-2">
                     <p className="text-sm text-red-800">⚠ {repeatedCtxPct.toFixed(0)}% of input is repeated context — recoverable with caching</p>

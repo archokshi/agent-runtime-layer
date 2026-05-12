@@ -20,6 +20,22 @@ function Badge({ quality }: { quality: string }) {
   );
 }
 
+function SplitBar({ label, pct, avg, color, warn }: { label: string; pct: number; avg: string; color: string; warn?: boolean }) {
+  return (
+    <div className="flex items-center gap-3">
+      <div className={`w-32 text-right text-sm font-medium ${warn ? "text-amber-700" : "text-slate-600"}`}>{label}</div>
+      <div className="flex-1">
+        <div className="h-4 overflow-hidden rounded-full bg-slate-100">
+          <div className="h-full rounded-full" style={{ width: `${Math.max(pct, 0)}%`, backgroundColor: color }} />
+        </div>
+      </div>
+      <div className={`w-28 text-sm font-semibold ${warn ? "text-amber-700" : "text-ink"}`}>
+        {pct.toFixed(0)}%{warn ? " ⚠" : ""} · {avg}
+      </div>
+    </div>
+  );
+}
+
 function MetricCard({ label, value, sub, quality }: { label: string; value: string; sub: string; quality: string }) {
   return (
     <div className="rounded-xl border border-line bg-white p-5 shadow-sm">
@@ -120,23 +136,9 @@ export default async function OverviewPage() {
               <Badge quality="estimated" />
             </div>
             <div className="space-y-3">
-              {[
-                { label: "Model inference", pct: modelPct, avg: `${avgModelSec}s avg`, color: "bg-mint", warn: false },
-                { label: "Tool wait", pct: toolPct, avg: `${avgToolSec}s avg`, color: "bg-amber-400", warn: toolPct >= 40 },
-                { label: "CPU / idle", pct: idlePct, avg: `${avgIdleSec}s avg`, color: "bg-slate-300", warn: false },
-              ].map(({ label, pct, avg, color, warn }) => (
-                <div key={label} className="flex items-center gap-3">
-                  <div className={`w-28 text-right text-sm font-medium ${warn ? "text-amber-700" : "text-slate-600"}`}>{label}</div>
-                  <div className="flex-1">
-                    <div className="h-4 overflow-hidden rounded-full bg-slate-100">
-                      <div className={`h-full rounded-full ${color}`} style={{ width: `${pct}%` }} />
-                    </div>
-                  </div>
-                  <div className={`w-28 text-sm font-semibold ${warn ? "text-amber-700" : "text-ink"}`}>
-                    {pct.toFixed(0)}% · {avg}{warn ? " ⚠" : ""}
-                  </div>
-                </div>
-              ))}
+              <SplitBar label="Model inference" pct={modelPct} avg={`${avgModelSec}s avg`} color="#1d7f70" />
+              <SplitBar label="Tool wait" pct={toolPct} avg={`${avgToolSec}s avg`} color="#f59e0b" warn={toolPct >= 40} />
+              <SplitBar label="CPU / idle" pct={idlePct} avg={`${avgIdleSec}s avg`} color="#94a3b8" />
             </div>
             {toolPct >= 40 && (
               <div className="mt-4 flex items-center justify-between rounded-lg border border-amber-200 bg-amber-50 px-4 py-2">
