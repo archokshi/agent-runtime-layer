@@ -1,4 +1,4 @@
-import type { AnalysisReport, BudgetGovernorSummary, ContextMemorySummary, ContextOptimizationReport, OptimizationProofRecord, OptimizationReport, Phase1ExitPackage, PlatformSummary, Task, TraceEvent } from "./types";
+import type { AnalysisReport, BudgetGovernorSummary, ContextMemorySummary, ContextOptimizationReport, OptimizationProofRecord, OptimizationReport, Phase1ExitPackage, PlatformSummary, Settings, Task, TraceEvent } from "./types";
 
 const serverBase = process.env.INTERNAL_API_BASE_URL ?? process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000/api";
 
@@ -37,3 +37,16 @@ export const getBudgetSummary = () => optional(get<BudgetGovernorSummary>("/budg
 
 // Phase 1.9
 export const getContextMemorySummary = () => optional(get<ContextMemorySummary>("/context-memory/summary"));
+
+// Phase 1.10
+export const getSettings = () => get<Settings>("/settings");
+export const patchSettings = (body: Partial<Settings>) =>
+  fetch(`${serverBase}/settings`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+    cache: "no-store",
+  }).then(async (r) => {
+    if (!r.ok) { const e = await r.json().catch(() => ({})); throw new Error(e.detail || `Error ${r.status}`); }
+    return r.json() as Promise<Settings>;
+  });

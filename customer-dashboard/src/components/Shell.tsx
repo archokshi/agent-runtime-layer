@@ -3,7 +3,7 @@ import { NavLink } from "./NavLink";
 import { LiveRefresher } from "./LiveRefresher";
 import {
   Gauge, ListTree, TrendingDown, ScanSearch,
-  Wallet, ListChecks, Upload, Hexagon
+  Wallet, ListChecks, Upload, Hexagon, Settings
 } from "lucide-react";
 
 export function Shell({ children, hasData = true }: { children: React.ReactNode; hasData?: boolean }) {
@@ -18,13 +18,25 @@ export function Shell({ children, hasData = true }: { children: React.ReactNode;
 
           {hasData && (
             <nav className="flex flex-wrap items-center gap-1.5">
+              {/* Primary — the journey */}
               <NavLink href="/overview"><Gauge size={14} aria-hidden />Overview</NavLink>
               <NavLink href="/runs"><ListTree size={14} aria-hidden />Runs</NavLink>
+
+              {/* Divider */}
+              <span className="h-4 w-px bg-slate-200 mx-0.5" aria-hidden />
+
+              {/* Deep dive */}
               <NavLink href="/bottlenecks"><TrendingDown size={14} aria-hidden />Bottlenecks</NavLink>
               <NavLink href="/context"><ScanSearch size={14} aria-hidden />Context</NavLink>
               <NavLink href="/cost"><Wallet size={14} aria-hidden />Cost</NavLink>
               <NavLink href="/recommendations"><ListChecks size={14} aria-hidden />Recommendations</NavLink>
               <NavLink href="/import"><Upload size={14} aria-hidden />Import</NavLink>
+
+              {/* Divider */}
+              <span className="h-4 w-px bg-slate-200 mx-0.5" aria-hidden />
+
+              {/* Control plane */}
+              <NavLink href="/settings"><Settings size={14} aria-hidden />Settings</NavLink>
             </nav>
           )}
 

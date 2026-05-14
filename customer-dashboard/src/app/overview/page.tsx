@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Shell } from "@/components/Shell";
-import { getAllAnalyses, getBudgetSummary, getContextMemorySummary, getPhase1ExitPackages, getPlatformSummary, getTasks } from "@/lib/api";
-import { ArrowRight, Shield, Brain } from "lucide-react";
+import { getAllAnalyses, getBudgetSummary, getContextMemorySummary, getPhase1ExitPackages, getPlatformSummary, getSettings, getTasks } from "@/lib/api";
+import { ArrowRight, Shield, Brain, TrendingDown, Settings } from "lucide-react";
 
 function Badge({ quality }: { quality: string }) {
   const map: Record<string, string> = {
@@ -49,11 +49,12 @@ function MetricCard({ label, value, sub, quality }: { label: string; value: stri
 
 export default async function OverviewPage() {
   const tasks = await getTasks().catch(() => []);
-  const [platform, reports, budgetSummary, memSummary] = await Promise.all([
+  const [platform, reports, budgetSummary, memSummary, currentSettings] = await Promise.all([
     getPlatformSummary(),
     getPhase1ExitPackages(),
     getBudgetSummary(),
     getContextMemorySummary(),
+    getSettings().catch(() => null),
   ]);
   const analyses = await getAllAnalyses(tasks);
   const latestReport = reports?.[0] ?? null;
@@ -95,6 +96,26 @@ export default async function OverviewPage() {
   const avgInputTokens = n > 0 ? analyses.reduce((s, a) => s + a.total_input_tokens, 0) / n : 0;
   const avgRepeatedTokens = avgInputTokens * (repeatedCtxPct / 100);
   const estimatedCacheSavingsPerRun = avgRepeatedTokens * (2.70 / 1_000_000);
+
+  // Phase 1.10: Gains since enabled — compare post-enable runs vs baseline snapshot
+  const enabledAt = currentSettings?.enabled_at ?? null;
+  const anyEnabled = currentSettings
+    ? currentSettings.optimizer_enabled || currentSettings.budget_enabled || currentSettings.memory_enabled
+    : false;
+  const postEnableAnalyses = enabledAt
+    ? analyses.filter((a) => {
+        const t = tasks.find((tk) => tk.task_id === a.task_id);
+        return t?.started_at && t.started_at > enabledAt;
+      })
+    : [];
+  const baselineTokens = currentSettings?.baseline_avg_tokens ?? null;
+  const baselineCost = currentSettings?.baseline_avg_cost ?? null;
+  const baselineRetries = currentSettings?.baseline_avg_retries ?? null;
+  const postN = postEnableAnalyses.length;
+  const postAvgTokens = postN > 0 ? postEnableAnalyses.reduce((s, a) => s + a.total_input_tokens, 0) / postN : null;
+  const postAvgCost = postN > 0 ? postEnableAnalyses.reduce((s, a) => s + a.estimated_total_cost_dollars, 0) / postN : null;
+  const postAvgRetries = postN > 0 ? postEnableAnalyses.reduce((s, a) => s + a.retry_count, 0) / postN : null;
+  const showGains = anyEnabled && enabledAt !== null && postN > 0 && baselineTokens !== null;
 
   const h1Count = analyses.filter((a) => a.total_task_duration_ms > 0 && a.tool_time_ms / a.total_task_duration_ms >= 0.25).length;
   const h2Count = analyses.filter((a) => a.repeated_context_percent >= 15).length;
@@ -138,6 +159,87 @@ export default async function OverviewPage() {
           <MetricCard label="Cost per successful task" value={avgSuccessCost !== null ? `$${avgSuccessCost.toFixed(4)}` : "—"} sub={`${successTasks.length} successful · ${failedTasks.length} failed`} quality={avgSuccessCost !== null ? "estimated" : "nodata"} />
           <MetricCard label="Task success rate" value={tasks.length > 0 ? `${successRate.toFixed(0)}%` : "—"} sub={`${successTasks.length} of ${tasks.length} runs`} quality={tasks.length > 0 ? "verified" : "nodata"} />
         </section>
+
+        {/* Phase 1.10 — Gains since enabled */}
+        {showGains && postAvgTokens !== null && postAvgCost !== null && baselineCost !== null && baselineTokens !== null ? (
+          <section className="rounded-xl border-2 border-teal-300 bg-teal-50 p-5 shadow-sm">
+            <div className="flex items-center gap-2 mb-4">
+              <TrendingDown size={16} className="text-mint flex-shrink-0" />
+              <h2 className="font-semibold text-teal-800">Gains since you enabled optimizations</h2>
+              <span className="ml-auto text-xs font-semibold px-2 py-0.5 rounded-full border bg-teal-100 text-teal-700 border-teal-300">
+                {postN} run{postN !== 1 ? "s" : ""} measured
+              </span>
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              {/* Tokens */}
+              <div className="rounded-lg bg-white border border-teal-200 p-3 text-center">
+                <p className="text-xs text-slate-400 font-medium">Avg input tokens</p>
+                <p className="text-xs text-slate-400 mt-1">{(baselineTokens / 1000).toFixed(1)}k → {(postAvgTokens / 1000).toFixed(1)}k</p>
+                <p className={`text-xl font-bold mt-1 ${postAvgTokens < baselineTokens ? "text-teal-700" : "text-slate-500"}`}>
+                  {postAvgTokens < baselineTokens
+                    ? `−${(((baselineTokens - postAvgTokens) / baselineTokens) * 100).toFixed(1)}%`
+                    : `+${(((postAvgTokens - baselineTokens) / baselineTokens) * 100).toFixed(1)}%`}
+                </p>
+              </div>
+              {/* Cost */}
+              <div className="rounded-lg bg-white border border-teal-200 p-3 text-center">
+                <p className="text-xs text-slate-400 font-medium">Avg cost / run</p>
+                <p className="text-xs text-slate-400 mt-1">${baselineCost.toFixed(4)} → ${postAvgCost.toFixed(4)}</p>
+                <p className={`text-xl font-bold mt-1 ${postAvgCost < baselineCost ? "text-teal-700" : "text-slate-500"}`}>
+                  {postAvgCost < baselineCost
+                    ? `−${(((baselineCost - postAvgCost) / baselineCost) * 100).toFixed(1)}%`
+                    : `+${(((postAvgCost - baselineCost) / baselineCost) * 100).toFixed(1)}%`}
+                </p>
+              </div>
+              {/* Retries */}
+              <div className="rounded-lg bg-white border border-teal-200 p-3 text-center">
+                <p className="text-xs text-slate-400 font-medium">Avg retries</p>
+                <p className="text-xs text-slate-400 mt-1">
+                  {baselineRetries !== null ? baselineRetries.toFixed(1) : "—"} → {postAvgRetries !== null ? postAvgRetries.toFixed(1) : "—"}
+                </p>
+                <p className={`text-xl font-bold mt-1 ${postAvgRetries !== null && baselineRetries !== null && postAvgRetries < baselineRetries ? "text-teal-700" : "text-slate-500"}`}>
+                  {postAvgRetries !== null && baselineRetries !== null && baselineRetries > 0
+                    ? `−${(((baselineRetries - postAvgRetries) / baselineRetries) * 100).toFixed(0)}%`
+                    : "—"}
+                </p>
+              </div>
+            </div>
+            <div className="mt-3 flex items-center justify-between">
+              <p className="text-xs text-teal-700">
+                Enabled {new Date(enabledAt!).toLocaleDateString()} · {postN} run{postN !== 1 ? "s" : ""} after optimizations applied
+              </p>
+              <Link href="/settings" className="text-xs font-semibold text-mint hover:underline flex items-center gap-1">
+                <Settings size={11} /> Manage controls →
+              </Link>
+            </div>
+          </section>
+        ) : anyEnabled && enabledAt !== null && postN === 0 ? (
+          <section className="rounded-xl border border-teal-200 bg-teal-50 p-4">
+            <div className="flex items-center gap-2">
+              <TrendingDown size={15} className="text-mint flex-shrink-0" />
+              <p className="text-sm font-medium text-teal-800">
+                Optimizations active — gains card will appear after your next agent run.
+              </p>
+              <Link href="/settings" className="ml-auto text-xs font-semibold text-mint hover:underline">
+                View settings →
+              </Link>
+            </div>
+          </section>
+        ) : !anyEnabled && n > 0 ? (
+          <section className="rounded-xl border border-line bg-white p-4 shadow-sm">
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-2">
+                <Settings size={15} className="text-slate-400 flex-shrink-0" />
+                <p className="text-sm text-slate-500">
+                  Optimizations not enabled yet. Turn them on to see gains here.
+                </p>
+              </div>
+              <Link href="/settings" className="flex-shrink-0 inline-flex items-center gap-1.5 rounded-lg bg-mint px-4 py-2 text-sm font-semibold text-white hover:opacity-90 transition-opacity">
+                Open Control Plane <ArrowRight size={13} />
+              </Link>
+            </div>
+          </section>
+        ) : null}
 
         {/* Time split */}
         {n > 0 && (

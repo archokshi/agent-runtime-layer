@@ -1,11 +1,13 @@
 import hashlib
 import json
+import os
 import time
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from types import TracebackType
 from typing import Any
+from urllib import request as urllib_request
 from uuid import uuid4
 
 from agent_runtime_layer.capture import DEFAULT_TRACE_DIR
@@ -242,6 +244,26 @@ class AgentRuntimeTracer:
         self.trace_path: Path | None = None
         self._ended = False
         self._context_hashes: dict[str, int] = {}
+        # Phase 1.10: pull settings from API — overrides constructor args if API is reachable
+        self._load_remote_settings()
+
+    def _load_remote_settings(self) -> None:
+        """Phase 1.10: Read control-plane settings from /api/settings on startup.
+        Silently no-ops if the backend is unreachable (local defaults apply)."""
+        api_base = os.environ.get("AGENT_RUNTIME_API_BASE", "http://localhost:8000/api").rstrip("/")
+        try:
+            req = urllib_request.Request(f"{api_base}/settings", method="GET")
+            with urllib_request.urlopen(req, timeout=1) as resp:
+                s = json.loads(resp.read().decode("utf-8"))
+            if s.get("optimizer_enabled"):
+                self.auto_optimize = True
+            if s.get("budget_enabled"):
+                if self.max_cost_per_run is None:
+                    self.max_cost_per_run = s.get("max_cost_per_run", 0.10)
+                if self.max_retries is None:
+                    self.max_retries = s.get("max_retries", 3)
+        except Exception:
+            pass  # backend unreachable — local constructor args / defaults apply
 
     def check_budget(self) -> tuple[bool, str]:
         """Phase 1.8: Check if session cost or retry count exceeds configured limits.

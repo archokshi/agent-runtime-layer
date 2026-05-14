@@ -148,6 +148,21 @@ export type BudgetGovernorSummary = {
   config: BudgetConfig;
 };
 
+// Phase 1.10
+export type Settings = {
+  plan: "free" | "pro" | "team" | "enterprise";
+  optimizer_enabled: boolean;
+  budget_enabled: boolean;
+  memory_enabled: boolean;
+  max_cost_per_run: number;
+  max_retries: number;
+  enabled_at: string | null;
+  baseline_avg_tokens: number | null;
+  baseline_avg_cost: number | null;
+  baseline_avg_retries: number | null;
+  updated_at: string;
+};
+
 // Phase 1.9
 export type ContextMemoryEntry = {
   fingerprint: string;

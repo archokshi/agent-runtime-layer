@@ -218,6 +218,23 @@ CREATE TABLE IF NOT EXISTS context_memory (
   hit_count INTEGER NOT NULL DEFAULT 1,
   cache_savings_dollars REAL NOT NULL DEFAULT 0
 );
+
+CREATE TABLE IF NOT EXISTS settings (
+  id INTEGER PRIMARY KEY DEFAULT 1,
+  plan TEXT NOT NULL DEFAULT 'free',
+  optimizer_enabled INTEGER NOT NULL DEFAULT 0,
+  budget_enabled INTEGER NOT NULL DEFAULT 0,
+  memory_enabled INTEGER NOT NULL DEFAULT 0,
+  max_cost_per_run REAL NOT NULL DEFAULT 0.10,
+  max_retries INTEGER NOT NULL DEFAULT 3,
+  enabled_at TEXT,
+  baseline_avg_tokens REAL,
+  baseline_avg_cost REAL,
+  baseline_avg_retries REAL,
+  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT OR IGNORE INTO settings (id) VALUES (1);
 """
 
 
