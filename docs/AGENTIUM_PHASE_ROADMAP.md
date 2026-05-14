@@ -35,6 +35,19 @@ Current status:
 
 Phase 1.0 Developer Preview is released.
 
+Phase 1 product arc:
+
+```
+Phase 1.0–1.6  →  "See it."      Profiler + traces + dashboard + evidence campaign
+Phase 1.7      →  "Fix it."      One-click context optimization + proof card
+Phase 1.8      →  "Control it."  Budget + retry enforcement via hook infrastructure
+Phase 1.9      →  "Remember it." Persistent context memory — compounding savings
+Phase 1.10     →  "Own it."      Unified control plane — toggle UI + pricing gates
+```
+
+Each phase is a standalone value add. Each unlocks a pricing tier. Observing is always free.
+Acting (optimizing, governing, remembering) is paid.
+
 Phase 1 sub-phases:
 
 - **Phase 1.0 Developer Preview**
@@ -218,12 +231,17 @@ Phase 1 sub-phases:
   - Before/after proof card in the customer dashboard run detail page showing measured
     token reduction, cost reduction, and success preservation
   - Apply Optimization button on run detail page (customer dashboard port 4000)
+  - ⚡ Context Optimizer toggle in the Phase 1.10 Control Plane UI — primary delivery
+    mechanism; CLI flag `auto_optimize=True` remains as developer fallback
+  - /runs page shows ⚡ Fix it badge on any run with ≥20% repeated context tokens
 
   What the developer gets:
 
   - One click from "you are wasting 43% of tokens" to "here is the proof it is fixed"
   - Shareable proof card: −44% tokens · −43% cost · success preserved ✓ [measured]
   - SDK flag for zero-friction automation: `auto_optimize=True`
+  - Toggle in Control Plane: flip ON → every subsequent run auto-optimized
+  - "Gains since enabled" delta card on overview showing cumulative savings
 
   Evidence quality rule:
 
@@ -254,18 +272,23 @@ Phase 1 sub-phases:
   - `.agentium/config.yaml` per-repo config file schema supporting:
     `max_cost_per_run`, `max_retries_per_task`, `alert_threshold`, `token_limit_per_call`
   - `packages/sdk-python/agent_runtime_layer/budget.py` — session cost and retry state
-    tracker (reads config, accumulates cost, counts retries per session)
+    tracker (reads config or API settings, accumulates cost, counts retries per session)
   - Budget enforcement in `claude_code.py` and `codex.py` hook handlers:
     PreToolUse checks budget state → returns blocked result if limit exceeded
   - `GET /api/budget/config` and `POST /api/budget/config` backend endpoints
-  - Budget Governor card on customer dashboard overview: live cost, retries stopped,
-    cumulative savings from enforced limits
+  - Budget Governor card on customer dashboard overview: actual retry count + estimated
+    wasted dollars from existing run data (value-first, not CLI-first empty state)
+  - 🛡 Budget Governor toggle in the Phase 1.10 Control Plane UI with inline inputs:
+    max cost/run field + max retries field — primary delivery mechanism
+  - SDK reads enforcement config from `/api/settings` on startup (not local YAML)
 
   What the developer gets:
 
   - "Stopped at retry 3 → saved $0.048" visible in dashboard
   - "Budget cap hit at $0.05 → run terminated" with cost preserved
   - Monthly savings summary from enforced limits across all runs
+  - Toggle in Control Plane: flip ON + set limits → enforced from next run forward
+  - No YAML editing, no CLI init command required
 
   Exit artifact:
 
@@ -298,18 +321,21 @@ Phase 1 sub-phases:
     intercepts `POST /v1/messages`, extracts stable prefix fingerprints, checks
     context_memory, injects `cache_control: {"type": "ephemeral"}` on matched blocks,
     forwards to real Anthropic API, records cache_read_input_tokens from response
-  - `agent-runtime proxy` CLI subcommand to start the proxy
+  - `agent-runtime proxy` CLI subcommand to start the proxy (developer fallback)
   - `GET /api/context-memory/summary` backend endpoint showing hit counts and savings
-  - Context Memory card on customer dashboard overview:
-    "X stable blocks · seen Y times · saved $Z total"
+  - Context Memory card on customer dashboard overview: estimated $/run caching
+    opportunity shown using existing repeated-context data (value-first empty state)
+  - 🧠 Context Memory toggle in Phase 1.10 Control Plane UI — primary delivery;
+    enabling toggle starts proxy automatically, sets ANTHROPIC_BASE_URL internally
   - Context Memory section on customer dashboard context page
 
   What the developer gets:
 
-  - One env var change: `ANTHROPIC_BASE_URL=http://localhost:8100`
+  - One toggle in the Control Plane — no env var change, no CLI command required
   - Stable context cached at $0.30/MTok instead of $3.00/MTok (90% cost reduction)
-  - Savings grow every run — compounding value
+  - Savings grow every run — compounding value, increasing switching cost
   - "24,100 tokens from context memory → saved $0.072 this call" in dashboard
+  - Context memory is local and private — no data leaves their environment
 
   Exit artifact:
 
@@ -320,13 +346,108 @@ Phase 1 sub-phases:
   Cumulative savings visible in dashboard context memory card
   ```
 
-Phase 1.7 through Phase 1.9 may build:
+- **Phase 1.10 Control Plane**
+  Unify Phase 1.7, 1.8, and 1.9 under a single toggle-based UI so any developer —
+  not just CLI-comfortable ones — can activate all three optimizations in one screen
+  and see their gains from the next run forward.
+
+  Problem it solves:
+
+  Phase 1.7–1.9 are built but require CLI commands, YAML config files, and manual env
+  var exports. No competitor has a toggle-based control plane for agent cost optimization.
+  This is the UX gap Agentium can own.
+
+  User flow:
+
+  ```
+  Step 1 — First run (Phase 1.6, already works)
+    Developer installs SDK + hooks → runs agent → dashboard shows:
+    "65% repeated tokens · $0.0142/run · 3 retries"
+    User thinks: "how do I fix this?"
+
+  Step 2 — Control Plane (/settings page)
+    User opens localhost:4000/settings
+    Sees 3 toggle cards — each showing their OWN data as the value prop:
+
+    ⚡ Context Optimizer    [toggle OFF → flip ON]
+       "Your runs waste 65% repeated tokens → ~$0.018 saving/run available"
+
+    🛡 Budget Governor     [toggle OFF → flip ON]
+       "3 retries this week → ~$0.009 wasted"
+       Max cost/run: [0.10]   Max retries: [3]
+
+    🧠 Context Memory      [toggle OFF → flip ON]
+       "65% tokens re-sent every call → ~$0.018/run cacheable"
+
+    User flips toggles → Save → "Active from your next run"
+
+  Step 3 — Next run (the payoff)
+    SDK reads /api/settings on startup
+    → optimizer ON  → strips repeated context automatically
+    → budget ON     → enforces cap + retry limit via hooks
+    → memory ON     → proxy injects cache_control markers
+    Run completes
+
+  Step 4 — Gains card ("the wow moment")
+    Overview page shows new section:
+    ┌──────────────────────────────────────────────────┐
+    │  Since you turned on optimizations (yesterday)   │
+    │  Tokens      48,200 → 27,400    −43%  ✓         │
+    │  Cost/run    $0.0142 → $0.0081  −43%  ✓         │
+    │  Retries     3 → 0              −100% ✓         │
+    └──────────────────────────────────────────────────┘
+  ```
+
+  What it builds:
+
+  - `settings` table in SQLite: `optimizer_enabled`, `budget_enabled`, `memory_enabled`,
+    `max_cost_per_run`, `max_retries`, `plan`, `enabled_at`,
+    `baseline_avg_tokens`, `baseline_avg_cost`, `baseline_retry_count`
+    (baseline snapshot captured from last 10 runs when toggle first turns ON)
+  - `GET /api/settings` and `PATCH /api/settings` backend endpoints
+  - Plan gate enforcement in PATCH: `PLAN_GATES` dict maps feature → allowed plans;
+    returns 403 with upgrade message if plan does not have access
+  - SDK `_load_remote_settings()` called on `AgentRuntimeTracer.__init__`:
+    reads `/api/settings`, applies optimizer/budget/memory config automatically;
+    silent fallback to local defaults if API unreachable
+  - `/settings` page in customer dashboard: three toggle cards with live value
+    estimates computed from user's own run data; budget inputs shown inline when
+    budget toggle is ON; PATCH on save; "Active from next run" confirmation banner
+  - Pricing gate UI: free-plan toggles render grayed with lock icon and upgrade CTA;
+    clicking locked toggle opens upgrade modal showing ROI calculation
+  - "Gains since enabled" delta card on `/overview`: compares runs after `enabled_at`
+    vs baseline snapshot; shows token delta, cost delta, retry delta; badge ✓ Verified
+    when real before/after pairs exist
+
+  Competitive positioning:
+
+  No competitor (Langfuse, Helicone, Portkey, LangSmith, Braintrust, Arize, W&B Weave)
+  offers a toggle-based control plane where flipping a switch applies an optimization
+  to the developer's next run and shows measured before/after gains. Portkey has budget
+  guardrails but requires JSON/YAML config. Helicone has caching but it is always-on
+  with no per-feature control. Agentium Phase 1.10 owns this gap.
+
+  Exit artifact:
+
+  ```text
+  /settings page live with 3 toggles + plan gates
+  PATCH /api/settings enforces plan tier
+  SDK reads settings from API on startup
+  "Gains since enabled" card visible on overview after first post-enable run
+  At least one alpha user activated all 3 toggles and saw gains card
+  ```
+
+Phase 1.7 through Phase 1.10 may build:
 
 - Context optimizer runtime (apply, not just recommend)
 - Budget and retry control using existing hook infrastructure
 - Anthropic prefix cache_control injection (product feature, not custom KV-cache)
 - Local API proxy for context interception (self-hosted, no cloud dependency)
-- Per-repo configuration files for budget and retry policy
+- Per-repo configuration files for budget and retry policy (developer fallback)
+- Toggle-based control plane UI (primary delivery mechanism for 1.7–1.9)
+- Pricing gate enforcement in backend (plan field, PLAN_GATES, 403 on upgrade required)
+- "Gains since enabled" delta card using baseline snapshot vs post-enable runs
+- SDK reading settings from API on startup (replaces local YAML as primary config)
 
 Phase 1 must not build:
 
@@ -339,6 +460,124 @@ Phase 1 must not build:
 - custom KV-cache implementation (use Anthropic prefix caching instead)
 - hardware simulation
 - RTL/FPGA/ASIC/chip design
+
+## Monetization Strategy
+
+### Core principle
+
+```
+Free  =  You can SEE the problem (observe)
+Paid  =  Agentium FIXES it for you (act)
+```
+
+Every toggle in the control plane is a pricing gate. Observing is free forever.
+Acting — optimizing, governing, remembering — is paid. No per-trace tax, no per-span
+billing. Charge for value delivered, not data ingested.
+
+### Pricing tiers
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  OBSERVE  — Free ($0)                                           │
+├─────────────────────────────────────────────────────────────────┤
+│  Unlimited traces + full dashboard (Phase 1.0–1.6)             │
+│  "You are wasting 65% tokens" — the insight shown              │
+│  "3 retries → ~$0.009 wasted" — the warning shown              │
+│  "~$0.018/run cacheable" — the opportunity shown               │
+│  ⚡ 🛡 🧠 Toggles visible but locked (lock icon + upgrade CTA) │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│  PRO  — $49/month (Optimize tier)   [Phase 1.7 unlock]         │
+├─────────────────────────────────────────────────────────────────┤
+│  ⚡ Context Optimizer toggle — ON                               │
+│  Auto-strips repeated context on every run                     │
+│  Proof card per run: −44% tokens · −43% cost · ✓ Verified      │
+│  "Gains since enabled" delta card on overview                  │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│  TEAM  — $149/month (Control tier)  [Phase 1.8 unlock]         │
+├─────────────────────────────────────────────────────────────────┤
+│  Everything in Pro                                             │
+│  🛡 Budget Governor toggle — ON                                 │
+│  Set max cost/run + max retries per project                    │
+│  "X runs blocked · $Y saved" dashboard                         │
+│  Governs all developers on the team under shared rules         │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│  ENTERPRISE  — Custom (Fabric tier) [Phase 1.9 unlock]         │
+├─────────────────────────────────────────────────────────────────┤
+│  Everything in Team                                            │
+│  🧠 Context Memory toggle — ON                                  │
+│  Caches stable context at $0.30/MTok vs $3.00/MTok (10×)      │
+│  Savings compound every run — the retention moat               │
+│  SLA: "your agent never exceeds your budget"                   │
+│  Context memory is local, private, portable                    │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### The upgrade trigger (why users pay)
+
+Each gate fires at the exact moment the user wants to act:
+
+```
+Free user sees: "65% repeated tokens · ~$0.018/run savings available"
+                [⚡ Enable Optimizer]  ← grayed, lock icon
+                "Unlock with Pro — $49/mo"
+
+At 100 runs/day that is $1.80/day = $54/month wasted.
+Pro costs $49/month. ROI is positive on day 31. The math sells itself.
+```
+
+### The retention hook (why users stay)
+
+```
+Phase 1.7 (Pro):     Proof card per run → dev shares with manager
+Phase 1.8 (Team):    Budget rules set once → never think about it again
+Phase 1.9 (Fabric):  Context memory grows every run →
+                     switching means losing your entire optimization history
+```
+
+### Revenue ladder
+
+```
+Phase 1.6 alone:  $0  — builds corpus of users who SEE the problem
+Phase 1.7 (Pro):  $49/mo  × N solo devs     ← first revenue
+Phase 1.8 (Team): $149/mo × N teams          ← 3× per account
+Phase 1.9 (Ent):  Custom  × N companies      ← enterprise + moat
+```
+
+### Billing implementation
+
+Phase 1 is single-tenant (one developer, one local Docker install). No Stripe, no auth,
+no user table required yet. The `plan` field in the settings table is set manually
+(or via a license key emailed to alpha users). When moving to multi-tenant SaaS, add
+`user_id` + Stripe customer ID.
+
+```sql
+-- settings table includes:
+plan TEXT DEFAULT 'free'
+-- Values: 'free' | 'pro' | 'team' | 'enterprise'
+-- Set manually for Phase 1 alpha; Stripe webhook sets it at scale
+```
+
+### Competitive moat summary
+
+```
+Langfuse:    OSS observability, no control plane
+Helicone:    Proxy + caching, always-on, no per-feature toggles
+Portkey:     Budget guardrails, config-file-first, no toggle UI
+LangSmith:   Tracing only, SaaS-only, no optimization actions
+Braintrust:  Eval + observability, no cost control plane
+
+Agentium:    First toggle-based control plane where flipping a switch
+             applies a measured optimization and shows before/after gains.
+             "Free to observe. Pay only when you save."
+```
+
+---
 
 ## Phase 2: Agentic Inference System Blueprint Validation
 
