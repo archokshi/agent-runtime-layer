@@ -175,6 +175,9 @@ export default async function RunDetailPage({ params }: { params: Promise<{ task
           </div>
         </section>
 
+        {/* Phase 1.7 — Apply Optimization (shown early so it's discoverable) */}
+        {analysis.repeated_context_percent >= 20 && <ApplyOptimizationButton taskId={task_id} />}
+
         {/* Waterfall + Context growth */}
         <div className="grid gap-4 lg:grid-cols-3">
 
@@ -298,8 +301,8 @@ export default async function RunDetailPage({ params }: { params: Promise<{ task
           </div>
         </section>
 
-        {/* Phase 1.7 — Apply Optimization */}
-        <ApplyOptimizationButton taskId={task_id} />
+        {/* Phase 1.7 — Apply Optimization (also shown at bottom for runs with low repeated ctx) */}
+        {analysis.repeated_context_percent < 20 && <ApplyOptimizationButton taskId={task_id} />}
 
         {/* Cross-links */}
         <div className="flex flex-wrap gap-3">

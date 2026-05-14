@@ -84,6 +84,18 @@ export default async function OverviewPage() {
     : null;
 
   const totalRetries = analyses.reduce((s, a) => s + a.retry_count, 0);
+  // Phase 1.8: estimate waste from retries (retry cost ≈ retry_count / model_call_count × total_cost)
+  const estimatedRetryWaste = analyses.reduce((s, a) => {
+    const retryFraction = a.model_call_count > 0 ? a.retry_count / a.model_call_count : 0;
+    return s + a.estimated_total_cost_dollars * retryFraction;
+  }, 0);
+  const highCostRun = analyses.length > 0 ? Math.max(...analyses.map((a) => a.estimated_total_cost_dollars)) : 0;
+
+  // Phase 1.9: estimate cache savings (repeated tokens × Anthropic cache discount ≈ $2.70/MTok)
+  const avgInputTokens = n > 0 ? analyses.reduce((s, a) => s + a.total_input_tokens, 0) / n : 0;
+  const avgRepeatedTokens = avgInputTokens * (repeatedCtxPct / 100);
+  const estimatedCacheSavingsPerRun = avgRepeatedTokens * (2.70 / 1_000_000);
+
   const h1Count = analyses.filter((a) => a.total_task_duration_ms > 0 && a.tool_time_ms / a.total_task_duration_ms >= 0.25).length;
   const h2Count = analyses.filter((a) => a.repeated_context_percent >= 15).length;
   const h6Count = analyses.filter((a) => a.retry_count > 0).length;
@@ -233,10 +245,30 @@ export default async function OverviewPage() {
                 </div>
               </div>
             ) : (
-              <div className="text-sm text-slate-500 space-y-2">
-                <p>No runs stopped yet. Install budget controls to prevent runaway costs.</p>
+              <div className="space-y-3">
+                {totalRetries > 0 || highCostRun > 0 ? (
+                  <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-amber-800">Cost risk in your runs</p>
+                    <div className="mt-2 grid grid-cols-2 gap-2">
+                      {totalRetries > 0 && (
+                        <div>
+                          <p className="text-xl font-bold text-amber-700">{totalRetries} retries</p>
+                          <p className="text-xs text-amber-600">~${estimatedRetryWaste.toFixed(4)} wasted</p>
+                        </div>
+                      )}
+                      {highCostRun > 0 && (
+                        <div>
+                          <p className="text-xl font-bold text-amber-700">${highCostRun.toFixed(4)}</p>
+                          <p className="text-xs text-amber-600">highest single run</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-sm text-slate-500">No retry overhead detected yet.</p>
+                )}
+                <p className="text-xs text-slate-500">Budget Governor caps cost per run and stops retry spirals automatically.</p>
                 <pre className="text-xs bg-ink text-teal-300 rounded-lg p-2 overflow-x-auto">{"agent-runtime budget-init --repo ."}</pre>
-                <p className="text-xs text-slate-400">Then set limits in <code className="bg-slate-100 px-1 rounded">.agentium/config.yaml</code></p>
               </div>
             )}
           </section>
@@ -267,10 +299,27 @@ export default async function OverviewPage() {
                 <p className="text-xs text-slate-500">{memSummary.message}</p>
               </div>
             ) : (
-              <div className="text-sm text-slate-500 space-y-2">
-                <p>No context blocks memorized yet. Start the proxy to begin saving on repeated stable context.</p>
+              <div className="space-y-3">
+                {estimatedCacheSavingsPerRun > 0 ? (
+                  <div className="rounded-lg border border-teal-200 bg-teal-50 p-3">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-teal-800">Caching opportunity detected</p>
+                    <div className="mt-2 grid grid-cols-2 gap-2">
+                      <div>
+                        <p className="text-xl font-bold text-teal-700">~${estimatedCacheSavingsPerRun.toFixed(4)}</p>
+                        <p className="text-xs text-teal-600">saved per run</p>
+                      </div>
+                      <div>
+                        <p className="text-xl font-bold text-teal-700">{repeatedCtxPct.toFixed(0)}%</p>
+                        <p className="text-xs text-teal-600">tokens re-sent every call</p>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="text-sm text-slate-500">Run more traces to see your caching opportunity.</p>
+                )}
+                <p className="text-xs text-slate-500">Context Memory fingerprints your stable context and caches it at 10× cheaper Anthropic rates.</p>
                 <pre className="text-xs bg-ink text-teal-300 rounded-lg p-2 overflow-x-auto">{"agent-runtime proxy --port 8100"}</pre>
-                <p className="text-xs text-slate-400">Then: <code className="bg-slate-100 px-1 rounded">export ANTHROPIC_BASE_URL=http://localhost:8100</code></p>
+                <p className="text-xs text-slate-400">Then: <code className="bg-slate-100 px-1 rounded">ANTHROPIC_BASE_URL=http://localhost:8100</code></p>
               </div>
             )}
           </section>

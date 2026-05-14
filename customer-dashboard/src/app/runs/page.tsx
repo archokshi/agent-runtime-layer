@@ -76,12 +76,13 @@ export default async function RunsPage() {
                 <th className="px-5 py-3 text-left">Retries</th>
                 <th className="px-5 py-3 text-left">Repeated CTX%</th>
                 <th className="px-5 py-3 text-left">Model calls</th>
+                <th className="px-5 py-3 text-left">Optimize</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100">
               {tasks.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-5 py-8 text-center text-sm text-slate-400">
+                  <td colSpan={8} className="px-5 py-8 text-center text-sm text-slate-400">
                     No runs yet.{" "}
                     <Link href="/import" className="text-mint hover:underline">Import a trace</Link> to get started.
                   </td>
@@ -113,6 +114,15 @@ export default async function RunsPage() {
                         {a ? `${ctxPct.toFixed(1)}%${isHighCtx ? " ⚠" : ""}` : "—"}
                       </td>
                       <td className="px-5 py-3 text-slate-600">{a ? a.model_call_count : "—"}</td>
+                      <td className="px-5 py-3">
+                        {a && a.repeated_context_percent >= 20 ? (
+                          <Link href={`/runs/${task.task_id}`} className="inline-flex items-center gap-1 rounded-full border border-teal-200 bg-teal-50 px-2 py-0.5 text-xs font-semibold text-teal-700 hover:bg-teal-100 transition-colors">
+                            ⚡ Fix it
+                          </Link>
+                        ) : (
+                          <span className="text-xs text-slate-300">—</span>
+                        )}
+                      </td>
                     </tr>
                   );
                 })
