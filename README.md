@@ -1,328 +1,238 @@
-# Agent Runtime Layer
+# Agentium — Agent Runtime Layer
 
-Self-hosted profiler for coding-agent traces, bottlenecks, context waste, and optimization evidence.
+**See it. Fix it. Control it. Remember it.**
 
-Agent Runtime Layer helps developers answer:
+Agentium is a self-hosted profiler and control plane for coding agents.
+It captures every model call, tool wait, retry, and context re-send — then gives
+you one-click controls to optimize them.
 
-- Why is this coding agent slow?
-- Where did model cost go?
-- How much context is repeated on every model call?
-- Are tools, retries, or orchestration causing idle time?
-- Which optimization should I try next, and what evidence supports it?
+```
+Free to observe. Pay only when you save.
+```
 
-It runs locally with FastAPI, SQLite, and a Next.js dashboard.
+---
 
 ## Preview
 
 ![Agentium — what happens inside a real coding agent run](docs/assets/dashboard-overview.svg)
 
-Import a trace, inspect bottlenecks, and generate optimization evidence from a self-hosted dashboard.
+---
 
-## Current Status
+## The Problem
 
-Developer preview.
+Every coding agent run wastes money and time in four ways:
 
-The core local product works end to end: trace import, command capture, SDK instrumentation, Codex native capture, Claude Code native capture, dashboard analysis, bottleneck detection, context inspector, cost explorer, optimization recommendations, context optimizer, benchmark evidence records, and Workload Reports.
+| Waste | Typical impact | What Agentium does |
+|---|---|---|
+| Repeated context | 40–70% of input tokens re-sent every call | Strips stable context automatically |
+| Retry spirals | 3–10 retries at full cost before giving up | Caps retries and cost per run |
+| Cold-start cost | Same system prompt billed at $3/MTok every run | Caches at $0.30/MTok via proxy |
+| No visibility | You don't know what the agent is doing or why | Full waterfall + event feed |
 
-This project does **not** claim real KV-cache control, production scheduler behavior, hardware simulation, or measured hardware speedups.
+---
 
-## Prerequisites
+## How It Works
 
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (for the backend and dashboards)
-- Python 3.10+ (for the `agent-runtime` CLI and SDK)
-- [Codex CLI](https://github.com/openai/codex) or [Claude Code](https://claude.ai/code) (for the respective integrations)
-
-Install the `agent-runtime` CLI:
-
-```bash
-cd packages/sdk-python
-pip install -e .
+```
+Step 1 — See it      Install hooks or SDK → dashboard shows token waste, cost, bottlenecks
+Step 2 — Fix it      Click Apply on any run → proof card shows −43% tokens, −43% cost
+Step 3 — Control it  Set budget cap → hooks block runaway runs automatically
+Step 4 — Remember it Proxy caches stable context → savings compound every run
 ```
 
-On Windows (PowerShell):
+One Control Plane page. Three toggles. Active from your next run.
 
-```powershell
-cd packages\sdk-python
-pip install -e .
-```
+---
 
 ## Quickstart
 
 ```bash
-docker compose up --build
-```
-
-Open the dashboard:
-
-```text
-http://localhost:4000
-```
-
-Backend API:
-
-```text
-http://localhost:8000/docs
-```
-
-## Supported Integrations
-
-### Codex
-
-Install repo-local Codex hooks in the repository where you run Codex:
-
-```bash
-agent-runtime integrations install codex --repo .
-```
-
-Then run Codex normally. Agent Runtime Layer captures Codex hook events into the local dashboard when the backend is running.
-
-For live validation when project-local hooks are not loading, use global Codex hooks:
-
-```bash
-agent-runtime integrations install codex --global
-```
-
-If a Codex CLI mode does not fire hooks on your platform, import the completed Codex session JSONL after the run:
-
-```bash
-agent-runtime codex-session ~/.codex/sessions/YYYY/MM/DD/rollout-....jsonl --project codex-live --upload
-```
-
-See [Codex Native Capture](docs/integrations/codex.md) and the [Codex Validation Demo](docs/integrations/codex-validation-demo.md).
-
-### Claude Code
-
-Install Claude Code hooks in the repository where you run Claude Code:
-
-```bash
-agent-runtime integrations install claude-code --repo .
-```
-
-Then run Claude Code normally. Each turn is captured as a task trace including prompt, tool calls, file changes, terminal output, and stop events.
-
-Check status or remove:
-
-```bash
-agent-runtime integrations status claude-code --repo .
-agent-runtime integrations uninstall claude-code --repo .
-```
-
-See [Claude Code Native Capture](docs/integrations/claude-code.md).
-
-### Custom Agents — Python SDK
-
-```python
-from agent_runtime_layer import AgentRuntimeTracer, prompt_hash
-
-with AgentRuntimeTracer(task_name="custom agent task") as trace:
-    trace.log_context_snapshot(
-        size_tokens=12000,
-        repeated_tokens_estimate=3000,
-        context_kind="repo_summary_plus_tool_schema",
-    )
-
-    with trace.model_call(
-        model="claude-3-5-sonnet",
-        role="planner",
-        estimated_input_tokens=12000,
-        expected_output_tokens=600,
-        prompt_hash_value=prompt_hash("plan the fix"),
-    ) as call:
-        call.finish(input_tokens=12000, output_tokens=520, cost_dollars=0.02)
-
-    with trace.tool_call(tool_name="terminal", command="pytest tests/") as tool:
-        tool.finish(status="success", exit_code=0, payload={"stdout_preview": "passed"})
-```
-
-## Golden Demo
-
-Click **Start demo** on the homepage at `http://localhost:4000`.
-
-The demo imports a bundled coding-agent trace where an agent:
-
-1. plans a checkout tax fix
-2. runs a failing test
-3. observes terminal output
-4. repeats stable repo and tool context
-5. calls the model again to repair the issue
-6. edits one file
-7. reruns tests successfully
-
-The app then generates:
-
-- execution graph
-- timeline and event table
-- bottleneck report
-- repeated-context analysis
-- estimated model cost
-- optimization recommendations
-- prefix-cache-ready context package
-- Workload Report
-
-The demo shows the core value: **evidence-backed diagnosis for why a coding-agent run is slow or expensive, and what optimization to try next.**
-
-## What You Can Do
-
-### Import Traces
-
-```bash
-curl -X POST http://localhost:8000/api/traces/import \
-  -H "Content-Type: application/json" \
-  --data-binary @examples/sample-traces/repeated-context-task.json
-```
-
-### Capture Local Commands
-
-```bash
-cd packages/sdk-python
-python -m agent_runtime_layer.cli trace --name "hello test" -- python -c "print('hello')"
-python -m agent_runtime_layer.cli import .agent-runtime/traces/<task_id>.json
-```
-
-Upload in one step:
-
-```bash
-python -m agent_runtime_layer.cli trace --name "hello test" --upload -- python -c "print('hello')"
-```
-
-### Generate Optimization Evidence
-
-```bash
-curl http://localhost:8000/api/tasks/<task_id>/optimizations
-curl -X POST http://localhost:8000/api/tasks/<task_id>/optimize-context
-```
-
-The dashboard shows stable context blocks, dynamic context blocks, estimated token reduction, estimated cost reduction, and an optimized prompt and context package.
-
-### Generate a Workload Report
-
-```bash
-curl -X POST http://localhost:8000/api/phase-1-exit/generate
+git clone https://github.com/archokshi/agent-runtime-layer.git
+cd agent-runtime-layer
+docker compose up --build -d
 ```
 
 Open:
 
-```text
-http://localhost:4000/recommendations
+```
+http://localhost:4000          ← Agentium dashboard
+http://localhost:8000/docs     ← API
 ```
 
-The Workload Report summarizes local evidence, recommendations, metric quality, cost and savings, and next validation steps.
+→ **[Full 5-minute guide](docs/QUICKSTART_5MIN.md)**
+
+---
+
+## Integrations
+
+### Claude Code
+
+```bash
+cd packages/sdk-python && pip install -e .
+agent-runtime integrations install claude-code --repo /path/to/your/repo
+```
+
+Run Claude Code normally. Every turn is captured.
+
+### Codex
+
+```bash
+agent-runtime integrations install codex --repo /path/to/your/repo
+```
+
+Or import a session after the run:
+
+```bash
+agent-runtime codex-session ~/.codex/sessions/YYYY/MM/DD/rollout-....jsonl \
+  --project my-project --upload
+```
+
+### Custom Python agent
+
+```python
+from agent_runtime_layer import AgentRuntimeTracer
+
+with AgentRuntimeTracer(task_name="my task") as trace:
+    with trace.model_call(model="claude-sonnet-4-6", role="planner",
+                          estimated_input_tokens=12000) as call:
+        call.finish(input_tokens=12000, output_tokens=520, cost_dollars=0.02)
+
+    with trace.tool_call(tool_name="terminal", command="pytest") as tool:
+        tool.finish(status="success", exit_code=0)
+```
+
+Settings from the Control Plane apply automatically on tracer init — no code
+changes needed after you flip a toggle.
+
+---
 
 ## Dashboard
 
-Open `http://localhost:4000` after starting with Docker Compose.
-
 | Route | What it shows |
 |---|---|
-| `/` | Landing page — what Agentium does and how to get started |
-| `/overview` | Live agent health — hero metrics, time split, detected patterns |
-| `/runs` | All traced runs with status, cost, retries, and repeated context % |
-| `/runs/<id>` | Run detail — waterfall timeline, context growth, event feed |
-| `/bottlenecks` | Time and cost bottleneck analysis with plain-English pattern cards |
-| `/context` | Context inspector — stable vs dynamic token breakdown per run |
-| `/cost` | Cost explorer — cost per task, cost per failure, before/after comparison |
-| `/recommendations` | Ranked action list with impact, confidence, and effort scores |
-| `/import` | Integration guides and trace import instructions |
+| `/overview` | Agent health, time split, detected patterns, gains since optimizations enabled |
+| `/runs` | All traced runs — status, cost, retries, repeated context %, optimize badge |
+| `/runs/<id>` | Waterfall timeline, context growth, event feed, Apply Optimization button |
+| `/bottlenecks` | Where time goes — model vs tool wait vs idle |
+| `/context` | Which tokens are re-sent on every call — stable vs dynamic breakdown |
+| `/cost` | Cost per task, cost per failure, before/after comparison |
+| `/recommendations` | Ranked action list — what to fix first with impact scores |
+| `/settings` | **Control Plane** — enable optimizations, set budget limits, see pricing |
 
-The dashboard auto-refreshes every 30 seconds with a live indicator.
+---
+
+## Control Plane
+
+Go to `http://localhost:4000/settings`.
+
+Each toggle shows your own run data as the value proposition before you enable it:
+
+```
+⚡ Context Optimizer    [toggle]
+   "Your runs waste 65% repeated tokens → ~$0.018 saving/run"
+
+🛡 Budget Governor     [toggle]   max cost: $0.10   max retries: 3
+   "3 retries detected this week → ~$0.009 wasted"
+
+🧠 Context Memory      [toggle]
+   "65% tokens re-sent every call → cacheable at 10× cheaper rate"
+```
+
+Flip a toggle → Save → run your agent again → the **Gains since enabled** card
+on `/overview` shows the before/after delta with real measured numbers.
+
+---
+
+## Pricing
+
+| Tier | Price | Unlocks |
+|---|---|---|
+| **Observe** | Free | Full dashboard — unlimited traces, all analysis pages |
+| **Pro** | $49/mo | ⚡ Context Optimizer — auto-fix + proof card per run |
+| **Team** | $149/mo | 🛡 Budget Governor — cost caps + retry limits across all runs |
+| **Enterprise** | Custom | 🧠 Context Memory — persistent cache, compounding savings, SLA |
+
+For local alpha testing, set your plan in the Developer section of `/settings`.
+
+---
 
 ## Architecture
 
-```text
+```
 Coding agents
-  - Codex (hooks)
-  - Claude Code (hooks)
-  - Custom agents (Python SDK)
-  - Imported traces (JSON)
-        |
-        v
-FastAPI backend + SQLite
-  http://localhost:8000
-        |
-        v
-  Agentium dashboard
-  http://localhost:4000
+  Codex (hooks) · Claude Code (hooks) · Custom agents (Python SDK) · Imported traces
+        │
+        ▼
+FastAPI + SQLite                    ← localhost:8000
+  Trace ingestion · Analysis · Optimization · Budget · Context Memory · Settings
+        │
+        ▼
+Agentium dashboard (Next.js)        ← localhost:4000
+  Overview · Runs · Bottlenecks · Context · Cost · Recommendations · Settings
 ```
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
-## Documentation
+---
 
-- [Quickstart](docs/QUICKSTART.md)
-- [Architecture](docs/ARCHITECTURE.md)
-- [Codex Native Capture](docs/integrations/codex.md)
-- [Codex Validation Demo](docs/integrations/codex-validation-demo.md)
-- [Claude Code Native Capture](docs/integrations/claude-code.md)
-- [Limitations](docs/LIMITATIONS.md)
-- [API spec](docs/API_SPEC.md)
-- [Trace schema](docs/TRACE_SCHEMA.md)
-- [Security and privacy](docs/SECURITY_PRIVACY.md)
+## What Agentium Does Not Claim
 
-## Validation
-
-Backend tests:
-
-```bash
-cd backend
-PYTHONPATH=. python -m pytest tests
-```
-
-Frontend build:
-
-```bash
-cd frontend
-npm ci
-npm run build
-```
-
-Docker smoke test:
-
-```bash
-docker compose up --build -d
-curl http://localhost:8000/api/health
-```
-
-Expected:
-
-```json
-{"status":"ok"}
-```
-
-## Privacy
-
-Agent traces can contain sensitive prompts, file paths, terminal output, tool results, and project metadata.
-
-By default:
-
-- data is stored locally in SQLite
-- no product telemetry is sent
-- obvious secrets are redacted before persistence where possible
-
-Review traces before sharing them publicly.
-
-## Limitations
-
-Agent Runtime Layer currently does not provide:
-
-- hosted SaaS
-- production authentication
-- billing
-- official SWE-bench runner
-- real KV-cache control
-- direct vLLM, SGLang, Dynamo, or LMCache integration
-- production scheduling
-- live GPU polling
-- hardware simulation
-- RTL, FPGA, ASIC, or chip design output
+- No real KV-cache control (uses Anthropic prefix caching, not custom backend)
+- No hardware simulation or speedup claims
+- No production authentication or billing (self-hosted, local by design)
+- No official SWE-bench results
 
 See [docs/LIMITATIONS.md](docs/LIMITATIONS.md).
 
-## Contributing
+---
 
-See [CONTRIBUTING.md](CONTRIBUTING.md).
+## Documentation
+
+| Doc | What it covers |
+|---|---|
+| [5-minute quickstart](docs/QUICKSTART_5MIN.md) | Install → first trace → Control Plane |
+| [Architecture](docs/ARCHITECTURE.md) | System design and data flow |
+| [Phase roadmap](docs/AGENTIUM_PHASE_ROADMAP.md) | Full product and monetization roadmap |
+| [Claude Code integration](docs/integrations/claude-code.md) | Hook setup and validation |
+| [Codex integration](docs/integrations/codex.md) | Hook setup and JSONL import |
+| [API spec](docs/API_SPEC.md) | All endpoints |
+| [Trace schema](docs/TRACE_SCHEMA.md) | Event format |
+| [Security and privacy](docs/SECURITY_PRIVACY.md) | Local data handling |
+| [Limitations](docs/LIMITATIONS.md) | What is and is not claimed |
+
+---
+
+## Validation
+
+```bash
+# Backend tests
+cd backend && PYTHONPATH=. python -m pytest tests
+
+# Docker smoke test
+docker compose up --build -d
+curl http://localhost:8000/api/health   # → {"status":"ok"}
+curl http://localhost:8000/api/settings # → {"plan":"free",...}
+```
+
+---
+
+## Privacy
+
+All data stays local. SQLite only. No telemetry. Obvious secrets are redacted
+before persistence. Review traces before sharing them publicly.
+
+---
 
 ## License
 
 AGPL-3.0-or-later. See [LICENSE](LICENSE).
 
-Agent Runtime Layer is free to use, self-host, modify, and contribute to under the GNU Affero General Public License v3.0 or any later version. Commercial licensing may be offered later for teams that need proprietary embedding, hosted-service use, or custom terms.
+Free to use, self-host, modify, and contribute under the GNU Affero General
+Public License v3.0 or later. Commercial licensing available for teams that need
+proprietary embedding, hosted-service use, or custom terms.
+
+---
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md).
