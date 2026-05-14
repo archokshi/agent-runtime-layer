@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Shell } from "@/components/Shell";
-import { getAllAnalyses, getPhase1ExitPackages, getPlatformSummary, getTasks } from "@/lib/api";
-import { ArrowRight } from "lucide-react";
+import { getAllAnalyses, getBudgetSummary, getContextMemorySummary, getPhase1ExitPackages, getPlatformSummary, getTasks } from "@/lib/api";
+import { ArrowRight, Shield, Brain } from "lucide-react";
 
 function Badge({ quality }: { quality: string }) {
   const map: Record<string, string> = {
@@ -49,9 +49,11 @@ function MetricCard({ label, value, sub, quality }: { label: string; value: stri
 
 export default async function OverviewPage() {
   const tasks = await getTasks().catch(() => []);
-  const [platform, reports] = await Promise.all([
+  const [platform, reports, budgetSummary, memSummary] = await Promise.all([
     getPlatformSummary(),
     getPhase1ExitPackages(),
+    getBudgetSummary(),
+    getContextMemorySummary(),
   ]);
   const analyses = await getAllAnalyses(tasks);
   const latestReport = reports?.[0] ?? null;
@@ -201,6 +203,76 @@ export default async function OverviewPage() {
                 );
               })}
             </div>
+          </section>
+        </div>
+
+        {/* Phase 1.8 — Budget Governor + Phase 1.9 — Context Memory */}
+        <div className="grid gap-4 lg:grid-cols-2">
+
+          {/* Budget Governor */}
+          <section className="rounded-xl border border-line bg-white p-5 shadow-sm">
+            <div className="flex items-center gap-2 mb-3">
+              <Shield size={16} className="text-mint flex-shrink-0" />
+              <h2 className="font-semibold text-ink">Budget Governor</h2>
+              <span className="ml-auto text-xs font-semibold px-2 py-0.5 rounded-full border bg-slate-50 text-slate-500 border-slate-200">Phase 1.8</span>
+            </div>
+            {budgetSummary && budgetSummary.total_blocked_runs > 0 ? (
+              <div className="space-y-3">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="rounded-lg bg-teal-50 border border-teal-200 p-3 text-center">
+                    <p className="text-xs text-teal-700 font-medium">Runs stopped</p>
+                    <p className="text-2xl font-bold text-teal-700 mt-1">{budgetSummary.total_blocked_runs}</p>
+                  </div>
+                  <div className="rounded-lg bg-teal-50 border border-teal-200 p-3 text-center">
+                    <p className="text-xs text-teal-700 font-medium">Saved</p>
+                    <p className="text-2xl font-bold text-teal-700 mt-1">${budgetSummary.total_saved_dollars.toFixed(4)}</p>
+                  </div>
+                </div>
+                <div className="text-xs text-slate-500">
+                  Budget: ${budgetSummary.config.max_cost_per_run}/run · Max retries: {budgetSummary.config.max_retries_per_task}
+                </div>
+              </div>
+            ) : (
+              <div className="text-sm text-slate-500 space-y-2">
+                <p>No runs stopped yet. Install budget controls to prevent runaway costs.</p>
+                <pre className="text-xs bg-ink text-teal-300 rounded-lg p-2 overflow-x-auto">{"agent-runtime budget-init --repo ."}</pre>
+                <p className="text-xs text-slate-400">Then set limits in <code className="bg-slate-100 px-1 rounded">.agentium/config.yaml</code></p>
+              </div>
+            )}
+          </section>
+
+          {/* Context Memory */}
+          <section className="rounded-xl border border-line bg-white p-5 shadow-sm">
+            <div className="flex items-center gap-2 mb-3">
+              <Brain size={16} className="text-mint flex-shrink-0" />
+              <h2 className="font-semibold text-ink">Context Memory</h2>
+              <span className="ml-auto text-xs font-semibold px-2 py-0.5 rounded-full border bg-slate-50 text-slate-500 border-slate-200">Phase 1.9</span>
+            </div>
+            {memSummary && memSummary.total_entries > 0 ? (
+              <div className="space-y-3">
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="rounded-lg bg-teal-50 border border-teal-200 p-2 text-center">
+                    <p className="text-xs text-teal-700">Blocks</p>
+                    <p className="text-xl font-bold text-teal-700">{memSummary.total_entries}</p>
+                  </div>
+                  <div className="rounded-lg bg-teal-50 border border-teal-200 p-2 text-center">
+                    <p className="text-xs text-teal-700">Hits</p>
+                    <p className="text-xl font-bold text-teal-700">{memSummary.total_hit_count}</p>
+                  </div>
+                  <div className="rounded-lg bg-teal-50 border border-teal-200 p-2 text-center">
+                    <p className="text-xs text-teal-700">Saved</p>
+                    <p className="text-xl font-bold text-teal-700">${memSummary.total_cache_savings_dollars.toFixed(3)}</p>
+                  </div>
+                </div>
+                <p className="text-xs text-slate-500">{memSummary.message}</p>
+              </div>
+            ) : (
+              <div className="text-sm text-slate-500 space-y-2">
+                <p>No context blocks memorized yet. Start the proxy to begin saving on repeated stable context.</p>
+                <pre className="text-xs bg-ink text-teal-300 rounded-lg p-2 overflow-x-auto">{"agent-runtime proxy --port 8100"}</pre>
+                <p className="text-xs text-slate-400">Then: <code className="bg-slate-100 px-1 rounded">export ANTHROPIC_BASE_URL=http://localhost:8100</code></p>
+              </div>
+            )}
           </section>
         </div>
 

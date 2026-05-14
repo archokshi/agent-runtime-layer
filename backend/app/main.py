@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api import analysis, benchmarks, blueprints, corpus, events, evidence, evidence_campaign, health, phase1_exit, phase2_handoff, platform, tasks, telemetry, traces, validation
+from app.api import analysis, benchmarks, blueprints, budget, context_memory, corpus, events, evidence, evidence_campaign, health, optimization, phase1_exit, phase2_handoff, platform, tasks, telemetry, traces, validation
 from app.db import init_db
 
 
@@ -17,7 +17,7 @@ def create_app() -> FastAPI:
     app = FastAPI(title="Agent Runtime Layer", version="5.0.0", lifespan=lifespan)
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+        allow_origins=["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:4000", "http://127.0.0.1:4000", "http://localhost:8100"],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -37,6 +37,9 @@ def create_app() -> FastAPI:
     app.include_router(evidence_campaign.router, prefix="/api")
     app.include_router(phase2_handoff.router, prefix="/api")
     app.include_router(telemetry.router, prefix="/api")
+    app.include_router(optimization.router, prefix="/api")
+    app.include_router(budget.router, prefix="/api")
+    app.include_router(context_memory.router, prefix="/api")
 
     return app
 

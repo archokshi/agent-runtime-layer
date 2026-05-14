@@ -101,3 +101,72 @@ export type Phase1ExitPackage = {
   metric_quality_scorecard: { name: string; value: string; evidence: string; quality: "measured" | "estimated" | "inferred" | "missing" }[];
   architecture_readiness_score: number;
 };
+
+// Phase 1.7
+export type OptimizationProofRecord = {
+  proof_id: string;
+  baseline_task_id: string;
+  optimized_task_id: string | null;
+  baseline_input_tokens: number;
+  optimized_input_tokens: number;
+  baseline_cost_dollars: number;
+  optimized_cost_dollars: number;
+  token_reduction_percent: number;
+  cost_reduction_percent: number;
+  success_preserved: boolean | null;
+  evidence_quality: string;
+  created_at: string | null;
+};
+
+// Phase 1.8
+export type BudgetConfig = {
+  max_cost_per_run: number;
+  max_retries_per_task: number;
+  alert_threshold: number;
+  token_limit_per_call: number;
+  enabled: boolean;
+};
+
+export type BudgetEvent = {
+  event_id: string;
+  session_id: string;
+  task_id: string | null;
+  event_type: string;
+  reason: string;
+  cost_at_block: number | null;
+  retries_at_block: number | null;
+  budget_limit: number | null;
+  retry_limit: number | null;
+  created_at: string | null;
+};
+
+export type BudgetGovernorSummary = {
+  total_blocked_runs: number;
+  total_saved_dollars: number;
+  blocks_by_type: Record<string, number>;
+  recent_events: BudgetEvent[];
+  config: BudgetConfig;
+};
+
+// Phase 1.9
+export type ContextMemoryEntry = {
+  fingerprint: string;
+  content_type: string;
+  token_count: number;
+  source_repo: string | null;
+  agent_type: string | null;
+  first_seen_at: string | null;
+  last_seen_at: string | null;
+  hit_count: number;
+  cache_savings_dollars: number;
+};
+
+export type ContextMemorySummary = {
+  total_entries: number;
+  total_tokens_memorized: number;
+  total_hit_count: number;
+  total_cache_savings_dollars: number;
+  top_entries: ContextMemoryEntry[];
+  evidence_quality: string;
+  message: string;
+};

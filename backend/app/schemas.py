@@ -959,3 +959,84 @@ class TelemetryCorpusReport(BaseModel):
     readiness_status: Literal["ready", "partial", "missing"] = "missing"
     limitations: list[str] = Field(default_factory=list)
     next_steps: list[str] = Field(default_factory=list)
+
+
+# ── Phase 1.7: Context Optimizer Runtime ─────────────────────────────────────
+
+class OptimizationProofRecord(BaseModel):
+    proof_id: str
+    baseline_task_id: str
+    optimized_task_id: str | None = None
+    baseline_input_tokens: int = 0
+    optimized_input_tokens: int = 0
+    baseline_cost_dollars: float = 0.0
+    optimized_cost_dollars: float = 0.0
+    token_reduction_percent: float = 0.0
+    cost_reduction_percent: float = 0.0
+    success_preserved: bool | None = None
+    evidence_quality: str = "estimated"
+    created_at: str | None = None
+
+
+class ApplyOptimizationResponse(BaseModel):
+    proof_id: str
+    baseline_task_id: str
+    token_reduction_percent: float
+    cost_reduction_percent: float
+    evidence_quality: str
+    message: str
+
+
+# ── Phase 1.8: Budget Governor ────────────────────────────────────────────────
+
+class BudgetConfig(BaseModel):
+    max_cost_per_run: float = 0.10
+    max_retries_per_task: int = 5
+    alert_threshold: float = 0.05
+    token_limit_per_call: int = 200000
+    enabled: bool = True
+
+
+class BudgetEvent(BaseModel):
+    event_id: str
+    session_id: str
+    task_id: str | None = None
+    event_type: str
+    reason: str
+    cost_at_block: float | None = None
+    retries_at_block: int | None = None
+    budget_limit: float | None = None
+    retry_limit: int | None = None
+    created_at: str | None = None
+
+
+class BudgetGovernorSummary(BaseModel):
+    total_blocked_runs: int = 0
+    total_saved_dollars: float = 0.0
+    blocks_by_type: dict[str, int] = Field(default_factory=dict)
+    recent_events: list[BudgetEvent] = Field(default_factory=list)
+    config: BudgetConfig = Field(default_factory=BudgetConfig)
+
+
+# ── Phase 1.9: Agent Context Fabric ──────────────────────────────────────────
+
+class ContextMemoryEntry(BaseModel):
+    fingerprint: str
+    content_type: str = "unknown"
+    token_count: int = 0
+    source_repo: str | None = None
+    agent_type: str | None = None
+    first_seen_at: str | None = None
+    last_seen_at: str | None = None
+    hit_count: int = 1
+    cache_savings_dollars: float = 0.0
+
+
+class ContextMemorySummary(BaseModel):
+    total_entries: int = 0
+    total_tokens_memorized: int = 0
+    total_hit_count: int = 0
+    total_cache_savings_dollars: float = 0.0
+    top_entries: list[ContextMemoryEntry] = Field(default_factory=list)
+    evidence_quality: str = "estimated"
+    message: str = "Context memory grows as Agentium captures more traces."

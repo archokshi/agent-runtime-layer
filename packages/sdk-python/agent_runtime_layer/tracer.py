@@ -218,6 +218,9 @@ class AgentRuntimeTracer:
         agent_type: str = "custom_agent",
         budget_dollars: float | None = None,
         latency_slo_seconds: int | None = None,
+        auto_optimize: bool = False,
+        max_retries: int | None = None,
+        max_cost_per_run: float | None = None,
     ) -> None:
         self.task_name = task_name
         self.project_id = project_id
@@ -226,11 +229,43 @@ class AgentRuntimeTracer:
         self.agent_type = agent_type
         self.budget_dollars = budget_dollars
         self.latency_slo_seconds = latency_slo_seconds
+        # Phase 1.7: auto_optimize — strip repeated stable context before model calls
+        self.auto_optimize = auto_optimize
+        self._stable_context_hashes: set[str] = set()
+        # Phase 1.8: budget governor — track cost + retries, enforce limits
+        self.max_retries = max_retries
+        self.max_cost_per_run = max_cost_per_run
+        self._session_cost: float = 0.0
+        self._retry_count: int = 0
         self.task_span_id = f"span_task_{uuid4().hex[:8]}"
         self.events: list[dict[str, Any]] = []
         self.trace_path: Path | None = None
         self._ended = False
         self._context_hashes: dict[str, int] = {}
+
+    def check_budget(self) -> tuple[bool, str]:
+        """Phase 1.8: Check if session cost or retry count exceeds configured limits.
+        Returns (allowed, reason). Call before each model/tool invocation."""
+        if self.max_cost_per_run is not None and self._session_cost >= self.max_cost_per_run:
+            return False, f"Budget exceeded: ${self._session_cost:.4f} >= ${self.max_cost_per_run:.4f} limit"
+        if self.max_retries is not None and self._retry_count >= self.max_retries:
+            return False, f"Retry limit reached: {self._retry_count} >= {self.max_retries} max retries"
+        return True, ""
+
+    def record_cost(self, cost_dollars: float) -> None:
+        """Phase 1.8: Accumulate cost for budget tracking."""
+        self._session_cost += cost_dollars
+
+    def record_retry(self) -> None:
+        """Phase 1.8: Increment retry counter."""
+        self._retry_count += 1
+
+    def register_stable_context(self, context_hash: str) -> bool:
+        """Phase 1.7: Register a stable context hash. Returns True if this is a repeat (can be skipped)."""
+        if context_hash in self._stable_context_hashes:
+            return True  # repeated — can be optimized away
+        self._stable_context_hashes.add(context_hash)
+        return False  # first time seen
 
     def __enter__(self) -> "AgentRuntimeTracer":
         self.start_task()

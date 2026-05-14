@@ -176,6 +176,48 @@ CREATE TABLE IF NOT EXISTS evidence_campaign_reports (
   campaign_id TEXT PRIMARY KEY,
   report_json TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS optimization_proofs (
+  proof_id TEXT PRIMARY KEY,
+  baseline_task_id TEXT NOT NULL,
+  optimized_task_id TEXT,
+  baseline_input_tokens INTEGER NOT NULL DEFAULT 0,
+  optimized_input_tokens INTEGER NOT NULL DEFAULT 0,
+  baseline_cost_dollars REAL NOT NULL DEFAULT 0,
+  optimized_cost_dollars REAL NOT NULL DEFAULT 0,
+  token_reduction_percent REAL NOT NULL DEFAULT 0,
+  cost_reduction_percent REAL NOT NULL DEFAULT 0,
+  success_preserved INTEGER,
+  evidence_quality TEXT NOT NULL DEFAULT 'estimated',
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS budget_events (
+  event_id TEXT PRIMARY KEY,
+  session_id TEXT NOT NULL,
+  task_id TEXT,
+  event_type TEXT NOT NULL,
+  reason TEXT NOT NULL,
+  cost_at_block REAL,
+  retries_at_block INTEGER,
+  budget_limit REAL,
+  retry_limit INTEGER,
+  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS idx_budget_events_session ON budget_events(session_id);
+
+CREATE TABLE IF NOT EXISTS context_memory (
+  fingerprint TEXT PRIMARY KEY,
+  content_type TEXT NOT NULL DEFAULT 'unknown',
+  token_count INTEGER NOT NULL DEFAULT 0,
+  source_repo TEXT,
+  agent_type TEXT,
+  first_seen_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  last_seen_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  hit_count INTEGER NOT NULL DEFAULT 1,
+  cache_savings_dollars REAL NOT NULL DEFAULT 0
+);
 """
 
 

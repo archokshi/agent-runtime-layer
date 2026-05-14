@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Shell } from "@/components/Shell";
 import { getAnalysis, getEvents, getOptimizedContext, getOptimizations, getTask } from "@/lib/api";
+import { ApplyOptimizationButton } from "@/components/ApplyOptimizationButton";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import type { TraceEvent } from "@/lib/types";
 
@@ -296,6 +297,9 @@ export default async function RunDetailPage({ params }: { params: Promise<{ task
             )}
           </div>
         </section>
+
+        {/* Phase 1.7 — Apply Optimization */}
+        <ApplyOptimizationButton taskId={task_id} />
 
         {/* Cross-links */}
         <div className="flex flex-wrap gap-3">

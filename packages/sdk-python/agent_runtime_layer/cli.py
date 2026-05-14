@@ -95,6 +95,11 @@ def main() -> None:
     cursor_stream_parser.add_argument("--repo", default=".")
     cursor_stream_parser.add_argument("--project", default=None)
     cursor_stream_parser.add_argument("--name", default=None)
+    proxy_parser = subparsers.add_parser("proxy", help="Phase 1.9: Start the Agentium Context Fabric proxy")
+    proxy_parser.add_argument("--port", type=int, default=8100)
+    proxy_parser.add_argument("--anthropic-url", default="https://api.anthropic.com")
+    budget_init_parser = subparsers.add_parser("budget-init", help="Phase 1.8: Write default .agentium/config.yaml")
+    budget_init_parser.add_argument("--repo", default=".")
     args = parser.parse_args()
 
     client = AgentRuntimeClient(args.base_url)
@@ -251,6 +256,18 @@ def main() -> None:
                 f"Agent Runtime Cursor stream handled task={result.task_id or 'none'} events={result.emitted_events}",
                 file=sys.stderr,
             )
+    if args.command == "proxy":
+        from agent_runtime_layer.proxy import run_proxy
+        run_proxy(
+            port=args.port,
+            agentium_url=args.base_url,
+            anthropic_url=args.anthropic_url,
+        )
+    if args.command == "budget-init":
+        from agent_runtime_layer.budget import write_default_config
+        config_path = write_default_config(repo_path=args.repo)
+        print(f"Wrote Agentium budget config: {config_path}")
+        print("Edit .agentium/config.yaml to set your budget limits, then re-install hooks.")
 
 
 if __name__ == "__main__":

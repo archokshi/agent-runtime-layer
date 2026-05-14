@@ -197,15 +197,146 @@ Phase 1 sub-phases:
   Clear Phase 2 test plan
   ```
 
+- **Phase 1.7 Context Optimizer Runtime**
+  Convert the Context Optimizer from an analysis tool into a runtime action. Phase 1.6
+  shows developers what to fix. Phase 1.7 lets them fix it in one click and see measured
+  proof that it worked. This is the first monetizable product feature.
+
+  Purpose:
+
+  The gap between seeing a problem and fixing it must be one action. Phase 1.7 closes
+  that gap. The developer clicks Apply — Agentium strips stable context, runs the
+  optimized prompt, captures the before/after delta, and produces a shareable proof card.
+
+  What it builds:
+
+  - `POST /api/tasks/{task_id}/apply-optimization` backend endpoint that runs the
+    optimizer and stores an OptimizationProofRecord with before/after token and cost delta
+  - `GET /api/optimization-proof/{proof_id}` to retrieve proof records
+  - `auto_optimize` flag on `AgentRuntimeTracer` — when True, automatically strips
+    stable context blocks before each model call using the optimizer
+  - Before/after proof card in the customer dashboard run detail page showing measured
+    token reduction, cost reduction, and success preservation
+  - Apply Optimization button on run detail page (customer dashboard port 4000)
+
+  What the developer gets:
+
+  - One click from "you are wasting 43% of tokens" to "here is the proof it is fixed"
+  - Shareable proof card: −44% tokens · −43% cost · success preserved ✓ [measured]
+  - SDK flag for zero-friction automation: `auto_optimize=True`
+
+  Evidence quality rule:
+
+  - Labels show `~ Estimated` until a real before/after pair is measured
+  - Labels upgrade to `✓ Verified` automatically after a measured pair is stored
+
+  Exit artifact:
+
+  ```text
+  At least one OptimizationProofRecord stored in the database
+  Before/after proof card visible in the customer dashboard
+  auto_optimize flag tested on at least one real agent run
+  ```
+
+- **Phase 1.8 Budget Governor**
+  Give developers hard controls over agent cost and retry behavior using the existing
+  hook infrastructure. PreToolUse hooks can block execution — Phase 1.8 uses this to
+  enforce per-project budget caps and retry limits before runaway costs occur.
+
+  Purpose:
+
+  No more $0.124 disaster runs. No more silent retry spirals. The developer configures
+  the rules once. Agentium enforces them on every run automatically via hooks that
+  already fire before every tool call.
+
+  What it builds:
+
+  - `.agentium/config.yaml` per-repo config file schema supporting:
+    `max_cost_per_run`, `max_retries_per_task`, `alert_threshold`, `token_limit_per_call`
+  - `packages/sdk-python/agent_runtime_layer/budget.py` — session cost and retry state
+    tracker (reads config, accumulates cost, counts retries per session)
+  - Budget enforcement in `claude_code.py` and `codex.py` hook handlers:
+    PreToolUse checks budget state → returns blocked result if limit exceeded
+  - `GET /api/budget/config` and `POST /api/budget/config` backend endpoints
+  - Budget Governor card on customer dashboard overview: live cost, retries stopped,
+    cumulative savings from enforced limits
+
+  What the developer gets:
+
+  - "Stopped at retry 3 → saved $0.048" visible in dashboard
+  - "Budget cap hit at $0.05 → run terminated" with cost preserved
+  - Monthly savings summary from enforced limits across all runs
+
+  Exit artifact:
+
+  ```text
+  At least one real run stopped by budget cap (measured, in dashboard)
+  At least one real run stopped by retry limit (measured, in dashboard)
+  .agentium/config.yaml documented and tested on Codex and Claude Code hooks
+  ```
+
+- **Phase 1.9 Agent Context Fabric**
+  Persist stable agent context across sessions using a local context memory store and
+  a lightweight API proxy. Agentium learns which context blocks are stable across runs
+  and automatically adds Anthropic cache_control markers so the developer pays
+  $0.30/MTok instead of $3.00/MTok on repeated prefixes. One environment variable
+  change. Zero agent code changes.
+
+  Purpose:
+
+  Every cold-start agent run re-sends the same system prompt, tool definitions, and
+  repo summary at full price. Phase 1.9 makes that cost disappear. The more runs
+  Agentium captures, the more context blocks it recognizes, and the more it saves.
+  The developer's trace history becomes their switching cost.
+
+  What it builds:
+
+  - `context_memory` table in the existing SQLite database:
+    fingerprint (sha256), content_type, token_count, source_repo, agent_type,
+    first_seen_at, last_seen_at, hit_count
+  - `packages/sdk-python/agent_runtime_layer/proxy.py` — local API proxy on port 8100:
+    intercepts `POST /v1/messages`, extracts stable prefix fingerprints, checks
+    context_memory, injects `cache_control: {"type": "ephemeral"}` on matched blocks,
+    forwards to real Anthropic API, records cache_read_input_tokens from response
+  - `agent-runtime proxy` CLI subcommand to start the proxy
+  - `GET /api/context-memory/summary` backend endpoint showing hit counts and savings
+  - Context Memory card on customer dashboard overview:
+    "X stable blocks · seen Y times · saved $Z total"
+  - Context Memory section on customer dashboard context page
+
+  What the developer gets:
+
+  - One env var change: `ANTHROPIC_BASE_URL=http://localhost:8100`
+  - Stable context cached at $0.30/MTok instead of $3.00/MTok (90% cost reduction)
+  - Savings grow every run — compounding value
+  - "24,100 tokens from context memory → saved $0.072 this call" in dashboard
+
+  Exit artifact:
+
+  ```text
+  context_memory table populated from at least one real trace
+  Proxy intercepts at least one real agent run with cache_control injection
+  Dashboard shows verified cache_read_input_tokens > 0 from Anthropic API response
+  Cumulative savings visible in dashboard context memory card
+  ```
+
+Phase 1.7 through Phase 1.9 may build:
+
+- Context optimizer runtime (apply, not just recommend)
+- Budget and retry control using existing hook infrastructure
+- Anthropic prefix cache_control injection (product feature, not custom KV-cache)
+- Local API proxy for context interception (self-hosted, no cloud dependency)
+- Per-repo configuration files for budget and retry policy
+
 Phase 1 must not build:
 
 - SaaS/team features
 - billing/auth/user management
 - generic LLMOps dashboards
 - prompt playgrounds
-- random integrations not needed by Phase 2
+- random integrations not needed by Phase 1.7 through Phase 1.9
 - production scheduler
-- real KV-cache manager
+- custom KV-cache implementation (use Anthropic prefix caching instead)
 - hardware simulation
 - RTL/FPGA/ASIC/chip design
 
