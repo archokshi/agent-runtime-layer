@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { browserBaseUrl } from "@/lib/api";
 import { Zap, CheckCircle, Loader } from "lucide-react";
+
+const apiBase = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8000/api";
 
 type ProofResult = {
   proof_id: string;
@@ -21,7 +22,7 @@ export function ApplyOptimizationButton({ taskId }: { taskId: string }) {
     setState("loading");
     setError("");
     try {
-      const base = browserBaseUrl ?? "http://localhost:8000/api";
+      const base = apiBase;
       const res = await fetch(`${base}/tasks/${taskId}/apply-optimization`, {
         method: "POST",
       });
