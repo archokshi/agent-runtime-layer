@@ -40,7 +40,7 @@ html,body{width:100%;height:100%;font-family:'Inter',sans-serif;background:#E5E7
 .hdr-right{display:flex;align-items:center;gap:10px;}
 .slide-label{font-size:9px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--muted2);}
 .backup-badge{font-size:8px;font-weight:700;padding:2px 7px;border-radius:99px;background:#FFF3CD;color:var(--amber);border:1px solid #FDE68A;letter-spacing:.3px;text-transform:uppercase;}
-.sbody{flex:1;padding:32px 56px;display:flex;flex-direction:column;justify-content:center;overflow:hidden;}
+.sbody{flex:1;padding:32px 56px;display:flex;flex-direction:column;justify-content:center;overflow:auto;}
 .sfooter{padding:9px 44px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--bg);}
 .sfooter-l{font-size:9px;color:var(--muted2);}
 .sfooter-r{font-size:9px;color:var(--mint);font-family:var(--mono);font-weight:600;}
@@ -404,7 +404,7 @@ html,body{width:100%;height:100%;font-family:'Inter',sans-serif;background:#E5E7
 <div class="slide" id="s4">
   <div class="shdr"><div class="logo"><div class="hex"></div><span class="logo-name">Agentium</span></div><div class="slide-label">The Proof Card</div></div>
   <div class="sbody" style="padding:24px 48px;">
-    <div class="ey">Phase 1.7 — Apply optimization</div>
+    <div class="ey">Context Optimizer — how it works</div>
     <div class="h2" style="font-size:22px;margin-bottom:14px;">One click. Measured result. <em>Shareable proof.</em></div>
     <div class="proof-layout">
       <div>
@@ -535,7 +535,7 @@ html,body{width:100%;height:100%;font-family:'Inter',sans-serif;background:#E5E7
         </div></div>
         <div class="ap"><div class="ap-dot"></div><div>
           <div class="ap-title">Context proxy intercepts API calls</div>
-          <div class="ap-desc">The Phase 1.9 proxy runs on port 8100. Developer sets ANTHROPIC_BASE_URL=http://localhost:8100. The proxy fingerprints stable context and injects cache_control markers.</div>
+          <div class="ap-desc">The Context Memory proxy runs on port 8100. Developer sets ANTHROPIC_BASE_URL=http://localhost:8100. The proxy fingerprints stable context and injects cache_control markers.</div>
           <span class="ap-code">ANTHROPIC_BASE_URL=http://localhost:8100</span>
         </div></div>
         <div class="ap"><div class="ap-dot"></div><div>
@@ -642,7 +642,7 @@ html,body{width:100%;height:100%;font-family:'Inter',sans-serif;background:#E5E7
         <div class="pg-pop">Most popular</div>
         <div class="pg-tier">Pro</div>
         <div class="pg-price ea">Early access pricing</div>
-        <div class="pg-unlock">⚡ Phase 1.7 unlock</div>
+        <div class="pg-unlock">⚡ Context Optimizer</div>
         <div class="pg-sub">For devs who want verified cost savings</div>
         <div class="pg-feats">
           <div class="pg-feat"><div class="pg-dot" style="background:var(--mint)"></div>Everything in Observe</div>
@@ -655,7 +655,7 @@ html,body{width:100%;height:100%;font-family:'Inter',sans-serif;background:#E5E7
       <div class="pg">
         <div class="pg-tier">Team</div>
         <div class="pg-price ea">Early access pricing</div>
-        <div class="pg-unlock">🛡 Phase 1.8 unlock</div>
+        <div class="pg-unlock">🛡 Budget Governor</div>
         <div class="pg-sub">Cost governance across your entire team</div>
         <div class="pg-feats">
           <div class="pg-feat"><div class="pg-dot" style="background:var(--amber)"></div>Everything in Pro</div>
@@ -668,7 +668,7 @@ html,body{width:100%;height:100%;font-family:'Inter',sans-serif;background:#E5E7
       <div class="pg">
         <div class="pg-tier">Enterprise</div>
         <div class="pg-price cu">Contact us</div>
-        <div class="pg-unlock">🧠 Phase 1.9 unlock</div>
+        <div class="pg-unlock">🧠 Context Memory</div>
         <div class="pg-sub">Persistent memory + cost SLA</div>
         <div class="pg-feats">
           <div class="pg-feat"><div class="pg-dot" style="background:var(--blue)"></div>Everything in Team</div>
@@ -777,7 +777,7 @@ html,body{width:100%;height:100%;font-family:'Inter',sans-serif;background:#E5E7
       </div>
       <div class="fq">
         <div class="fq-q">Does it change how my agent behaves?</div>
-        <div class="fq-a">No. Phase 1.6 (observe) is completely passive — hooks capture events but don't modify agent behaviour. Phase 1.7 only activates when you explicitly click "Apply Optimization" or enable the toggle.</div>
+        <div class="fq-a">No. The observe mode is completely passive — hooks capture events but don't modify agent behaviour. The optimizer only activates when you explicitly click "Apply Optimization" or enable the toggle in Settings.</div>
       </div>
       <div class="fq">
         <div class="fq-q">What if Docker isn't installed?</div>
@@ -794,7 +794,7 @@ html,body{width:100%;height:100%;font-family:'Inter',sans-serif;background:#E5E7
       </div>
       <div class="fq">
         <div class="fq-q">What is Context Memory and how does it save money?</div>
-        <div class="fq-a">The Phase 1.9 local proxy intercepts Anthropic API calls at localhost:8100. It fingerprints stable context blocks (SHA-256), marks them with cache_control: ephemeral, and forwards to Anthropic. Anthropic charges $0.30/MTok for cached tokens vs $3.00/MTok for standard — a 10× discount.</div>
+        <div class="fq-a">The Context Memory proxy intercepts Anthropic API calls at localhost:8100. It fingerprints stable context blocks (SHA-256), marks them with cache_control: ephemeral, and forwards to Anthropic. Anthropic charges $0.30/MTok for cached tokens vs $3.00/MTok for standard — a 10× discount.</div>
       </div>
     </div>
   </div>

@@ -39,7 +39,7 @@ html,body{width:100%;height:100%;font-family:'Inter',sans-serif;background:#000;
 .logo-name{font-size:12px;font-weight:800;color:var(--text);}
 .slide-label{font-size:9px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--muted);}
 .backup-badge{font-size:8px;font-weight:700;padding:2px 7px;border-radius:99px;background:#F59E0B20;color:var(--amber);border:1px solid #F59E0B30;text-transform:uppercase;letter-spacing:.3px;}
-.sbody{flex:1;padding:30px 56px;display:flex;flex-direction:column;justify-content:center;overflow:hidden;}
+.sbody{flex:1;padding:30px 56px;display:flex;flex-direction:column;justify-content:center;overflow:auto;}
 .sftr{padding:9px 44px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
 .sftr-l{font-size:9px;color:var(--muted2);}
 .sftr-r{font-size:9px;color:var(--mint);font-family:var(--mono);}
@@ -358,7 +358,7 @@ html,body{width:100%;height:100%;font-family:'Inter',sans-serif;background:#000;
     <div class="h2" style="font-size:24px;">Each phase is a standalone value add <em>unlocking the next pricing tier.</em></div>
     <div class="phase-arc">
       <div class="ph">
-        <div class="ph-tag">Phase 1.6 · Free</div>
+        <div class="ph-tag">Free tier</div>
         <div class="ph-icon">👁</div>
         <div class="ph-title">See it</div>
         <div class="ph-desc">Full observability dashboard. 8 pages: Overview, Runs, Run detail, Bottlenecks, Context inspector, Cost explorer, Recommendations, Control Plane. Unlimited traces. Self-hosted.</div>
@@ -366,7 +366,7 @@ html,body{width:100%;height:100%;font-family:'Inter',sans-serif;background:#000;
         <span class="ph-api">GET /api/tasks/{id}/analysis</span>
       </div>
       <div class="ph ft">
-        <div class="ph-tag">Phase 1.7 · Pro tier</div>
+        <div class="ph-tag">Pro tier</div>
         <div class="ph-icon">⚡</div>
         <div class="ph-title">Fix it</div>
         <div class="ph-desc">One-click context optimizer. SHA-256 fingerprints stable blocks, strips them from per-call payload. Stores OptimizationProofRecord with measured before/after delta. Proof card per run.</div>
@@ -374,7 +374,7 @@ html,body{width:100%;height:100%;font-family:'Inter',sans-serif;background:#000;
         <span class="ph-api">POST /api/tasks/{id}/apply-optimization</span>
       </div>
       <div class="ph">
-        <div class="ph-tag">Phase 1.8 · Team tier</div>
+        <div class="ph-tag">Team tier</div>
         <div class="ph-icon">🛡</div>
         <div class="ph-title">Control it</div>
         <div class="ph-desc">Budget Governor enforces max_cost_per_run and max_retries via PreToolUse hooks. Returns blocked=true if limit exceeded — Claude Code stops the run. Configurable via Control Plane UI. Zero code changes.</div>
@@ -382,7 +382,7 @@ html,body{width:100%;height:100%;font-family:'Inter',sans-serif;background:#000;
         <span class="ph-api">PATCH /api/settings → budget_enabled</span>
       </div>
       <div class="ph">
-        <div class="ph-tag">Phase 1.9 · Enterprise</div>
+        <div class="ph-tag">Enterprise tier</div>
         <div class="ph-icon">🧠</div>
         <div class="ph-title">Remember it</div>
         <div class="ph-desc">Local proxy on :8100 intercepts Anthropic API calls, fingerprints stable context, injects cache_control: ephemeral. Anthropic charges $0.30/MTok for cached vs $3.00/MTok standard. 10× discount, compounding savings.</div>
@@ -443,7 +443,7 @@ html,body{width:100%;height:100%;font-family:'Inter',sans-serif;background:#000;
           <div class="uc-desc">Free user sees quantified waste from their own runs on their first session. The data converts them — not a sales email.</div>
         </div>
         <div class="uc">
-          <div class="uc-lbl">Retention mechanism — Phase 1.9</div>
+          <div class="uc-lbl">Retention mechanism — Context Memory</div>
           <div style="font-size:13px;font-weight:700;color:var(--mint);margin-top:3px;line-height:1.4;">Context Memory grows with every run. Switching means losing your entire optimization history. The product gets better the longer you use it.</div>
         </div>
         <div class="uc">
@@ -523,46 +523,46 @@ html,body{width:100%;height:100%;font-family:'Inter',sans-serif;background:#000;
     <div class="ey">Built, shipped, deployed — live now</div>
     <div class="h2">Full Phase 1 product complete. <em>Ready for customers today.</em></div>
     <div class="tr-grid">
-      <div class="tc"><div class="tv">1.10</div><div class="tl">Phases shipped</div><div class="tn">Phase 1.0–1.10 complete in Phase 1</div></div>
+      <div class="tc"><div class="tv">4</div><div class="tl">Core capabilities</div><div class="tn">Observe · Fix · Control · Remember</div></div>
       <div class="tc"><div class="tv">200+</div><div class="tl">Waitlist</div><div class="tn">Early access page live</div></div>
       <div class="tc"><div class="tv">−43%</div><div class="tl">Token reduction</div><div class="tn">Verified · real before/after pair</div></div>
       <div class="tc"><div class="tv">8</div><div class="tl">Dashboard pages</div><div class="tn">All routes returning 200</div></div>
     </div>
     <div class="phases-built">
       <div class="pb">
-        <div class="pb-phase">Phase 1.6</div>
+        <div class="pb-phase">Observability</div>
         <div class="pb-item"><span class="pb-check">✓</span> Hooks (CC + Codex)</div>
         <div class="pb-item"><span class="pb-check">✓</span> Tracer SDK</div>
         <div class="pb-item"><span class="pb-check">✓</span> Full dashboard</div>
         <div class="pb-item"><span class="pb-check">✓</span> Analysis API</div>
       </div>
       <div class="pb">
-        <div class="pb-phase">Phase 1.7</div>
+        <div class="pb-phase">Optimizer</div>
         <div class="pb-item"><span class="pb-check">✓</span> Context optimizer</div>
         <div class="pb-item"><span class="pb-check">✓</span> Proof records DB</div>
         <div class="pb-item"><span class="pb-check">✓</span> Proof card UI</div>
-        <div class="pb-item"><span class="pb-check">✓</span> auto_optimize flag</div>
+        <div class="pb-item"><span class="pb-check">✓</span> Auto-optimize SDK</div>
       </div>
       <div class="pb">
-        <div class="pb-phase">Phase 1.8</div>
-        <div class="pb-item"><span class="pb-check">✓</span> Budget Governor</div>
+        <div class="pb-phase">Budget Governor</div>
         <div class="pb-item"><span class="pb-check">✓</span> Hook enforcement</div>
-        <div class="pb-item"><span class="pb-check">✓</span> budget_events DB</div>
+        <div class="pb-item"><span class="pb-check">✓</span> Max cost + retries</div>
+        <div class="pb-item"><span class="pb-check">✓</span> Budget events DB</div>
         <div class="pb-item"><span class="pb-check">✓</span> Savings dashboard</div>
       </div>
       <div class="pb">
-        <div class="pb-phase">Phase 1.9</div>
-        <div class="pb-item"><span class="pb-check">✓</span> Context Memory</div>
+        <div class="pb-phase">Context Memory</div>
         <div class="pb-item"><span class="pb-check">✓</span> Local proxy :8100</div>
         <div class="pb-item"><span class="pb-check">✓</span> SHA-256 fingerprint</div>
         <div class="pb-item"><span class="pb-check">✓</span> cache_control inject</div>
+        <div class="pb-item"><span class="pb-check">✓</span> Hit count tracking</div>
       </div>
       <div class="pb">
-        <div class="pb-phase">Phase 1.10</div>
-        <div class="pb-item"><span class="pb-check">✓</span> Control Plane UI</div>
-        <div class="pb-item"><span class="pb-check">✓</span> 3 toggles + gates</div>
-        <div class="pb-item"><span class="pb-check">✓</span> Plan gating (PLAN_GATES)</div>
-        <div class="pb-item"><span class="pb-check">✓</span> SDK reads settings</div>
+        <div class="pb-phase">Control Plane</div>
+        <div class="pb-item"><span class="pb-check">✓</span> Toggle UI</div>
+        <div class="pb-item"><span class="pb-check">✓</span> Pricing gates</div>
+        <div class="pb-item"><span class="pb-check">✓</span> SDK auto-config</div>
+        <div class="pb-item"><span class="pb-check">✓</span> Gains dashboard</div>
       </div>
     </div>
     <div style="margin-top:12px;background:var(--mint-lt);border:1px solid var(--mint-md);border-radius:8px;padding:10px 14px;font-size:11px;color:var(--text);line-height:1.5;">
@@ -655,7 +655,7 @@ html,body{width:100%;height:100%;font-family:'Inter',sans-serif;background:#000;
       </table>
     </div>
     <div class="moat-note">
-      <strong style="color:var(--mint)">The moat:</strong> No competitor offers (1) agent-specific profiling, (2) one-click optimization with a measured proof card, AND (3) a toggle-based control plane — in a self-hosted product. Agentium is the only product where flipping a switch applies a measured optimization and shows verified before/after gains on the next run. The Phase 1.9 Context Memory creates compounding switching cost that grows with every run.
+      <strong style="color:var(--mint)">The moat:</strong> No competitor offers (1) agent-specific profiling, (2) one-click optimization with a measured proof card, AND (3) a toggle-based control plane — in a self-hosted product. Agentium is the only product where flipping a switch applies a measured optimization and shows verified before/after gains on the next run. The Context Memory feature creates compounding switching cost that grows with every run.
     </div>
   </div>
   <div class="sftr"><div class="sftr-l">Agentium · Investor Presentation v2 · Confidential</div><div class="sftr-r">agent-runtime-layer.vercel.app</div></div>
@@ -878,11 +878,11 @@ html,body{width:100%;height:100%;font-family:'Inter',sans-serif;background:#000;
           <div style="font-size:10.5px;color:var(--muted);line-height:1.5;margin-top:4px">Zero external dependencies. Self-contained Docker image. Backs up to a single file. Runs on any machine. Enterprise can deploy on-prem with zero cloud footprint.</div>
         </div>
         <div class="ra" style="background:var(--card)">
-          <div class="ra-title">Hook mechanism (Phase 1.8 enforcement)</div>
+          <div class="ra-title">Hook mechanism (Budget Governor enforcement)</div>
           <div style="font-size:10.5px;color:var(--muted);line-height:1.5;margin-top:4px">PreToolUse hook fires before every agent tool call. Budget Governor checks session cost + retry count. Returns <code style="font-family:var(--mono);font-size:9.5px;background:var(--surface);padding:1px 4px;border-radius:3px;color:var(--mint)">blocked=true</code> if limits exceeded. Claude Code stops the run instantly.</div>
         </div>
         <div class="ra" style="background:var(--card)">
-          <div class="ra-title">Context Memory proxy (Phase 1.9)</div>
+          <div class="ra-title">Context Memory proxy (how it works)</div>
           <div style="font-size:10.5px;color:var(--muted);line-height:1.5;margin-top:4px">Intercepts POST /v1/messages. SHA-256 fingerprints stable blocks. Injects cache_control: ephemeral on matched blocks. Forwards to Anthropic. Records cache_read_input_tokens from response.</div>
         </div>
         <div class="ra" style="background:var(--card)">
@@ -904,7 +904,7 @@ html,body{width:100%;height:100%;font-family:'Inter',sans-serif;background:#000;
     <div class="roadmap-items">
       <div class="ri">
         <div class="ri-phase" style="color:var(--green)">✓ Done</div>
-        <div><div class="ri-title">Phase 1.0–1.10 — Full Agent Runtime Layer</div><div class="ri-desc">Profiler, hooks (Claude Code + Codex), tracer SDK, context optimizer + proof cards (1.7), budget governor via hooks (1.8), context memory local proxy (1.9), toggle-based control plane with plan gating (1.10). Live at agent-runtime-layer.vercel.app.</div><div class="ri-timeline">Complete · shipped</div></div>
+        <div><div class="ri-title">Full product — all four capabilities shipped</div><div class="ri-desc">Observability profiler, hooks (Claude Code + Codex), tracer SDK, Context Optimizer with proof cards, Budget Governor via hooks, Context Memory local proxy, toggle-based Control Plane with pricing gates. Live at agent-runtime-layer.vercel.app.</div><div class="ri-timeline">Complete · shipped</div></div>
       </div>
       <div class="ri">
         <div class="ri-phase">Month 2–3</div>
