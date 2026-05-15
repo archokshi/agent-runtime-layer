@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Agentium — Investor Presentation v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --mint:#00C9A7;--mint-lt:#00C9A710;--mint-md:#00C9A728;
+  --green:#10B981;--amber:#F59E0B;--red:#EF4444;--blue:#6366F1;
+  --bg:#080810;--surface:#0F0F1A;--card:#141420;--border:#1E1E2E;--border2:#252538;
+  --text:#EDEDF0;--muted:#6B7280;--muted2:#4B5563;
+  --mono:'JetBrains Mono',monospace;
+}
+html,body{width:100%;height:100%;font-family:'Inter',sans-serif;background:#000;overflow:hidden;-webkit-font-smoothing:antialiased;}
+.deck{width:100%;height:100%;position:relative;}
+.slide{position:absolute;top:0;left:0;width:100%;height:100%;display:none;flex-direction:column;background:var(--bg);}
+.slide.active{display:flex;}
+
+/* Nav */
+.nav{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;z-index:100;background:rgba(255,255,255,.05);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.08);border-radius:99px;padding:6px 12px;}
+.nav-btn{background:none;border:none;color:#4B5563;cursor:pointer;font-size:17px;padding:0 3px;transition:color .15s;line-height:1;}
+.nav-btn:hover{color:#fff;}
+.nav-dots{display:flex;gap:4px;align-items:center;}
+.dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.2);cursor:pointer;transition:all .2s;border:none;}
+.dot.active{background:var(--mint);width:16px;border-radius:99px;}
+.dot.backup{background:rgba(245,158,11,.25);}
+.dot.backup.active{background:var(--amber);}
+.nav-div{width:1px;height:12px;background:rgba(255,255,255,.12);}
+.scount{font-size:9px;color:#4B5563;font-family:var(--mono);white-space:nowrap;}
+.bb-lbl{font-size:8px;color:var(--amber);font-weight:700;letter-spacing:.3px;}
+
+/* Layout */
+.shdr{padding:12px 44px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.logo{display:flex;align-items:center;gap:7px;}
+.hex{width:18px;height:18px;background:var(--mint);clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);}
+.logo-name{font-size:12px;font-weight:800;color:var(--text);}
+.slide-label{font-size:9px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--muted);}
+.backup-badge{font-size:8px;font-weight:700;padding:2px 7px;border-radius:99px;background:#F59E0B20;color:var(--amber);border:1px solid #F59E0B30;text-transform:uppercase;letter-spacing:.3px;}
+.sbody{flex:1;padding:30px 56px;display:flex;flex-direction:column;justify-content:center;overflow:hidden;}
+.sftr{padding:9px 44px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.sftr-l{font-size:9px;color:var(--muted2);}
+.sftr-r{font-size:9px;color:var(--mint);font-family:var(--mono);}
+
+/* Type */
+.ey{font-size:10px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--mint);margin-bottom:9px;}
+.h1{font-size:44px;font-weight:900;letter-spacing:-2px;line-height:1.05;color:var(--text);}
+.h1 em{color:var(--mint);font-style:normal;}
+.h2{font-size:26px;font-weight:800;letter-spacing:-.7px;line-height:1.15;color:var(--text);}
+.h2 em{color:var(--mint);font-style:normal;}
+.sub{font-size:13px;color:var(--muted);line-height:1.65;margin-top:8px;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:18px;}
+.mono{font-family:var(--mono);}
+
+/* Cover */
+#s1{background:radial-gradient(ellipse at 70% 50%,#00C9A712 0%,var(--bg) 65%);}
+#s1 .sbody{padding:52px 76px;align-items:flex-start;justify-content:center;}
+#s1 .badge{display:inline-flex;align-items:center;gap:6px;background:var(--mint-md);border:1px solid var(--mint-md);color:var(--mint);font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:4px 12px;border-radius:99px;margin-bottom:16px;}
+#s1 .h1{font-size:50px;max-width:700px;}
+#s1 .div{width:36px;height:3px;background:var(--mint);border-radius:2px;margin:18px 0;}
+#s1 .meta{display:flex;gap:28px;}
+#s1 .mi .ml{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:3px;}
+#s1 .mi .mv{font-size:15px;font-weight:700;color:var(--text);}
+#s1 .tagline{font-size:12px;color:var(--muted2);margin-top:10px;font-style:italic;}
+
+/* 2col */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:16px;align-items:start;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:16px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px;}
+
+/* Problem */
+.pc{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:20px;}
+.pc.r{border-top:2px solid var(--red);}
+.pc.a{border-top:2px solid var(--amber);}
+.pc.b{border-top:2px solid var(--blue);}
+.pi{font-size:24px;margin-bottom:8px;}
+.pt{font-size:13.5px;font-weight:700;color:var(--text);margin-bottom:5px;}
+.pd{font-size:11px;color:var(--muted);line-height:1.6;}
+.ps{font-size:22px;font-weight:800;font-family:var(--mono);margin-top:12px;}
+.pq{margin-top:8px;padding:9px 12px;background:var(--surface);border:1px solid var(--border);border-radius:7px;font-size:10.5px;color:var(--muted);font-style:italic;line-height:1.5;}
+.pa{font-size:10px;font-weight:700;color:var(--mint);margin-top:6px;}
+
+/* Market TAM */
+.tam{display:flex;flex-direction:column;gap:10px;}
+.tam-row{display:flex;align-items:center;gap:10px;}
+.tam-lbl{width:55px;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);text-align:right;flex-shrink:0;}
+.tam-bar{flex:1;height:32px;background:var(--surface);border:1px solid var(--border);border-radius:6px;overflow:hidden;position:relative;}
+.tam-fill{height:100%;border-radius:6px;display:flex;align-items:center;padding:0 10px;font-size:10.5px;font-weight:700;font-family:var(--mono);}
+.tam-val{width:70px;flex-shrink:0;font-size:13px;font-weight:800;font-family:var(--mono);text-align:right;}
+.why-tam{display:flex;flex-direction:column;gap:9px;}
+.wt{display:flex;gap:10px;align-items:flex-start;}
+.wt-dot{width:6px;height:6px;border-radius:50%;background:var(--mint);flex-shrink:0;margin-top:4px;}
+.wt-title{font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px;}
+.wt-desc{font-size:10.5px;color:var(--muted);line-height:1.5;}
+.wt-proof{font-size:10px;font-weight:700;font-family:var(--mono);color:var(--mint);margin-top:2px;}
+
+/* Product phases */
+.phase-arc{display:flex;gap:0;border:1px solid var(--border);border-radius:11px;overflow:hidden;margin-top:18px;}
+.ph{flex:1;padding:20px 16px;border-right:1px solid var(--border);display:flex;flex-direction:column;gap:6px;}
+.ph:last-child{border-right:none;}
+.ph.ft{background:linear-gradient(160deg,var(--mint-lt),var(--bg));}
+.ph-tag{font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted2);}
+.ph-icon{font-size:20px;}
+.ph-title{font-size:14px;font-weight:800;color:var(--text);}
+.ph-desc{font-size:10.5px;color:var(--muted);line-height:1.5;}
+.ph-proof{font-size:9px;font-weight:600;font-family:var(--mono);color:var(--mint);background:var(--mint-lt);border:1px solid var(--mint-md);padding:2px 7px;border-radius:4px;display:inline-block;margin-top:3px;}
+.ph-api{font-size:8.5px;font-family:var(--mono);color:var(--muted2);margin-top:3px;}
+
+/* Biz model */
+.bm-left{display:flex;flex-direction:column;gap:8px;}
+.bt{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:12px 14px;display:flex;align-items:center;gap:12px;}
+.bt.ft{border-color:var(--mint-md);background:linear-gradient(90deg,var(--mint-lt),var(--card));}
+.bt-tier{width:70px;flex-shrink:0;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);}
+.bt-price{width:105px;flex-shrink:0;font-size:12px;font-weight:700;}
+.bt-price.fr{color:var(--text);font-family:var(--mono);}
+.bt-price.ea{color:var(--mint);font-size:10.5px;}
+.bt-price.cu{color:var(--text);font-size:10.5px;}
+.bt-unlock{flex:1;font-size:10.5px;color:var(--muted);}
+.bt-unlock strong{color:var(--text);}
+.bm-right{display:flex;flex-direction:column;gap:9px;}
+.uc{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:13px;}
+.uc-lbl{font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:5px;}
+.uc-val{font-size:20px;font-weight:800;font-family:var(--mono);color:var(--mint);}
+.uc-desc{font-size:10.5px;color:var(--muted);margin-top:3px;line-height:1.4;}
+
+/* GTM */
+.gtm-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;}
+.gc{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;}
+.gc-phase{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--mint);margin-bottom:5px;}
+.gc-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;}
+.gc-items{display:flex;flex-direction:column;gap:4px;}
+.gi{font-size:10.5px;color:var(--muted);display:flex;align-items:flex-start;gap:6px;}
+.gd{width:5px;height:5px;border-radius:50%;background:var(--mint);flex-shrink:0;margin-top:4px;}
+.gc-target{font-size:10px;font-weight:700;font-family:var(--mono);color:var(--mint);margin-top:7px;}
+
+/* Traction */
+.tr-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:18px;}
+.tc{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:18px;text-align:center;}
+.tv{font-size:32px;font-weight:900;font-family:var(--mono);color:var(--mint);letter-spacing:-1.5px;line-height:1;}
+.tl{font-size:9.5px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-top:5px;}
+.tn{font-size:10px;color:var(--muted2);margin-top:3px;}
+.phases-built{display:grid;grid-template-columns:repeat(5,1fr);gap:0;margin-top:14px;border:1px solid var(--border);border-radius:9px;overflow:hidden;}
+.pb{padding:12px 10px;border-right:1px solid var(--border);text-align:center;}
+.pb:last-child{border-right:none;}
+.pb-phase{font-size:8.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--mint);margin-bottom:5px;}
+.pb-item{font-size:9px;color:var(--text);display:flex;align-items:center;gap:4px;margin-bottom:2px;}
+.pb-check{color:var(--green);}
+
+/* Competition */
+.comp-wrap{margin-top:16px;border:1px solid var(--border);border-radius:11px;overflow:hidden;}
+.comp-wrap table{width:100%;border-collapse:collapse;}
+.comp-wrap thead tr{background:var(--surface);border-bottom:1px solid var(--border);}
+.comp-wrap th{padding:9px 12px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);text-align:center;}
+.comp-wrap th:first-child{text-align:left;}
+.comp-wrap th.us{color:var(--mint);}
+.comp-wrap tbody tr{border-bottom:1px solid var(--border);}
+.comp-wrap tbody tr:last-child{border-bottom:none;}
+.comp-wrap tbody tr.us-row{background:var(--mint-lt);}
+.comp-wrap td{padding:10px 12px;font-size:11px;color:var(--text);text-align:center;}
+.comp-wrap td:first-child{text-align:left;font-weight:700;}
+.comp-wrap td.us{color:var(--mint);font-weight:700;}
+.cy{color:var(--green);font-weight:700;}
+.cp{color:var(--amber);}
+.cn{color:var(--muted2);}
+.moat-note{margin-top:12px;background:var(--mint-lt);border:1px solid var(--mint-md);border-radius:7px;padding:11px 14px;font-size:11.5px;color:var(--text);line-height:1.5;}
+
+/* Why Now */
+.wn-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:20px;}
+.wn{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:20px;}
+.wni{font-size:22px;margin-bottom:8px;}
+.wnt{font-size:13.5px;font-weight:700;color:var(--text);margin-bottom:5px;}
+.wnd{font-size:11px;color:var(--muted);line-height:1.6;}
+.wnp{font-size:10px;font-weight:700;font-family:var(--mono);color:var(--mint);margin-top:8px;}
+
+/* Revenue projections */
+.rev-layout{display:grid;grid-template-columns:1.4fr 1fr;gap:22px;margin-top:16px;align-items:start;}
+.rev-bars{display:flex;flex-direction:column;gap:12px;}
+.rb-year{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin-bottom:4px;}
+.rb-bar-wrap{height:32px;background:var(--surface);border:1px solid var(--border);border-radius:6px;overflow:hidden;position:relative;}
+.rb-fill{height:100%;border-radius:6px;display:flex;align-items:center;padding:0 10px;font-size:11px;font-weight:700;font-family:var(--mono);color:#fff;}
+.rb-val{font-size:13px;font-weight:800;font-family:var(--mono);color:var(--mint);margin-top:3px;}
+.rev-assumptions{display:flex;flex-direction:column;gap:8px;}
+.ra{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:11px 13px;}
+.ra-title{font-size:10.5px;font-weight:700;color:var(--text);margin-bottom:3px;}
+.ra-calc{font-size:10px;font-family:var(--mono);color:var(--mint);line-height:1.6;}
+
+/* Team */
+.team-card{background:var(--card);border:1px solid var(--border);border-radius:11px;padding:22px;display:flex;gap:16px;}
+.ta{width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--mint),#059669);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;flex-shrink:0;}
+.tn{font-size:14px;font-weight:700;color:var(--text);}
+.tr{font-size:11px;font-weight:600;color:var(--mint);margin-top:2px;}
+.tb{font-size:11px;color:var(--muted);margin-top:7px;line-height:1.6;}
+.tp{background:var(--card);border:1px dashed var(--border2);border-radius:11px;padding:22px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:5px;}
+
+/* Vision */
+.vis-layout{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:center;margin-top:16px;}
+.vc{background:var(--card);border:1px solid var(--border);border-radius:9px;padding:14px;display:flex;align-items:flex-start;gap:10px;margin-bottom:10px;}
+.vc:last-child{margin-bottom:0;}
+.vci{font-size:18px;flex-shrink:0;}
+.vct{font-size:12px;font-weight:700;color:var(--text);margin-bottom:2px;}
+.vcd{font-size:10.5px;color:var(--muted);line-height:1.5;}
+
+/* Ask */
+#s12{background:radial-gradient(ellipse at 50% 35%,#00C9A715 0%,var(--bg) 70%);}
+#s12 .sbody{align-items:center;text-align:center;justify-content:center;}
+#s12 .h1{font-size:42px;}
+#s12 .ask-amt{font-size:66px;font-weight:900;font-family:var(--mono);color:var(--mint);letter-spacing:-3px;line-height:1;margin:20px 0 6px;}
+#s12 .ask-sub{font-size:13px;color:var(--muted);margin-bottom:20px;}
+#s12 .ask-g{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:620px;}
+#s12 .ai{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:15px;}
+#s12 .ap{font-size:20px;font-weight:800;font-family:var(--mono);color:var(--mint);}
+#s12 .al{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin-top:4px;}
+#s12 .ad{font-size:10px;color:var(--muted);margin-top:5px;line-height:1.4;}
+#s12 .milestones{display:flex;gap:0;border:1px solid var(--border);border-radius:9px;overflow:hidden;margin-top:16px;max-width:620px;}
+#s12 .ms{flex:1;padding:11px;border-right:1px solid var(--border);text-align:center;}
+#s12 .ms:last-child{border-right:none;}
+#s12 .ms-t{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--mint);}
+#s12 .ms-v{font-size:12px;font-weight:700;color:var(--text);margin-top:3px;}
+#s12 .contact{margin-top:20px;font-size:12px;color:var(--muted);}
+
+/* Backup */
+.rd-layout{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:16px;}
+.rm{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;}
+.rm-q{font-size:12px;font-weight:700;color:var(--text);margin-bottom:5px;}
+.rm-a{font-size:10.5px;color:var(--muted);line-height:1.55;}
+.rm-code{font-family:var(--mono);font-size:9.5px;color:var(--mint);margin-top:5px;background:var(--surface);padding:4px 8px;border-radius:4px;display:block;}
+.roadmap-items{display:flex;flex-direction:column;gap:10px;margin-top:16px;}
+.ri{display:flex;gap:14px;align-items:flex-start;background:var(--card);border:1px solid var(--border);border-radius:9px;padding:14px;}
+.ri-phase{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--mint);width:70px;flex-shrink:0;padding-top:1px;}
+.ri-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px;}
+.ri-desc{font-size:10.5px;color:var(--muted);line-height:1.5;}
+.ri-timeline{font-size:9.5px;font-family:var(--mono);color:var(--amber);margin-top:4px;}
+</style>
+</head>
+<body>
+<div class="deck">
+
+<!-- S1 COVER -->
+<div class="slide active" id="s1">
+  <div class="sbody">
+    <div class="badge">⚡ Seed Round · Preparing to Raise · Confidential</div>
+    <div class="h1">The control plane for<br><em>agentic AI cost optimization.</em></div>
+    <div class="sub" style="max-width:560px;font-size:15px;">Agentium is the first toggle-based profiler and control plane for coding agents. Developers see where money is wasted, fix it in one click, and get a verified proof card. No competitor offers this end-to-end.</div>
+    <div class="div"></div>
+    <div class="meta">
+      <div class="mi"><div class="ml">Stage</div><div class="mv">Seed · Preparing to raise</div></div>
+      <div class="mi"><div class="ml">Category</div><div class="mv">AI DevTools · Agent Observability</div></div>
+      <div class="mi"><div class="ml">Model</div><div class="mv">Self-hosted SaaS · Free → Paid</div></div>
+      <div class="mi"><div class="ml">Contact</div><div class="mv">optiinfra@gmail.com</div></div>
+    </div>
+    <div class="tagline">"Free to observe. Pay only when you save." — unique in this category.</div>
+  </div>
+</div>
+
+<!-- S2 PROBLEM -->
+<div class="slide" id="s2">
+  <div class="shdr"><div class="logo"><div class="hex"></div><span class="logo-name">Agentium</span></div><div class="slide-label">The Problem</div></div>
+  <div class="sbody" style="padding:24px 48px;">
+    <div class="ey">A $4B problem hiding in plain sight</div>
+    <div class="h2">Coding agents are going mainstream. <em>The cost problem arrives on day 30.</em></div>
+    <div class="g3">
+      <div class="pc r">
+        <div class="pi">💸</div>
+        <div class="pt">Zero runtime visibility</div>
+        <div class="pd">Every developer using Claude Code or Codex sees one monthly bill. No breakdown by run, no bottleneck map, no per-call cost. The only signal is the total — which arrives weeks after the problem starts.</div>
+        <div class="ps" style="color:var(--red)">$0 insight</div>
+        <div class="pq">"We had no idea our agent was re-sending 18,400 tokens of system prompt on every single API call until we saw the Agentium trace."</div>
+        <div class="pa">Annual waste per team using 50 agent runs/day: ~$28K</div>
+      </div>
+      <div class="pc a">
+        <div class="pi">🔁</div>
+        <div class="pt">65% of input tokens are wasted</div>
+        <div class="pd">System prompt, tool definitions, and repo summary are sent on every model call — even though they never change. At $3.00/MTok, this is the single largest avoidable cost in any coding agent workload.</div>
+        <div class="ps" style="color:var(--amber)">65% avg</div>
+        <div class="pq">"System prompt: 18,400 tok × 47 calls/day × 30 days × $3/MTok = $78/month. From one developer. One repo."</div>
+        <div class="pa">Agentium reduces this to $0.30/MTok (10× cheaper) via cache_control injection</div>
+      </div>
+      <div class="pc b">
+        <div class="pi">🔥</div>
+        <div class="pt">Retry spirals multiply costs silently</div>
+        <div class="pd">Failed agent tasks retry automatically. No budget cap. No retry limit. No alert. A single runaway retry loop that runs 11× before anyone notices costs 11× what one run costs. This compounds across a team.</div>
+        <div class="ps" style="color:var(--blue)">3–11× cost</div>
+        <div class="pq">"One retry spiral ran 11 times on a $0.024 task. That's $0.26 from one accidental loop. Multiply by 20 developers × 5 days = $26 from a single bug."</div>
+        <div class="pa">Budget Governor blocks at first violation — zero code changes</div>
+      </div>
+    </div>
+  </div>
+  <div class="sftr"><div class="sftr-l">Agentium · Investor Presentation v2 · Confidential</div><div class="sftr-r">agent-runtime-layer.vercel.app</div></div>
+</div>
+
+<!-- S3 MARKET -->
+<div class="slide" id="s3">
+  <div class="shdr"><div class="logo"><div class="hex"></div><span class="logo-name">Agentium</span></div><div class="slide-label">Market Opportunity</div></div>
+  <div class="sbody" style="padding:24px 48px;">
+    <div class="ey">Large TAM · Fast growth · First-mover window</div>
+    <div class="h2">AI coding agent adoption is <em>creating the market Agentium owns.</em></div>
+    <div class="g2" style="margin-top:14px;">
+      <div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:10px;">Market sizing</div>
+        <div class="tam">
+          <div class="tam-row">
+            <div class="tam-lbl">TAM</div>
+            <div class="tam-bar"><div class="tam-fill" style="width:100%;background:linear-gradient(90deg,#00C9A718,#00C9A710);color:var(--mint)">All developers using AI coding agents globally</div></div>
+            <div class="tam-val" style="color:var(--mint)">$4.2B</div>
+          </div>
+          <div style="font-size:9px;color:var(--muted2);padding-left:65px;margin-top:-4px;margin-bottom:4px">5M+ developers × $70/mo avg API spend × 12 = $4.2B annual</div>
+          <div class="tam-row">
+            <div class="tam-lbl">SAM</div>
+            <div class="tam-bar"><div class="tam-fill" style="width:60%;background:linear-gradient(90deg,#00C9A728,#00C9A715);color:var(--mint)">Daily users who face cost pressure</div></div>
+            <div class="tam-val" style="color:var(--mint)">$840M</div>
+          </div>
+          <div style="font-size:9px;color:var(--muted2);padding-left:65px;margin-top:-4px;margin-bottom:4px">2M developers × $35/mo addressable via optimization tools</div>
+          <div class="tam-row">
+            <div class="tam-lbl">SOM</div>
+            <div class="tam-bar"><div class="tam-fill" style="width:20%;background:var(--mint);color:#000">10K devs · Year 1</div></div>
+            <div class="tam-val" style="color:var(--mint)">$6M ARR</div>
+          </div>
+          <div style="font-size:9px;color:var(--muted2);padding-left:65px;margin-top:-4px;">10K paying users × avg $50/mo (Pro + Team mix)</div>
+        </div>
+        <div style="margin-top:12px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:11px 13px;font-size:10.5px;color:var(--muted);line-height:1.6;">
+          <strong style="color:var(--text)">Comparable:</strong> Datadog reached $1B ARR serving DevOps observability. The agentic AI observability + control market is in its <em>Datadog 2012 moment</em> — the infrastructure is going mainstream, no dedicated tooling exists yet.
+        </div>
+      </div>
+      <div class="why-tam">
+        <div class="wt"><div class="wt-dot"></div><div>
+          <div class="wt-title">GitHub Copilot alone: 1.8M+ paid users</div>
+          <div class="wt-desc">Claude Code, Codex, and emerging coding agents are growing alongside. Every team adopting these hits the cost problem within 30 days. There is no observability tool waiting for them.</div>
+          <div class="wt-proof">5M → 20M developers by 2027</div>
+        </div></div>
+        <div class="wt"><div class="wt-dot"></div><div>
+          <div class="wt-title">No dedicated agent profiler exists</div>
+          <div class="wt-desc">Langfuse, Helicone, and LangSmith profile generic LLM calls. None address the agent runtime specifically — token waste patterns, bottleneck analysis, retry governance, context memory. Agentium is the only product in this space.</div>
+          <div class="wt-proof">Zero direct competitors with control plane</div>
+        </div></div>
+        <div class="wt"><div class="wt-dot"></div><div>
+          <div class="wt-title">Self-hosted removes enterprise blocker</div>
+          <div class="wt-desc">Enterprise engineering teams cannot send agent prompts, code, and outputs to third-party SaaS. Agentium runs entirely on localhost — data never leaves the machine. This removes the #1 adoption blocker for the highest-value customers.</div>
+          <div class="wt-proof">0 data privacy barriers · SOC 2 roadmap</div>
+        </div></div>
+        <div class="wt"><div class="wt-dot"></div><div>
+          <div class="wt-title">CFO pressure creates urgency</div>
+          <div class="wt-desc">As AI API spend becomes a significant line item ($500–$5K/month per team), finance teams are demanding ROI justification. Engineering leads need an answer. Agentium gives them one — with verified proof.</div>
+          <div class="wt-proof">$1,400/month avg waste detected in early users</div>
+        </div></div>
+      </div>
+    </div>
+  </div>
+  <div class="sftr"><div class="sftr-l">Agentium · Investor Presentation v2 · Confidential</div><div class="sftr-r">agent-runtime-layer.vercel.app</div></div>
+</div>
+
+<!-- S4 PRODUCT -->
+<div class="slide" id="s4">
+  <div class="shdr"><div class="logo"><div class="hex"></div><span class="logo-name">Agentium</span></div><div class="slide-label">The Product</div></div>
+  <div class="sbody" style="padding:22px 48px;">
+    <div class="ey">Four phases · One product · Incremental revenue unlock</div>
+    <div class="h2" style="font-size:24px;">Each phase is a standalone value add <em>unlocking the next pricing tier.</em></div>
+    <div class="phase-arc">
+      <div class="ph">
+        <div class="ph-tag">Phase 1.6 · Free</div>
+        <div class="ph-icon">👁</div>
+        <div class="ph-title">See it</div>
+        <div class="ph-desc">Full observability dashboard. 8 pages: Overview, Runs, Run detail, Bottlenecks, Context inspector, Cost explorer, Recommendations, Control Plane. Unlimited traces. Self-hosted.</div>
+        <span class="ph-proof">Free forever · drives adoption</span>
+        <span class="ph-api">GET /api/tasks/{id}/analysis</span>
+      </div>
+      <div class="ph ft">
+        <div class="ph-tag">Phase 1.7 · Pro tier</div>
+        <div class="ph-icon">⚡</div>
+        <div class="ph-title">Fix it</div>
+        <div class="ph-desc">One-click context optimizer. SHA-256 fingerprints stable blocks, strips them from per-call payload. Stores OptimizationProofRecord with measured before/after delta. Proof card per run.</div>
+        <span class="ph-proof">−43% tokens · ✓ Verified</span>
+        <span class="ph-api">POST /api/tasks/{id}/apply-optimization</span>
+      </div>
+      <div class="ph">
+        <div class="ph-tag">Phase 1.8 · Team tier</div>
+        <div class="ph-icon">🛡</div>
+        <div class="ph-title">Control it</div>
+        <div class="ph-desc">Budget Governor enforces max_cost_per_run and max_retries via PreToolUse hooks. Returns blocked=true if limit exceeded — Claude Code stops the run. Configurable via Control Plane UI. Zero code changes.</div>
+        <span class="ph-proof">Hook-based · instant enforcement</span>
+        <span class="ph-api">PATCH /api/settings → budget_enabled</span>
+      </div>
+      <div class="ph">
+        <div class="ph-tag">Phase 1.9 · Enterprise</div>
+        <div class="ph-icon">🧠</div>
+        <div class="ph-title">Remember it</div>
+        <div class="ph-desc">Local proxy on :8100 intercepts Anthropic API calls, fingerprints stable context, injects cache_control: ephemeral. Anthropic charges $0.30/MTok for cached vs $3.00/MTok standard. 10× discount, compounding savings.</div>
+        <span class="ph-proof">$0.30/MTok · compounding moat</span>
+        <span class="ph-api">ANTHROPIC_BASE_URL=http://localhost:8100</span>
+      </div>
+    </div>
+    <div style="margin-top:14px;display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--border);border-radius:9px;overflow:hidden;">
+      <div style="padding:10px 14px;border-right:1px solid var(--border);text-align:center;">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin-bottom:3px;">Free → observe</div>
+        <div style="font-size:14px;font-weight:800;font-family:var(--mono);color:var(--mint)">Full dashboard</div>
+        <div style="font-size:9px;color:var(--muted2);margin-top:2px">no cap on traces</div>
+      </div>
+      <div style="padding:10px 14px;border-right:1px solid var(--border);text-align:center;background:var(--mint-lt);">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--mint);margin-bottom:3px;">Pro → early access</div>
+        <div style="font-size:14px;font-weight:800;font-family:var(--mono);color:var(--mint)">First revenue</div>
+        <div style="font-size:9px;color:var(--muted2);margin-top:2px">optimizer + proof card</div>
+      </div>
+      <div style="padding:10px 14px;border-right:1px solid var(--border);text-align:center;">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin-bottom:3px;">Team → early access</div>
+        <div style="font-size:14px;font-weight:800;font-family:var(--mono);color:var(--mint)">3× per account</div>
+        <div style="font-size:9px;color:var(--muted2);margin-top:2px">budget governor</div>
+      </div>
+      <div style="padding:10px 14px;text-align:center;">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin-bottom:3px;">Enterprise → custom</div>
+        <div style="font-size:14px;font-weight:800;font-family:var(--mono);color:var(--mint)">Retention moat</div>
+        <div style="font-size:9px;color:var(--muted2);margin-top:2px">context memory</div>
+      </div>
+    </div>
+  </div>
+  <div class="sftr"><div class="sftr-l">Agentium · Investor Presentation v2 · Confidential</div><div class="sftr-r">agent-runtime-layer.vercel.app</div></div>
+</div>
+
+<!-- S5 BUSINESS MODEL -->
+<div class="slide" id="s5">
+  <div class="shdr"><div class="logo"><div class="hex"></div><span class="logo-name">Agentium</span></div><div class="slide-label">Business Model</div></div>
+  <div class="sbody" style="padding:24px 48px;">
+    <div class="ey">Bottoms-up SaaS · Developer-led · Free → Paid</div>
+    <div class="h2">The upgrade trigger is <em>the product itself.</em></div>
+    <div class="g2" style="margin-top:14px;">
+      <div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:8px;">Pricing tiers</div>
+        <div class="bm-left">
+          <div class="bt"><div class="bt-tier">Observe</div><div class="bt-price fr">Always free</div><div class="bt-unlock">Full dashboard · unlimited traces · <strong>no credit card</strong></div></div>
+          <div class="bt ft"><div class="bt-tier" style="color:var(--mint)">Pro</div><div class="bt-price ea">Early access pricing</div><div class="bt-unlock">⚡ Context Optimizer · proof card · <strong>gains dashboard · SDK flag</strong></div></div>
+          <div class="bt"><div class="bt-tier">Team</div><div class="bt-price ea">Early access pricing</div><div class="bt-unlock">🛡 Budget Governor · retry limits · <strong>shared team rules · hooks</strong></div></div>
+          <div class="bt"><div class="bt-tier">Enterprise</div><div class="bt-price cu">Contact us</div><div class="bt-unlock">🧠 Context Memory · 10× cache · <strong>SLA · compounding savings</strong></div></div>
+        </div>
+        <div style="margin-top:12px;background:var(--mint-lt);border:1px solid var(--mint-md);border-radius:8px;padding:11px 13px;">
+          <div style="font-size:10px;font-weight:700;color:var(--mint);margin-bottom:4px;">The upgrade mechanic</div>
+          <div style="font-size:11px;color:var(--text);line-height:1.6;">Free user opens dashboard. Sees "65% repeated tokens · ~$0.018/run savings available." Clicks locked toggle. Sees upgrade modal. ROI is positive before they pay. Conversion is demand-driven, not sales-driven.</div>
+        </div>
+      </div>
+      <div class="bm-right">
+        <div class="uc">
+          <div class="uc-lbl">Free → Pro conversion trigger</div>
+          <div class="uc-val">Day 1</div>
+          <div class="uc-desc">Free user sees quantified waste from their own runs on their first session. The data converts them — not a sales email.</div>
+        </div>
+        <div class="uc">
+          <div class="uc-lbl">Retention mechanism — Phase 1.9</div>
+          <div style="font-size:13px;font-weight:700;color:var(--mint);margin-top:3px;line-height:1.4;">Context Memory grows with every run. Switching means losing your entire optimization history. The product gets better the longer you use it.</div>
+        </div>
+        <div class="uc">
+          <div class="uc-lbl">Pro → Team upsell trigger</div>
+          <div style="font-size:12px;font-weight:700;color:var(--text);margin-top:3px;line-height:1.4;">Pro user shares proof card with manager. Manager asks "can we do this for the whole team?" → Team upgrade. The proof card is the sales collateral.</div>
+        </div>
+        <div class="uc">
+          <div class="uc-lbl">Distribution — zero CAC model</div>
+          <div class="uc-desc">Developer installs → sees savings → shares proof card → team upgrades. No outbound sales required for Pro/Team. Enterprise requires sales motion but Self-hosted removes security barrier.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="sftr"><div class="sftr-l">Agentium · Investor Presentation v2 · Confidential</div><div class="sftr-r">agent-runtime-layer.vercel.app</div></div>
+</div>
+
+<!-- S6 GTM -->
+<div class="slide" id="s6">
+  <div class="shdr"><div class="logo"><div class="hex"></div><span class="logo-name">Agentium</span></div><div class="slide-label">Go-to-Market</div></div>
+  <div class="sbody" style="padding:24px 48px;">
+    <div class="ey">Developer-led · bottoms-up · community-amplified</div>
+    <div class="h2">Individual devs adopt. <em>Teams buy. Companies renew.</em></div>
+    <div class="gtm-grid">
+      <div class="gc">
+        <div class="gc-phase">Now · Alpha (25 users)</div>
+        <div class="gc-title">Personal outreach + walkthrough</div>
+        <div class="gc-items">
+          <div class="gi"><div class="gd"></div>Direct DMs to developers actively using Claude Code and Codex (LinkedIn, X, Discord)</div>
+          <div class="gi"><div class="gd"></div>Anthropic Discord #claude-code channel · r/ClaudeAI · r/LocalLLaMA communities</div>
+          <div class="gi"><div class="gd"></div>Personal 20-min install walkthrough for each alpha user — learn what breaks</div>
+          <div class="gi"><div class="gd"></div>Install link: curl -sSL agent-runtime-layer.vercel.app/install.sh | bash</div>
+        </div>
+        <div class="gc-target">Target: 25 installs · first proof cards</div>
+      </div>
+      <div class="gc">
+        <div class="gc-phase">Month 2–3 · Public launch</div>
+        <div class="gc-title">Product Hunt + developer content</div>
+        <div class="gc-items">
+          <div class="gi"><div class="gd"></div>Product Hunt launch: "Agentium — agent cost profiler"</div>
+          <div class="gi"><div class="gd"></div>Twitter/X thread: "How we found $1,400/month in wasted AI spend" (real user data)</div>
+          <div class="gi"><div class="gd"></div>Before/after case studies from alpha users — proof cards as social proof</div>
+          <div class="gi"><div class="gd"></div>Hacker News Show HN: self-hosted agent profiler</div>
+        </div>
+        <div class="gc-target">Target: 500 installs · first 50 Pro users</div>
+      </div>
+      <div class="gc">
+        <div class="gc-phase">Month 4–6 · Team expansion</div>
+        <div class="gc-title">Individual → team upsell motion</div>
+        <div class="gc-items">
+          <div class="gi"><div class="gd"></div>Pro users share proof cards with engineering manager → natural team upgrade trigger</div>
+          <div class="gi"><div class="gd"></div>Budget Governor demo for CTOs and VP Eng: "your agents never exceed budget"</div>
+          <div class="gi"><div class="gd"></div>Integration with Claude Code and Codex update channels (changelog mention)</div>
+          <div class="gi"><div class="gd"></div>YC community and AI founder networks for team/enterprise leads</div>
+        </div>
+        <div class="gc-target">Target: 50 teams · $50K MRR</div>
+      </div>
+      <div class="gc">
+        <div class="gc-phase">Month 7–12 · Enterprise</div>
+        <div class="gc-title">Context Memory as enterprise moat</div>
+        <div class="gc-items">
+          <div class="gi"><div class="gd"></div>Context Memory = private, local optimization history that grows with usage</div>
+          <div class="gi"><div class="gd"></div>Enterprise SLA: "We guarantee your agents never exceed your cost budget"</div>
+          <div class="gi"><div class="gd"></div>SOC 2 Type II roadmap for enterprise procurement gate</div>
+          <div class="gi"><div class="gd"></div>Strategic integration partnerships with AI coding platforms</div>
+        </div>
+        <div class="gc-target">Target: 10 enterprise contracts · $200K+ ARR</div>
+      </div>
+    </div>
+  </div>
+  <div class="sftr"><div class="sftr-l">Agentium · Investor Presentation v2 · Confidential</div><div class="sftr-r">agent-runtime-layer.vercel.app</div></div>
+</div>
+
+<!-- S7 TRACTION -->
+<div class="slide" id="s7">
+  <div class="shdr"><div class="logo"><div class="hex"></div><span class="logo-name">Agentium</span></div><div class="slide-label">Traction</div></div>
+  <div class="sbody" style="padding:24px 48px;">
+    <div class="ey">Built, shipped, deployed — live now</div>
+    <div class="h2">Full Phase 1 product complete. <em>Ready for customers today.</em></div>
+    <div class="tr-grid">
+      <div class="tc"><div class="tv">1.10</div><div class="tl">Phases shipped</div><div class="tn">Phase 1.0–1.10 complete in Phase 1</div></div>
+      <div class="tc"><div class="tv">200+</div><div class="tl">Waitlist</div><div class="tn">Early access page live</div></div>
+      <div class="tc"><div class="tv">−43%</div><div class="tl">Token reduction</div><div class="tn">Verified · real before/after pair</div></div>
+      <div class="tc"><div class="tv">8</div><div class="tl">Dashboard pages</div><div class="tn">All routes returning 200</div></div>
+    </div>
+    <div class="phases-built">
+      <div class="pb">
+        <div class="pb-phase">Phase 1.6</div>
+        <div class="pb-item"><span class="pb-check">✓</span> Hooks (CC + Codex)</div>
+        <div class="pb-item"><span class="pb-check">✓</span> Tracer SDK</div>
+        <div class="pb-item"><span class="pb-check">✓</span> Full dashboard</div>
+        <div class="pb-item"><span class="pb-check">✓</span> Analysis API</div>
+      </div>
+      <div class="pb">
+        <div class="pb-phase">Phase 1.7</div>
+        <div class="pb-item"><span class="pb-check">✓</span> Context optimizer</div>
+        <div class="pb-item"><span class="pb-check">✓</span> Proof records DB</div>
+        <div class="pb-item"><span class="pb-check">✓</span> Proof card UI</div>
+        <div class="pb-item"><span class="pb-check">✓</span> auto_optimize flag</div>
+      </div>
+      <div class="pb">
+        <div class="pb-phase">Phase 1.8</div>
+        <div class="pb-item"><span class="pb-check">✓</span> Budget Governor</div>
+        <div class="pb-item"><span class="pb-check">✓</span> Hook enforcement</div>
+        <div class="pb-item"><span class="pb-check">✓</span> budget_events DB</div>
+        <div class="pb-item"><span class="pb-check">✓</span> Savings dashboard</div>
+      </div>
+      <div class="pb">
+        <div class="pb-phase">Phase 1.9</div>
+        <div class="pb-item"><span class="pb-check">✓</span> Context Memory</div>
+        <div class="pb-item"><span class="pb-check">✓</span> Local proxy :8100</div>
+        <div class="pb-item"><span class="pb-check">✓</span> SHA-256 fingerprint</div>
+        <div class="pb-item"><span class="pb-check">✓</span> cache_control inject</div>
+      </div>
+      <div class="pb">
+        <div class="pb-phase">Phase 1.10</div>
+        <div class="pb-item"><span class="pb-check">✓</span> Control Plane UI</div>
+        <div class="pb-item"><span class="pb-check">✓</span> 3 toggles + gates</div>
+        <div class="pb-item"><span class="pb-check">✓</span> Plan gating (PLAN_GATES)</div>
+        <div class="pb-item"><span class="pb-check">✓</span> SDK reads settings</div>
+      </div>
+    </div>
+    <div style="margin-top:12px;background:var(--mint-lt);border:1px solid var(--mint-md);border-radius:8px;padding:10px 14px;font-size:11px;color:var(--text);line-height:1.5;">
+      <strong style="color:var(--mint)">Live endpoints:</strong> Docker images on Docker Hub (archokshi/backend, archokshi/dashboard) · Install page at agent-runtime-layer.vercel.app · curl installer auto-installs Docker on macOS + Linux
+    </div>
+  </div>
+  <div class="sftr"><div class="sftr-l">Agentium · Investor Presentation v2 · Confidential</div><div class="sftr-r">agent-runtime-layer.vercel.app</div></div>
+</div>
+
+<!-- S8 COMPETITION -->
+<div class="slide" id="s8">
+  <div class="shdr"><div class="logo"><div class="hex"></div><span class="logo-name">Agentium</span></div><div class="slide-label">Competition</div></div>
+  <div class="sbody" style="padding:22px 48px;">
+    <div class="ey">First mover — no direct competitor has a control plane</div>
+    <div class="h2">Observability tools exist. <em>None fix the problem.</em></div>
+    <div class="comp-wrap">
+      <table>
+        <thead><tr>
+          <th>Product</th>
+          <th>Agent-specific profiling</th>
+          <th>One-click optimization</th>
+          <th>Proof card (measured)</th>
+          <th>Budget enforcement</th>
+          <th>Context memory</th>
+          <th class="us">Toggle control plane</th>
+          <th>Self-hosted</th>
+        </tr></thead>
+        <tbody>
+          <tr class="us-row">
+            <td class="us">⬡ Agentium</td>
+            <td class="cy">✓ Agent runtime</td>
+            <td class="cy">✓ SHA-256 + strip</td>
+            <td class="cy">✓ OptimizationProofRecord</td>
+            <td class="cy">✓ PreToolUse hooks</td>
+            <td class="cy">✓ Local proxy :8100</td>
+            <td class="cy us">✓ 3 toggles + gates</td>
+            <td class="cy">✓ Always</td>
+          </tr>
+          <tr>
+            <td>Langfuse</td>
+            <td class="cn">✗ Generic LLM</td>
+            <td class="cn">✗ None</td>
+            <td class="cn">✗ None</td>
+            <td class="cn">✗ None</td>
+            <td class="cn">✗ None</td>
+            <td class="cn">✗ None</td>
+            <td class="cy">✓ OSS</td>
+          </tr>
+          <tr>
+            <td>Helicone</td>
+            <td class="cn">✗ Generic LLM</td>
+            <td class="cn">✗ None</td>
+            <td class="cn">✗ None</td>
+            <td class="cn">✗ None</td>
+            <td class="cp">~ Route caching</td>
+            <td class="cn">✗ None</td>
+            <td class="cp">~ Open source</td>
+          </tr>
+          <tr>
+            <td>LangSmith</td>
+            <td class="cn">✗ Generic LLM</td>
+            <td class="cn">✗ None</td>
+            <td class="cn">✗ None</td>
+            <td class="cn">✗ None</td>
+            <td class="cn">✗ None</td>
+            <td class="cn">✗ None</td>
+            <td class="cn">✗ SaaS only</td>
+          </tr>
+          <tr>
+            <td>Portkey</td>
+            <td class="cn">✗ LLM gateway</td>
+            <td class="cn">✗ None</td>
+            <td class="cn">✗ None</td>
+            <td class="cp">~ Config-file</td>
+            <td class="cn">✗ None</td>
+            <td class="cn">✗ None</td>
+            <td class="cp">~ Hybrid</td>
+          </tr>
+          <tr>
+            <td>Arize Phoenix</td>
+            <td class="cn">✗ Generic LLM</td>
+            <td class="cn">✗ None</td>
+            <td class="cn">✗ None</td>
+            <td class="cn">✗ None</td>
+            <td class="cn">✗ None</td>
+            <td class="cn">✗ None</td>
+            <td class="cy">✓ OSS</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="moat-note">
+      <strong style="color:var(--mint)">The moat:</strong> No competitor offers (1) agent-specific profiling, (2) one-click optimization with a measured proof card, AND (3) a toggle-based control plane — in a self-hosted product. Agentium is the only product where flipping a switch applies a measured optimization and shows verified before/after gains on the next run. The Phase 1.9 Context Memory creates compounding switching cost that grows with every run.
+    </div>
+  </div>
+  <div class="sftr"><div class="sftr-l">Agentium · Investor Presentation v2 · Confidential</div><div class="sftr-r">agent-runtime-layer.vercel.app</div></div>
+</div>
+
+<!-- S9 WHY NOW -->
+<div class="slide" id="s9">
+  <div class="shdr"><div class="logo"><div class="hex"></div><span class="logo-name">Agentium</span></div><div class="slide-label">Why Now</div></div>
+  <div class="sbody" style="padding:24px 48px;">
+    <div class="ey">Three forces converging in 2025–2026</div>
+    <div class="h2">The window to be first is <em>open now — and closing fast.</em></div>
+    <div class="wn-grid">
+      <div class="wn">
+        <div class="wni">🚀</div>
+        <div class="wnt">Coding agents going mainstream</div>
+        <div class="wnd">Claude Code launched in 2024. Codex CLI is widely adopted. GitHub Copilot has 1.8M+ paid users. Every new team adopting coding agents hits the cost problem within 30 days of serious usage. The problem is created by adoption — and adoption is accelerating.</div>
+        <div class="wnp">5M+ developers now · 20M est. by 2027</div>
+      </div>
+      <div class="wn">
+        <div class="wni">💰</div>
+        <div class="wnt">AI API bills are becoming line items</div>
+        <div class="wnd">As teams scale from "one developer experimenting" to "ten developers running agents daily," monthly AI API bills reach $500–$5,000. CFOs are asking engineering leads to justify and reduce spend. Engineering leads need a tool that gives them answers — and proof.</div>
+        <div class="wnp">$1,400/month avg waste detected in alpha users</div>
+      </div>
+      <div class="wn">
+        <div class="wni">🔒</div>
+        <div class="wnt">Enterprise needs self-hosted tooling</div>
+        <div class="wnd">Agents process proprietary code, customer data, and internal documentation. Enterprise engineering teams cannot send this to third-party SaaS observability tools. Agentium's self-hosted model removes this barrier entirely — zero data leaves the machine, ever.</div>
+        <div class="wnp">Zero data privacy barriers · only self-hosted agent profiler</div>
+      </div>
+    </div>
+    <div style="margin-top:16px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;display:grid;grid-template-columns:repeat(4,1fr);gap:0;">
+      <div style="padding:0 14px;border-right:1px solid var(--border);text-align:center;">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin-bottom:4px">Window open</div>
+        <div style="font-size:14px;font-weight:700;color:var(--mint)">Today</div>
+        <div style="font-size:9.5px;color:var(--muted2);margin-top:2px">No direct competitor with full control plane</div>
+      </div>
+      <div style="padding:0 14px;border-right:1px solid var(--border);text-align:center;">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin-bottom:4px">First mover advantage</div>
+        <div style="font-size:14px;font-weight:700;color:var(--mint)">12–18 mo</div>
+        <div style="font-size:9.5px;color:var(--muted2);margin-top:2px">Before well-funded competitors build equivalent</div>
+      </div>
+      <div style="padding:0 14px;border-right:1px solid var(--border);text-align:center;">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin-bottom:4px">Comparable</div>
+        <div style="font-size:14px;font-weight:700;color:var(--mint)">Datadog 2012</div>
+        <div style="font-size:9.5px;color:var(--muted2);margin-top:2px">DevOps observability before incumbents noticed</div>
+      </div>
+      <div style="padding:0 14px;text-align:center;">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);margin-bottom:4px">Key insight</div>
+        <div style="font-size:14px;font-weight:700;color:var(--mint)">Self-hosted</div>
+        <div style="font-size:9.5px;color:var(--muted2);margin-top:2px">Removes enterprise barrier none of the SaaS tools can cross</div>
+      </div>
+    </div>
+  </div>
+  <div class="sftr"><div class="sftr-l">Agentium · Investor Presentation v2 · Confidential</div><div class="sftr-r">agent-runtime-layer.vercel.app</div></div>
+</div>
+
+<!-- S10 TEAM -->
+<div class="slide" id="s10">
+  <div class="shdr"><div class="logo"><div class="hex"></div><span class="logo-name">Agentium</span></div><div class="slide-label">Team</div></div>
+  <div class="sbody" style="padding:24px 48px;">
+    <div class="ey">Founder-led · building in public</div>
+    <div class="h2" style="margin-bottom:18px;">The team behind <em>Agentium.</em></div>
+    <div class="g2">
+      <div class="team-card">
+        <div class="ta">A</div>
+        <div>
+          <div class="tn">Alpesh Chokshi</div>
+          <div class="tr">Founder &amp; CEO</div>
+          <div class="tb">[ Founder background coming soon — previous companies, relevant experience in AI/infrastructure/developer tools, why uniquely positioned to build this product. ]<br><br>Contact: optiinfra@gmail.com</div>
+        </div>
+      </div>
+      <div class="tp">
+        <div style="font-size:22px">🤝</div>
+        <div style="font-size:13px;font-weight:700;color:var(--text)">Actively hiring</div>
+        <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:4px">Co-founder · Head of Engineering<br>First engineering hire post-seed</div>
+      </div>
+    </div>
+    <div style="margin-top:18px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px 18px;">
+      <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:10px;">Advisors &amp; supporters</div>
+      <div style="font-size:12px;color:var(--muted);">[ To be added — advisors, angels, network connections relevant to the AI developer tools space ]</div>
+    </div>
+  </div>
+  <div class="sftr"><div class="sftr-l">Agentium · Investor Presentation v2 · Confidential</div><div class="sftr-r">agent-runtime-layer.vercel.app</div></div>
+</div>
+
+<!-- S11 VISION -->
+<div class="slide" id="s11">
+  <div class="shdr"><div class="logo"><div class="hex"></div><span class="logo-name">Agentium</span></div><div class="slide-label">Vision</div></div>
+  <div class="sbody" style="padding:24px 48px;">
+    <div class="vis-layout">
+      <div>
+        <div class="ey">Phase 2 and beyond</div>
+        <div class="h2">The runtime layer for <em>every agentic AI workload.</em></div>
+        <div style="margin-top:12px;font-size:13px;color:var(--muted);line-height:1.7;max-width:400px;">Phase 1 is coding agents. But every agentic AI system — customer support agents, research agents, data pipeline agents, autonomous workflows — has the same problems: wasted tokens, runaway costs, zero visibility, no control.<br><br>Agentium becomes the standard control plane for the agentic era.</div>
+        <div style="margin-top:18px;background:var(--mint-lt);border:1px solid var(--mint-md);border-radius:9px;padding:13px 15px;">
+          <div style="font-size:10px;font-weight:700;color:var(--mint);margin-bottom:4px;">The Datadog comparison</div>
+          <div style="font-size:11.5px;color:var(--text);line-height:1.6;">Datadog didn't build infrastructure monitoring. It built visibility and control for DevOps teams who were flying blind. Agentium is doing the same for the agent runtime layer — at the exact moment teams need it.</div>
+        </div>
+      </div>
+      <div>
+        <div class="vc"><div class="vci">🤖</div><div><div class="vct">Phase 2 — Multi-agent orchestration</div><div class="vcd">Profile and optimize multi-agent workflows. Cost attribution across agent chains. Bottleneck detection in orchestration layers. Shared context between agents.</div></div></div>
+        <div class="vc"><div class="vci">🏢</div><div><div class="vct">Phase 3 — Enterprise platform</div><div class="vcd">Team-wide observability. Budget governance across hundreds of developers. SSO. Audit logs. SOC 2 Type II. Enterprise procurement ready.</div></div></div>
+        <div class="vc"><div class="vci">🔌</div><div><div class="vct">Phase 4 — Platform integrations</div><div class="vcd">Native integrations: Slack budget alerts, Jira cost-per-ticket, GitHub Actions cost gates. Agentium becomes part of every engineering workflow.</div></div></div>
+        <div class="vc"><div class="vci">🌐</div><div><div class="vct">The long-term moat</div><div class="vcd">Context Memory grows with every agent run. After 6 months of usage, the optimization history is irreplaceable. Switching cost compounds every day.</div></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="sftr"><div class="sftr-l">Agentium · Investor Presentation v2 · Confidential</div><div class="sftr-r">agent-runtime-layer.vercel.app</div></div>
+</div>
+
+<!-- S12 ASK -->
+<div class="slide" id="s12">
+  <div class="sbody">
+    <div class="ey">Seed round — preparing to raise</div>
+    <div class="h1">The <em>ask</em></div>
+    <div class="ask-amt">[ TBD ]</div>
+    <div class="ask-sub">Seed round · details to be confirmed · optiinfra@gmail.com</div>
+    <div class="ask-g">
+      <div class="ai"><div class="ap">40%</div><div class="al">Product &amp; Engineering</div><div class="ad">First engineering hire. Accelerate Phase 2 multi-agent. SOC 2 readiness. Harden enterprise feature set.</div></div>
+      <div class="ai"><div class="ap">35%</div><div class="al">Go-to-Market</div><div class="ad">Developer marketing, community, content. First sales hire for team/enterprise motion. Product Hunt + conference presence.</div></div>
+      <div class="ai"><div class="ap">25%</div><div class="al">Operations &amp; Runway</div><div class="ad">18-month runway. Infrastructure, legal, compliance. Customer success as we scale to first 1,000 paying users.</div></div>
+    </div>
+    <div class="milestones">
+      <div class="ms"><div class="ms-t">Month 1–2</div><div class="ms-v">25 alpha users</div></div>
+      <div class="ms"><div class="ms-t">Month 3</div><div class="ms-v">Product Hunt</div></div>
+      <div class="ms"><div class="ms-t">Month 6</div><div class="ms-v">50 teams paying</div></div>
+      <div class="ms"><div class="ms-t">Month 9</div><div class="ms-v">$50K MRR</div></div>
+      <div class="ms"><div class="ms-t">Month 12</div><div class="ms-v">$200K ARR</div></div>
+    </div>
+    <div class="contact">Ready to talk? <strong style="color:var(--text)">optiinfra@gmail.com</strong> · <strong style="color:var(--mint)">agent-runtime-layer.vercel.app</strong></div>
+  </div>
+</div>
+
+<!-- ═══ BACKUP SLIDES ═══ -->
+
+<!-- B1 REVENUE PROJECTIONS -->
+<div class="slide" id="b1">
+  <div class="shdr"><div class="logo"><div class="hex"></div><span class="logo-name">Agentium</span></div><div class="hdr-right" style="display:flex;gap:8px;align-items:center;"><div class="slide-label">Revenue Projections</div><span class="backup-badge">Backup</span></div></div>
+  <div class="sbody" style="padding:24px 48px;">
+    <div class="ey">Bottom-up model · conservative assumptions</div>
+    <div class="h2" style="font-size:22px;margin-bottom:14px;">Path to <em>$1M ARR</em> in 18 months.</div>
+    <div class="rev-layout">
+      <div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:10px;">Annual recurring revenue — 3-year projection</div>
+        <div class="rev-bars">
+          <div><div class="rb-year">Year 1 (Month 12)</div><div class="rb-bar-wrap"><div class="rb-fill" style="width:20%;background:linear-gradient(90deg,#00C9A740,#00C9A720)">1,000 Pro · 100 Team</div></div><div class="rb-val">~$200K ARR</div></div>
+          <div><div class="rb-year">Year 2 (Month 24)</div><div class="rb-bar-wrap"><div class="rb-fill" style="width:55%;background:linear-gradient(90deg,#00C9A760,#00C9A730)">5,000 Pro · 500 Team · 10 Enterprise</div></div><div class="rb-val">~$1.2M ARR</div></div>
+          <div><div class="rb-year">Year 3 (Month 36)</div><div class="rb-bar-wrap"><div class="rb-fill" style="width:100%;background:var(--mint)">20K Pro · 2K Team · 50 Enterprise</div></div><div class="rb-val">~$6M ARR</div></div>
+        </div>
+        <div style="margin-top:12px;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:11px 13px;font-size:10.5px;color:var(--muted);line-height:1.6;">
+          <strong style="color:var(--text)">Key driver:</strong> Pro/Team ratio improves as proof cards create organic upsell. Each Pro user who shares a proof card with their manager has a ~30% conversion to Team.
+        </div>
+      </div>
+      <div class="rev-assumptions">
+        <div class="ra">
+          <div class="ra-title">Year 1 assumptions</div>
+          <div class="ra-calc">Pro: 1,000 users × $49/mo × 12 = $588K<br>Team: 100 teams × $149/mo × 12 = $179K<br>Total = ~$767K · ARR run-rate $200K</div>
+        </div>
+        <div class="ra">
+          <div class="ra-title">CAC model</div>
+          <div class="ra-calc">Free tier: $0 CAC (organic/community)<br>Pro upgrade: $0 CAC (in-product trigger)<br>Team: ~$200 CAC (developer referral)<br>Enterprise: ~$5K CAC (sales motion)</div>
+        </div>
+        <div class="ra">
+          <div class="ra-title">LTV estimate</div>
+          <div class="ra-calc">Pro: $49/mo × 24 avg mo = $1,176 LTV<br>Team: $149/mo × 36 avg mo = $5,364 LTV<br>Enterprise: custom × 36 avg mo = $25K+ LTV</div>
+        </div>
+        <div class="ra">
+          <div class="ra-title">LTV:CAC ratio</div>
+          <div class="ra-calc">Pro: $1,176 / $0 = ∞ (organic)<br>Team: $5,364 / $200 = 26.8× LTV:CAC<br>Enterprise: $25K+ / $5K = 5× LTV:CAC</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="sftr"><div class="sftr-l">Agentium · Backup · Confidential</div><div class="sftr-r">agent-runtime-layer.vercel.app</div></div>
+</div>
+
+<!-- B2 TECHNICAL ARCHITECTURE -->
+<div class="slide" id="b2">
+  <div class="shdr"><div class="logo"><div class="hex"></div><span class="logo-name">Agentium</span></div><div class="hdr-right" style="display:flex;gap:8px;align-items:center;"><div class="slide-label">Technical Architecture</div><span class="backup-badge">Backup</span></div></div>
+  <div class="sbody" style="padding:24px 48px;">
+    <div class="ey">Self-hosted · zero external dependencies · 3 Docker services</div>
+    <div class="h2" style="font-size:20px;margin-bottom:14px;">Built on <em>FastAPI + SQLite + Next.js.</em> No external DB. No cloud. No data egress.</div>
+    <div class="g2">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:16px;font-family:var(--mono);">
+        <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:10px;">System architecture</div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:10px;margin-bottom:8px;">
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted2);margin-bottom:6px;">Coding agents (user's machine)</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <div style="background:#00C9A718;border:1px solid #00C9A730;color:var(--mint);padding:4px 9px;border-radius:5px;font-size:9.5px;font-weight:600">Claude Code</div>
+            <div style="background:#00C9A718;border:1px solid #00C9A730;color:var(--mint);padding:4px 9px;border-radius:5px;font-size:9.5px;font-weight:600">Codex CLI</div>
+            <div style="background:#00C9A718;border:1px solid #00C9A730;color:var(--mint);padding:4px 9px;border-radius:5px;font-size:9.5px;font-weight:600">Python SDK</div>
+          </div>
+        </div>
+        <div style="text-align:center;color:var(--muted2);font-size:10px;margin:4px 0">↓ hooks · events · HTTP POST /api/traces</div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:10px;margin-bottom:8px;">
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted2);margin-bottom:6px;">Docker Compose (localhost)</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <div style="background:#6366F118;border:1px solid #6366F130;color:#6366F1;padding:4px 9px;border-radius:5px;font-size:9.5px;font-weight:600">FastAPI :8000</div>
+            <div style="background:#F59E0B18;border:1px solid #F59E0B30;color:#F59E0B;padding:4px 9px;border-radius:5px;font-size:9.5px;font-weight:600">Next.js :4001</div>
+            <div style="background:#EC489918;border:1px solid #EC489930;color:#EC4899;padding:4px 9px;border-radius:5px;font-size:9.5px;font-weight:600">Proxy :8100</div>
+          </div>
+        </div>
+        <div style="text-align:center;color:var(--muted2);font-size:10px;margin:4px 0">↓ reads/writes</div>
+        <div style="background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:10px;">
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted2);margin-bottom:6px;">SQLite (local file)</div>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;">
+            <div style="background:#D9770618;border:1px solid #D9770630;color:#D97706;padding:3px 7px;border-radius:4px;font-size:8.5px;font-weight:600">trace_events</div>
+            <div style="background:#D9770618;border:1px solid #D9770630;color:#D97706;padding:3px 7px;border-radius:4px;font-size:8.5px;font-weight:600">analysis_reports</div>
+            <div style="background:#D9770618;border:1px solid #D9770630;color:#D97706;padding:3px 7px;border-radius:4px;font-size:8.5px;font-weight:600">optimization_proofs</div>
+            <div style="background:#D9770618;border:1px solid #D9770630;color:#D97706;padding:3px 7px;border-radius:4px;font-size:8.5px;font-weight:600">budget_events</div>
+            <div style="background:#D9770618;border:1px solid #D9770630;color:#D97706;padding:3px 7px;border-radius:4px;font-size:8.5px;font-weight:600">context_memory</div>
+            <div style="background:#D9770618;border:1px solid #D9770630;color:#D97706;padding:3px 7px;border-radius:4px;font-size:8.5px;font-weight:600">settings</div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:9px;">
+        <div class="ra" style="background:var(--card)">
+          <div class="ra-title">Why FastAPI + SQLite?</div>
+          <div style="font-size:10.5px;color:var(--muted);line-height:1.5;margin-top:4px">Zero external dependencies. Self-contained Docker image. Backs up to a single file. Runs on any machine. Enterprise can deploy on-prem with zero cloud footprint.</div>
+        </div>
+        <div class="ra" style="background:var(--card)">
+          <div class="ra-title">Hook mechanism (Phase 1.8 enforcement)</div>
+          <div style="font-size:10.5px;color:var(--muted);line-height:1.5;margin-top:4px">PreToolUse hook fires before every agent tool call. Budget Governor checks session cost + retry count. Returns <code style="font-family:var(--mono);font-size:9.5px;background:var(--surface);padding:1px 4px;border-radius:3px;color:var(--mint)">blocked=true</code> if limits exceeded. Claude Code stops the run instantly.</div>
+        </div>
+        <div class="ra" style="background:var(--card)">
+          <div class="ra-title">Context Memory proxy (Phase 1.9)</div>
+          <div style="font-size:10.5px;color:var(--muted);line-height:1.5;margin-top:4px">Intercepts POST /v1/messages. SHA-256 fingerprints stable blocks. Injects cache_control: ephemeral on matched blocks. Forwards to Anthropic. Records cache_read_input_tokens from response.</div>
+        </div>
+        <div class="ra" style="background:var(--card)">
+          <div class="ra-title">Settings-first Control Plane</div>
+          <div style="font-size:10.5px;color:var(--muted);line-height:1.5;margin-top:4px">SDK calls GET /api/settings on AgentRuntimeTracer init. Reads optimizer_enabled, budget limits, plan tier. Applies automatically — no code changes needed after the dashboard toggle is flipped.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="sftr"><div class="sftr-l">Agentium · Backup · Confidential</div><div class="sftr-r">agent-runtime-layer.vercel.app</div></div>
+</div>
+
+<!-- B3 ROADMAP -->
+<div class="slide" id="b3">
+  <div class="shdr"><div class="logo"><div class="hex"></div><span class="logo-name">Agentium</span></div><div class="hdr-right" style="display:flex;gap:8px;align-items:center;"><div class="slide-label">Product Roadmap</div><span class="backup-badge">Backup</span></div></div>
+  <div class="sbody" style="padding:24px 48px;">
+    <div class="ey">Phase 1 complete · Phase 2 scoped</div>
+    <div class="h2" style="font-size:22px;margin-bottom:14px;">Phases 1.0–1.10 shipped. <em>Phase 2 starts post-seed.</em></div>
+    <div class="roadmap-items">
+      <div class="ri">
+        <div class="ri-phase" style="color:var(--green)">✓ Done</div>
+        <div><div class="ri-title">Phase 1.0–1.10 — Full Agent Runtime Layer</div><div class="ri-desc">Profiler, hooks (Claude Code + Codex), tracer SDK, context optimizer + proof cards (1.7), budget governor via hooks (1.8), context memory local proxy (1.9), toggle-based control plane with plan gating (1.10). Live at agent-runtime-layer.vercel.app.</div><div class="ri-timeline">Complete · shipped</div></div>
+      </div>
+      <div class="ri">
+        <div class="ri-phase">Month 2–3</div>
+        <div><div class="ri-title">Alpha → Public — First 25 users + Product Hunt</div><div class="ri-desc">Personal onboarding of 25 alpha users. Collect real before/after proof cards. Fix install friction discovered during onboarding. Public Product Hunt launch with real user testimonials and proof card screenshots.</div><div class="ri-timeline">Immediate post-funding priority</div></div>
+      </div>
+      <div class="ri">
+        <div class="ri-phase">Month 4–8</div>
+        <div><div class="ri-title">Phase 2.0 — Multi-agent orchestration profiling</div><div class="ri-desc">Extend tracer to capture multi-agent workflows. Cost attribution across agent chains. Shared context detection between agents. Bottleneck detection in orchestration layers. Team dashboard showing all developers' agents in one view.</div><div class="ri-timeline">Post-seed · first engineering hire</div></div>
+      </div>
+      <div class="ri">
+        <div class="ri-phase">Month 9–12</div>
+        <div><div class="ri-title">Phase 2.1 — Enterprise readiness</div><div class="ri-desc">SSO (SAML/OIDC). Role-based access control. Audit logs for compliance. SOC 2 Type II preparation. Enterprise SLA: "Your agents never exceed your budget." Dedicated support channel. On-prem deployment option.</div><div class="ri-timeline">Enterprise sales motion begins</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="sftr"><div class="sftr-l">Agentium · Backup · Confidential</div><div class="sftr-r">agent-runtime-layer.vercel.app</div></div>
+</div>
+
+<!-- B4 SECURITY -->
+<div class="slide" id="b4">
+  <div class="shdr"><div class="logo"><div class="hex"></div><span class="logo-name">Agentium</span></div><div class="hdr-right" style="display:flex;gap:8px;align-items:center;"><div class="slide-label">Security &amp; Privacy</div><span class="backup-badge">Backup</span></div></div>
+  <div class="sbody" style="padding:24px 48px;">
+    <div class="ey">Security model — self-hosted by design</div>
+    <div class="h2" style="font-size:22px;margin-bottom:16px;">Agents process proprietary code. <em>None of it leaves the machine.</em></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">
+      <div style="background:var(--card);border:1px solid var(--border);border-top:2px solid var(--green);border-radius:11px;padding:18px;">
+        <div style="font-size:22px;margin-bottom:8px">🔒</div>
+        <div style="font-size:13.5px;font-weight:700;color:var(--text);margin-bottom:5px">100% local storage</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.6">All trace data, prompts, tool outputs stored in local SQLite at ~/.agentium/data/. No external database, no cloud sync, no telemetry. You own 100% of the data.</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-top:2px solid var(--mint);border-radius:11px;padding:18px;">
+        <div style="font-size:22px;margin-bottom:8px">🌐</div>
+        <div style="font-size:13.5px;font-weight:700;color:var(--text);margin-bottom:5px">Zero external connections</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.6">Backend makes no external API calls. Dashboard makes no external calls. The only outbound traffic is when the proxy forwards to Anthropic — and that only happens because you set the env var.</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-top:2px solid var(--blue);border-radius:11px;padding:18px;">
+        <div style="font-size:22px;margin-bottom:8px">🔑</div>
+        <div style="font-size:13.5px;font-weight:700;color:var(--text);margin-bottom:5px">Automatic secret redaction</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.6">The SDK redacts obvious secrets (API keys, tokens, passwords matching common patterns) before persisting to SQLite. Redaction runs before storage — not as a post-processing step.</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:11px;padding:18px;">
+        <div style="font-size:22px;margin-bottom:8px">🐳</div>
+        <div style="font-size:13.5px;font-weight:700;color:var(--text);margin-bottom:5px">Docker isolation</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.6">All services run in isolated Docker containers. Only localhost:8000 and localhost:4001 are exposed — no external port binding by default. Enterprise can add reverse proxy + auth layer on top.</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:11px;padding:18px;">
+        <div style="font-size:22px;margin-bottom:8px">📋</div>
+        <div style="font-size:13.5px;font-weight:700;color:var(--text);margin-bottom:5px">SOC 2 roadmap</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.6">SOC 2 Type II preparation begins post-seed as part of the enterprise readiness phase. All current architecture decisions are made with SOC 2 controls in mind.</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:11px;padding:18px;">
+        <div style="font-size:22px;margin-bottom:8px">🗑</div>
+        <div style="font-size:13.5px;font-weight:700;color:var(--text);margin-bottom:5px">Complete removal</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.6"><code style="font-family:var(--mono);font-size:10px;background:var(--surface);padding:1px 4px;border-radius:3px;color:var(--mint)">docker compose down</code> removes all services. <code style="font-family:var(--mono);font-size:10px;background:var(--surface);padding:1px 4px;border-radius:3px;color:var(--mint)">rm -rf ~/.agentium</code> removes all data. No account to delete, no support ticket required.</div>
+      </div>
+    </div>
+  </div>
+  <div class="sftr"><div class="sftr-l">Agentium · Backup · Confidential</div><div class="sftr-r">agent-runtime-layer.vercel.app</div></div>
+</div>
+
+</div><!-- /deck -->
+
+<div class="nav">
+  <button class="nav-btn" onclick="prev()">‹</button>
+  <div class="nav-dots" id="main-d"></div>
+  <div class="nav-div"></div>
+  <span class="bb-lbl">BACKUP</span>
+  <div class="nav-dots" id="back-d"></div>
+  <button class="nav-btn" onclick="next()">›</button>
+  <div class="scount" id="cnt">1/16</div>
+</div>
+
+<script>
+const slides=document.querySelectorAll('.slide');
+const mainD=document.getElementById('main-d');
+const backD=document.getElementById('back-d');
+const cntEl=document.getElementById('cnt');
+let cur=0;
+const MC=12;
+slides.forEach((_,i)=>{
+  const d=document.createElement('button');
+  const isB=i>=MC;
+  d.className='dot'+(isB?' backup':'')+(i===0?' active':'');
+  d.onclick=()=>go(i);
+  (isB?backD:mainD).appendChild(d);
+});
+function go(n){
+  slides[cur].classList.remove('active');
+  document.querySelectorAll('.dot')[cur].classList.remove('active');
+  cur=(n+slides.length)%slides.length;
+  slides[cur].classList.add('active');
+  document.querySelectorAll('.dot')[cur].classList.add('active');
+  cntEl.textContent=(cur+1)+'/'+slides.length;
+}
+function next(){go(cur+1);}
+function prev(){go(cur-1);}
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key==='ArrowDown')next();
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp')prev();
+});
+</script>
+</body>
+</html>

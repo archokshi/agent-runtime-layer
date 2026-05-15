@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Agentium — Customer Presentation v2</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --mint:#00A991;--mint-lt:#00A99112;--mint-md:#00A99128;
+  --green:#059669;--amber:#D97706;--red:#DC2626;--blue:#4F46E5;
+  --ink:#0F1117;--text:#1C1C2E;--muted:#6B7280;--muted2:#9CA3AF;
+  --border:#E5E7EB;--bg:#F9FAFB;--card:#FFFFFF;--surface:#F3F4F6;
+  --mono:'JetBrains Mono',monospace;
+}
+html,body{width:100%;height:100%;font-family:'Inter',sans-serif;background:#E5E7EB;overflow:hidden;-webkit-font-smoothing:antialiased;}
+.deck{width:100%;height:100%;position:relative;}
+.slide{position:absolute;top:0;left:0;width:100%;height:100%;display:none;flex-direction:column;background:#fff;}
+.slide.active{display:flex;}
+
+/* Nav */
+.nav{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:12px;z-index:100;background:rgba(15,17,23,.88);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,.1);border-radius:99px;padding:7px 14px;}
+.nav-btn{background:none;border:none;color:#6B7280;cursor:pointer;font-size:18px;padding:0 3px;transition:color .15s;line-height:1;}
+.nav-btn:hover{color:#fff;}
+.nav-section{display:flex;align-items:center;gap:4px;}
+.dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.25);cursor:pointer;transition:all .2s;border:none;}
+.dot.active{background:var(--mint);width:18px;border-radius:99px;}
+.dot.backup{background:rgba(255,165,0,.3);}
+.dot.backup.active{background:var(--amber);}
+.nav-divider{width:1px;height:14px;background:rgba(255,255,255,.15);}
+.slide-count{font-size:10px;color:#6B7280;font-family:var(--mono);white-space:nowrap;}
+.backup-label{font-size:9px;color:var(--amber);font-weight:700;letter-spacing:.4px;}
+
+/* Shared */
+.shdr{padding:12px 44px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--card);}
+.logo{display:flex;align-items:center;gap:8px;}
+.hex{width:20px;height:20px;background:var(--mint);clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);}
+.logo-name{font-size:13px;font-weight:800;color:var(--ink);}
+.hdr-right{display:flex;align-items:center;gap:10px;}
+.slide-label{font-size:9px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--muted2);}
+.backup-badge{font-size:8px;font-weight:700;padding:2px 7px;border-radius:99px;background:#FFF3CD;color:var(--amber);border:1px solid #FDE68A;letter-spacing:.3px;text-transform:uppercase;}
+.sbody{flex:1;padding:32px 56px;display:flex;flex-direction:column;justify-content:center;overflow:hidden;}
+.sfooter{padding:9px 44px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;background:var(--bg);}
+.sfooter-l{font-size:9px;color:var(--muted2);}
+.sfooter-r{font-size:9px;color:var(--mint);font-family:var(--mono);font-weight:600;}
+
+/* Type */
+.ey{font-size:10px;font-weight:700;letter-spacing:.7px;text-transform:uppercase;color:var(--mint);margin-bottom:8px;}
+.h1{font-size:40px;font-weight:900;letter-spacing:-1.5px;line-height:1.1;color:var(--ink);}
+.h1 em{color:var(--mint);font-style:normal;}
+.h2{font-size:26px;font-weight:800;letter-spacing:-.6px;line-height:1.2;color:var(--ink);}
+.h2 em{color:var(--mint);font-style:normal;}
+.h3{font-size:16px;font-weight:700;color:var(--ink);}
+.sub{font-size:13px;color:var(--muted);line-height:1.65;margin-top:8px;}
+.code{font-family:var(--mono);background:var(--ink);color:var(--mint);padding:10px 16px;border-radius:7px;font-size:12px;}
+
+/* ── SLIDE 1 COVER ── */
+#s1{background:linear-gradient(135deg,#0F1117 0%,#1a1a2e 55%,#0c2518 100%);}
+#s1 .sbody{padding:56px 80px;justify-content:center;align-items:flex-start;}
+#s1 .badge{display:inline-flex;align-items:center;gap:6px;background:var(--mint-md);color:var(--mint);font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:5px 12px;border-radius:99px;margin-bottom:18px;border:1px solid var(--mint-md);}
+#s1 .h1{color:#fff;font-size:50px;max-width:700px;}
+#s1 .sub{color:#9CA3AF;max-width:520px;font-size:15px;}
+#s1 .div{width:40px;height:3px;background:var(--mint);border-radius:2px;margin:20px 0;}
+#s1 .stats{display:flex;gap:0;border:1px solid rgba(255,255,255,.1);border-radius:10px;overflow:hidden;max-width:480px;}
+#s1 .st{flex:1;padding:14px 10px;border-right:1px solid rgba(255,255,255,.08);text-align:center;}
+#s1 .st:last-child{border-right:none;}
+#s1 .sv{font-size:24px;font-weight:800;font-family:var(--mono);color:var(--mint);letter-spacing:-1px;}
+#s1 .sl{font-size:8.5px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:#6B7280;margin-top:3px;}
+#s1 .sn{font-size:8px;color:#4B5563;margin-top:1px;}
+
+/* ── PROBLEM ── */
+.prob3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px;}
+.pc{background:var(--bg);border:1px solid var(--border);border-radius:11px;padding:20px;}
+.pc.r{border-top:3px solid var(--red);}
+.pc.a{border-top:3px solid var(--amber);}
+.pc.b{border-top:3px solid var(--blue);}
+.pi{font-size:26px;margin-bottom:8px;}
+.pt{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:5px;}
+.pd{font-size:11.5px;color:var(--muted);line-height:1.6;}
+.ps{font-size:24px;font-weight:800;font-family:var(--mono);margin-top:12px;}
+.pq{margin-top:10px;padding:10px 12px;background:var(--card);border:1px solid var(--border);border-radius:7px;font-size:10.5px;color:var(--muted);font-style:italic;line-height:1.5;}
+
+/* ── DASHBOARD MULTI-PAGE ── */
+.dp-layout{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:16px;}
+.dp-mock{background:#F7F7F5;border:1.5px solid #D1D5DB;border-radius:9px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.08);}
+.dm-bar{background:#fff;border-bottom:1px solid #E4E4DC;padding:6px 10px;display:flex;align-items:center;justify-content:space-between;}
+.dm-dots{display:flex;gap:3px;}
+.dmd{width:7px;height:7px;border-radius:50%;}
+.dm-url{font-family:var(--mono);font-size:8px;color:#9CA3AF;}
+.dm-body{display:flex;}
+.dm-side{width:60px;background:#EFEFEC;border-right:1px solid #E4E4DC;padding:7px 4px;}
+.dn{font-size:7px;font-weight:600;color:#737373;padding:3px 5px;border-radius:3px;margin-bottom:1px;}
+.dn.on{background:#fff;color:#00A991;border:1px solid #E4E4DC;}
+.dnl{font-size:6px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#A3A3A3;padding:5px 5px 2px;}
+.dm-main{flex:1;padding:8px;}
+.dm-title{font-size:9.5px;font-weight:700;color:#171717;margin-bottom:6px;}
+
+/* runs table mock */
+.rt{width:100%;border-collapse:collapse;}
+.rt th{font-size:6px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;color:#9CA3AF;padding:3px 5px;border-bottom:1px solid #E4E4DC;text-align:left;}
+.rt td{font-size:7.5px;color:#171717;padding:4px 5px;border-bottom:1px solid #F3F4F6;font-family:var(--mono);}
+.rt tr:last-child td{border-bottom:none;}
+.rt .warn{color:#D97706;font-weight:700;}
+.rt .good{color:#059669;font-weight:700;}
+.rt .fix{display:inline-flex;align-items:center;gap:2px;background:#00A99112;color:#00A991;border:1px solid #00A99120;border-radius:3px;padding:1px 5px;font-size:6.5px;font-weight:700;}
+
+/* bottlenecks mock */
+.bn-bars{display:flex;flex-direction:column;gap:4px;margin-top:4px;}
+.bn-row{display:flex;align-items:center;gap:4px;}
+.bn-label{font-size:7px;color:#737373;width:50px;text-align:right;flex-shrink:0;}
+.bn-track{flex:1;height:12px;background:#F3F4F6;border-radius:99px;overflow:hidden;}
+.bn-fill{height:100%;border-radius:99px;}
+.bn-pct{font-size:7px;font-weight:700;font-family:var(--mono);width:30px;}
+
+/* context mock */
+.ctx-item{display:flex;align-items:center;justify-content:space-between;padding:5px 7px;background:#fff;border:1px solid #E4E4DC;border-radius:4px;margin-bottom:3px;}
+.ctx-name{font-size:7.5px;font-weight:600;color:#171717;}
+.ctx-hash{font-size:6px;color:#9CA3AF;font-family:var(--mono);}
+.ctx-tok{font-size:9px;font-weight:700;font-family:var(--mono);}
+
+/* ── ARCHITECTURE ── */
+.arch{display:grid;grid-template-columns:1fr 1.2fr;gap:24px;margin-top:16px;align-items:start;}
+.arch-diagram{background:var(--ink);border-radius:12px;padding:20px;font-family:var(--mono);}
+.arch-row{display:flex;align-items:center;gap:0;margin-bottom:0;}
+.arch-box{padding:8px 14px;border-radius:7px;font-size:10.5px;font-weight:600;text-align:center;white-space:nowrap;}
+.arch-arrow{font-size:14px;color:#4B5563;margin:0 4px;}
+.arch-group{display:flex;flex-direction:column;gap:8px;}
+.arch-layer{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:9px;padding:12px 14px;}
+.arch-layer-label{font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#4B5563;margin-bottom:8px;}
+.arch-boxes{display:flex;gap:6px;flex-wrap:wrap;}
+.ab-agent{background:#00A99118;border:1px solid #00A99130;color:var(--mint);}
+.ab-sdk{background:#10B98118;border:1px solid #10B98130;color:#10B981;}
+.ab-backend{background:#6366F118;border:1px solid #6366F130;color:#6366F1;}
+.ab-db{background:#D9770618;border:1px solid #D9770630;color:#D97706;}
+.ab-dash{background:#F59E0B18;border:1px solid #F59E0B30;color:#F59E0B;}
+.ab-proxy{background:#EC489918;border:1px solid #EC489930;color:#EC4899;}
+.arch-points{display:flex;flex-direction:column;gap:10px;}
+.ap{display:flex;gap:10px;align-items:flex-start;}
+.ap-dot{width:6px;height:6px;border-radius:50%;background:var(--mint);flex-shrink:0;margin-top:5px;}
+.ap-title{font-size:12px;font-weight:700;color:var(--ink);margin-bottom:2px;}
+.ap-desc{font-size:10.5px;color:var(--muted);line-height:1.5;}
+.ap-code{font-size:9.5px;font-family:var(--mono);color:var(--mint);margin-top:3px;background:var(--bg);padding:3px 7px;border-radius:4px;display:inline-block;}
+
+/* ── PROOF CARD SLIDE ── */
+.proof-layout{display:grid;grid-template-columns:1.1fr 1fr;gap:24px;margin-top:16px;align-items:start;}
+.proof-card{background:var(--card);border:1px solid var(--border);border-top:3px solid var(--mint);border-radius:12px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.06);}
+.proof-hdr{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+.proof-title{font-size:13px;font-weight:700;color:var(--ink);}
+.proof-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.proof-cell{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:14px;text-align:center;}
+.proof-cell-l{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);}
+.proof-cell-v{font-size:30px;font-weight:800;font-family:var(--mono);color:var(--mint);letter-spacing:-1px;margin-top:4px;}
+.proof-msg{font-size:11px;color:var(--muted);line-height:1.6;margin-bottom:8px;}
+.proof-id{font-size:10px;color:var(--muted2);font-family:var(--mono);}
+.proof-table{margin-top:14px;}
+.proof-table table{width:100%;border-collapse:collapse;}
+.proof-table th{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);padding:6px 10px;background:var(--bg);border-bottom:1px solid var(--border);text-align:left;}
+.proof-table td{font-size:12px;padding:8px 10px;border-bottom:1px solid var(--border);font-family:var(--mono);}
+.proof-table tr:last-child td{border-bottom:none;}
+.ev-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:99px;}
+.ev-m{background:#00A99115;color:var(--mint);border:1px solid #00A99125;}
+.ev-e{background:#D9770615;color:var(--amber);border:1px solid #D9770625;}
+.proof-why{display:flex;flex-direction:column;gap:10px;}
+.pw-item{background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:14px;}
+.pw-title{font-size:12px;font-weight:700;color:var(--ink);margin-bottom:4px;}
+.pw-desc{font-size:11px;color:var(--muted);line-height:1.5;}
+.pw-code{font-size:9.5px;font-family:var(--mono);color:var(--mint);margin-top:6px;background:var(--ink);padding:5px 9px;border-radius:5px;display:block;}
+
+/* ── INSTALL ── */
+.install-layout{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:16px;}
+.install-steps{display:flex;flex-direction:column;gap:10px;}
+.is{display:flex;gap:12px;align-items:flex-start;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;}
+.is-num{width:26px;height:26px;background:var(--mint);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#fff;flex-shrink:0;}
+.is-title{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:3px;}
+.is-desc{font-size:11px;color:var(--muted);line-height:1.5;}
+.is-cmd{font-size:10px;font-family:var(--mono);color:var(--mint);margin-top:6px;background:var(--ink);padding:5px 10px;border-radius:5px;display:block;word-break:break-all;}
+.install-right{display:flex;flex-direction:column;gap:10px;}
+.compat-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;}
+.compat-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:10px;}
+.compat-item{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px;}
+.compat-item:last-child{border-bottom:none;}
+.compat-check{color:var(--green);font-weight:700;}
+.req-card{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:14px;}
+
+/* ── PRICING ── */
+.price-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px;}
+.pg{border:1px solid var(--border);border-radius:11px;padding:18px;background:var(--card);position:relative;}
+.pg.ft{border-color:var(--mint-md);background:linear-gradient(160deg,var(--mint-lt),#fff);}
+.pg-pop{position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--mint);color:#fff;font-size:8.5px;font-weight:700;padding:2px 10px;border-radius:99px;white-space:nowrap;text-transform:uppercase;letter-spacing:.3px;}
+.pg-tier{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:7px;}
+.pg-price{font-size:14px;font-weight:800;margin-bottom:3px;}
+.pg-price.fr{color:var(--ink);font-family:var(--mono);}
+.pg-price.ea{color:var(--mint);font-size:12px;}
+.pg-price.cu{color:var(--ink);font-size:12px;}
+.pg-unlock{font-size:10px;font-weight:700;color:var(--mint);background:var(--mint-lt);padding:2px 7px;border-radius:4px;display:inline-block;margin-bottom:8px;}
+.pg-sub{font-size:10.5px;color:var(--muted);margin-bottom:12px;line-height:1.4;}
+.pg-feats{display:flex;flex-direction:column;gap:5px;}
+.pg-feat{display:flex;align-items:flex-start;gap:6px;font-size:10.5px;color:var(--text);}
+.pg-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0;margin-top:5px;}
+.roi-strip{margin-top:14px;background:var(--ink);border-radius:9px;padding:12px 16px;display:grid;grid-template-columns:repeat(4,1fr);gap:0;}
+.roi-item{text-align:center;border-right:1px solid rgba(255,255,255,.08);padding:4px 8px;}
+.roi-item:last-child{border-right:none;}
+.roi-val{font-size:18px;font-weight:800;font-family:var(--mono);color:var(--mint);}
+.roi-label{font-size:8px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:#6B7280;margin-top:2px;}
+
+/* ── CTA ── */
+#s8{background:linear-gradient(135deg,#0F1117,#1a1a2e);}
+#s8 .sbody{align-items:center;justify-content:center;text-align:center;}
+#s8 .h1{color:#fff;font-size:42px;}
+#s8 .sub{color:#9CA3AF;margin:0 auto;font-size:15px;max-width:580px;}
+#s8 .cmd{font-family:var(--mono);font-size:15px;color:var(--mint);background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:9px;padding:14px 24px;margin-top:28px;display:inline-block;}
+#s8 .badges{display:flex;align-items:center;justify-content:center;gap:18px;margin-top:18px;}
+#s8 .badge{font-size:11px;color:#6B7280;display:flex;align-items:center;gap:5px;}
+#s8 .contact{margin-top:28px;font-size:13px;color:#6B7280;}
+#s8 .contact strong{color:#9CA3AF;}
+
+/* ── BACKUP — TECH DEEP DIVE ── */
+.td-layout{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:16px;}
+.td-col{display:flex;flex-direction:column;gap:10px;}
+.td-card{background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:14px;}
+.td-title{font-size:11px;font-weight:700;color:var(--ink);margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.td-items{display:flex;flex-direction:column;gap:5px;}
+.td-item{display:flex;align-items:flex-start;gap:7px;font-size:11px;color:var(--muted);line-height:1.4;}
+.td-key{font-family:var(--mono);font-size:10px;color:var(--mint);margin-top:2px;background:var(--card);padding:1px 5px;border-radius:3px;}
+
+/* ── BACKUP — FAQ ── */
+.faq{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px;}
+.fq{background:var(--bg);border:1px solid var(--border);border-radius:9px;padding:14px;}
+.fq-q{font-size:12px;font-weight:700;color:var(--ink);margin-bottom:5px;}
+.fq-a{font-size:11px;color:var(--muted);line-height:1.55;}
+.fq-code{font-family:var(--mono);font-size:9.5px;color:var(--mint);margin-top:5px;background:var(--ink);padding:4px 8px;border-radius:4px;display:block;}
+</style>
+</head>
+<body>
+<div class="deck">
+
+<!-- ── S1 COVER ── -->
+<div class="slide active" id="s1">
+  <div class="sbody">
+    <div class="badge">⚡ Early Access · Customer Presentation</div>
+    <div class="h1">Your coding agent is wasting money <em>on every run.</em></div>
+    <div class="sub">Agentium profiles every model call, tool call, token, and dollar — then fixes the waste in one click. Self-hosted. Free to observe. Pay only when you save.</div>
+    <div class="div"></div>
+    <div class="stats">
+      <div class="st"><div class="sv">−43%</div><div class="sl">Token cost</div><div class="sn">verified · not estimated</div></div>
+      <div class="st"><div class="sv">65%</div><div class="sl">Avg wasted</div><div class="sn">tokens re-sent every call</div></div>
+      <div class="st"><div class="sv">5 min</div><div class="sl">To install</div><div class="sn">one curl command</div></div>
+      <div class="st"><div class="sv">$0</div><div class="sl">To observe</div><div class="sn">free forever</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── S2 PROBLEM ── -->
+<div class="slide" id="s2">
+  <div class="shdr"><div class="logo"><div class="hex"></div><span class="logo-name">Agentium</span></div><div class="slide-label">The Problem</div></div>
+  <div class="sbody">
+    <div class="ey">What's happening in your agent right now</div>
+    <div class="h2">You're paying for the same context <em>on every single call.</em></div>
+    <div class="prob3">
+      <div class="pc r">
+        <div class="pi">💸</div>
+        <div class="pt">One bill. Zero insight.</div>
+        <div class="pd">Your coding agent provider charges you at month-end. No breakdown by run. No map of where time went. No way to know if run #47 cost 3× more than run #46 — or why.</div>
+        <div class="ps" style="color:var(--red)">0% visibility</div>
+        <div class="pq">"I had no idea each agent call was re-sending 18,400 tokens of system prompt. That's $0.055 wasted per call, every call, all month."</div>
+      </div>
+      <div class="pc a">
+        <div class="pi">🔁</div>
+        <div class="pt">65% of tokens re-sent every call</div>
+        <div class="pd">System prompt, tool definitions, and repo summary are <strong>identical across every model call</strong> in a run — yet sent at $3.00/MTok each time. None of it needs to be re-sent.</div>
+        <div class="ps" style="color:var(--amber)">65% wasted</div>
+        <div class="pq">"We were paying for 18,400 tokens of system prompt × 47 calls per day × 30 days. That's $776/month on context that never changes."</div>
+      </div>
+      <div class="pc b">
+        <div class="pi">🔥</div>
+        <div class="pt">Retry spirals are silent budget killers</div>
+        <div class="pd">When an agent task fails, it retries — silently, without limit. Each retry is billed at full cost. You find out weeks later when the invoice arrives.</div>
+        <div class="ps" style="color:var(--blue)">3–10× cost</div>
+        <div class="pq">"One retry spiral ran 11 times before I noticed. At $0.014/run that's $0.15 I didn't know about — until it happened 200 times in a week."</div>
+      </div>
+    </div>
+  </div>
+  <div class="sfooter"><div class="sfooter-l">Agentium · Customer Presentation v2</div><div class="sfooter-r">agent-runtime-layer.vercel.app</div></div>
+</div>
+
+<!-- ── S3 DASHBOARD TOUR ── -->
+<div class="slide" id="s3">
+  <div class="shdr"><div class="logo"><div class="hex"></div><span class="logo-name">Agentium</span></div><div class="slide-label">The Dashboard</div></div>
+  <div class="sbody" style="padding:20px 44px;">
+    <div class="ey">8 pages — everything your agent does, visible</div>
+    <div class="h2" style="font-size:22px;margin-bottom:14px;">From <em>waterfall timelines</em> to context fingerprints to cost-per-failure.</div>
+    <div class="dp-layout">
+      <!-- Runs page mock -->
+      <div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:6px;">📋 Runs — all traced agent tasks</div>
+        <div class="dp-mock">
+          <div class="dm-bar"><div class="dm-dots"><div class="dmd" style="background:#FF5F57"></div><div class="dmd" style="background:#FFBD2E"></div><div class="dmd" style="background:#28CA41"></div></div><div class="dm-url">localhost:4001/runs</div></div>
+          <div class="dm-body">
+            <div class="dm-side">
+              <div class="dnl">Main</div>
+              <div class="dn">Overview</div><div class="dn on">Runs</div><div class="dn">Settings</div>
+              <div class="dnl">Analysis</div>
+              <div class="dn">Bottlenecks</div><div class="dn">Context</div><div class="dn">Cost</div>
+            </div>
+            <div class="dm-main">
+              <div class="dm-title">Runs · 12 traced · 10 succeeded</div>
+              <table class="rt">
+                <thead><tr><th>Goal</th><th>Status</th><th>Cost</th><th>Ctx%</th><th>Opt</th></tr></thead>
+                <tbody>
+                  <tr><td style="max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Fix checkout tax bug</td><td style="color:#059669">✓</td><td>$0.0142</td><td class="warn">65% ⚠</td><td><span class="fix">⚡ Fix</span></td></tr>
+                  <tr><td style="max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Add OAuth2 auth</td><td style="color:#059669">✓</td><td>$0.0188</td><td class="warn">71% ⚠</td><td><span class="fix">⚡ Fix</span></td></tr>
+                  <tr><td style="max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Write unit tests</td><td style="color:#DC2626">✗</td><td>$0.0089</td><td>38%</td><td style="color:#D1D5DB;font-size:7px">—</td></tr>
+                  <tr><td style="max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Refactor DB pool</td><td style="color:#059669">✓</td><td>$0.0241</td><td class="warn">59% ⚠</td><td><span class="fix">⚡ Fix</span></td></tr>
+                </tbody>
+              </table>
+              <div style="font-size:6.5px;color:#9CA3AF;margin-top:4px;padding-top:4px;border-top:1px solid #F3F4F6">⚠ = repeated context ≥55% — highest optimization priority</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Bottlenecks page mock -->
+      <div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:6px;">📊 Bottlenecks — where time goes</div>
+        <div class="dp-mock">
+          <div class="dm-bar"><div class="dm-dots"><div class="dmd" style="background:#FF5F57"></div><div class="dmd" style="background:#FFBD2E"></div><div class="dmd" style="background:#28CA41"></div></div><div class="dm-url">localhost:4001/bottlenecks</div></div>
+          <div class="dm-body">
+            <div class="dm-side">
+              <div class="dnl">Main</div>
+              <div class="dn">Overview</div><div class="dn">Runs</div><div class="dn">Settings</div>
+              <div class="dnl">Analysis</div>
+              <div class="dn on">Bottlenecks</div><div class="dn">Context</div><div class="dn">Cost</div>
+            </div>
+            <div class="dm-main">
+              <div class="dm-title">Bottlenecks · avg across 12 runs</div>
+              <div class="bn-bars">
+                <div class="bn-row"><div class="bn-label">Model</div><div class="bn-track"><div class="bn-fill" style="width:42%;background:#00A991"></div></div><div class="bn-pct" style="color:#00A991">42%</div></div>
+                <div class="bn-row"><div class="bn-label" style="color:#D97706">Tool wait⚠</div><div class="bn-track"><div class="bn-fill" style="width:43%;background:#D97706"></div></div><div class="bn-pct" style="color:#D97706">43%</div></div>
+                <div class="bn-row"><div class="bn-label">Idle/CPU</div><div class="bn-track"><div class="bn-fill" style="width:15%;background:#D1D5DB"></div></div><div class="bn-pct" style="color:#9CA3AF">15%</div></div>
+              </div>
+              <div style="margin-top:6px;background:#FFF3CD;border:1px solid #FDE68A;border-radius:4px;padding:5px 7px;font-size:7px;color:#D97706">⚠ Tool wait is #1 bottleneck — 43% of elapsed time (8.6s avg). Parallelising tool calls could save ~4.3s/run.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Context inspector mock -->
+      <div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:6px;">🔍 Context inspector — which tokens repeat?</div>
+        <div class="dp-mock">
+          <div class="dm-bar"><div class="dm-dots"><div class="dmd" style="background:#FF5F57"></div><div class="dmd" style="background:#FFBD2E"></div><div class="dmd" style="background:#28CA41"></div></div><div class="dm-url">localhost:4001/context</div></div>
+          <div class="dm-body">
+            <div class="dm-side">
+              <div class="dnl">Main</div>
+              <div class="dn">Overview</div><div class="dn">Runs</div><div class="dn">Settings</div>
+              <div class="dnl">Analysis</div>
+              <div class="dn">Bottlenecks</div><div class="dn on">Context</div><div class="dn">Cost</div>
+            </div>
+            <div class="dm-main">
+              <div class="dm-title">Stable blocks — re-sent every call</div>
+              <div class="ctx-item" style="border-top:2px solid #DC2626"><div><div class="ctx-name">System prompt</div><div class="ctx-hash">sha256:a4f3b1… · 12/12 runs</div></div><div class="ctx-tok" style="color:#DC2626">18,400</div></div>
+              <div class="ctx-item" style="border-top:2px solid #D97706"><div><div class="ctx-name">Tool definitions</div><div class="ctx-hash">sha256:c9d2e5… · 12/12 runs</div></div><div class="ctx-tok" style="color:#D97706">8,200</div></div>
+              <div class="ctx-item"><div><div class="ctx-name">Repo summary</div><div class="ctx-hash">sha256:7e3a2b… · 10/12 runs</div></div><div class="ctx-tok" style="color:#9CA3AF">4,730</div></div>
+              <div style="margin-top:5px;background:#00A99112;border:1px solid #00A99120;border-radius:4px;padding:4px 6px;font-size:6.5px;color:#00A991">⚡ Enable Optimizer in Settings → −43% tokens/run · estimated $0.006/run saved</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Settings mock -->
+      <div>
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:6px;">⚙️ Control Plane — 3 toggles, active next run</div>
+        <div class="dp-mock">
+          <div class="dm-bar"><div class="dm-dots"><div class="dmd" style="background:#FF5F57"></div><div class="dmd" style="background:#FFBD2E"></div><div class="dmd" style="background:#28CA41"></div></div><div class="dm-url">localhost:4001/settings</div></div>
+          <div class="dm-body">
+            <div class="dm-side">
+              <div class="dnl">Main</div>
+              <div class="dn">Overview</div><div class="dn">Runs</div><div class="dn on">Settings</div>
+              <div class="dnl">Analysis</div>
+              <div class="dn">Bottlenecks</div><div class="dn">Context</div><div class="dn">Cost</div>
+            </div>
+            <div class="dm-main">
+              <div class="dm-title">Control Plane</div>
+              <div style="background:#fff;border:1px solid #E4E4DC;border-top:2px solid #00A991;border-radius:5px;padding:6px 8px;margin-bottom:4px;display:flex;align-items:center;justify-content:space-between;">
+                <div><div style="font-size:8px;font-weight:700;color:#171717">⚡ Context Optimizer</div><div style="font-size:6.5px;color:#737373">Strip repeated context automatically</div></div>
+                <div style="width:24px;height:13px;background:#00A991;border-radius:99px;position:relative;flex-shrink:0"><div style="position:absolute;top:2px;right:2px;width:9px;height:9px;background:#fff;border-radius:50%"></div></div>
+              </div>
+              <div style="background:#fff;border:1px solid #E4E4DC;border-top:2px solid #D97706;border-radius:5px;padding:6px 8px;margin-bottom:4px;display:flex;align-items:center;justify-content:space-between;">
+                <div><div style="font-size:8px;font-weight:700;color:#171717">🛡 Budget Governor</div><div style="font-size:6.5px;color:#737373">Cap cost/run + retry limits</div></div>
+                <div style="width:24px;height:13px;background:#00A991;border-radius:99px;position:relative;flex-shrink:0"><div style="position:absolute;top:2px;right:2px;width:9px;height:9px;background:#fff;border-radius:50%"></div></div>
+              </div>
+              <div style="background:#fff;border:1px solid #E4E4DC;border-radius:5px;padding:6px 8px;display:flex;align-items:center;justify-content:space-between;opacity:.7;">
+                <div><div style="font-size:8px;font-weight:700;color:#171717">🧠 Context Memory</div><div style="font-size:6.5px;color:#737373">Cache at 10× cheaper rate</div></div>
+                <div style="font-size:6.5px;color:#9CA3AF;background:#F3F4F6;border:1px solid #E4E4DC;border-radius:3px;padding:1px 5px">🔒 Enterprise</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="sfooter"><div class="sfooter-l">Agentium · Customer Presentation v2</div><div class="sfooter-r">agent-runtime-layer.vercel.app</div></div>
+</div>
+
+<!-- ── S4 PROOF CARD ── -->
+<div class="slide" id="s4">
+  <div class="shdr"><div class="logo"><div class="hex"></div><span class="logo-name">Agentium</span></div><div class="slide-label">The Proof Card</div></div>
+  <div class="sbody" style="padding:24px 48px;">
+    <div class="ey">Phase 1.7 — Apply optimization</div>
+    <div class="h2" style="font-size:22px;margin-bottom:14px;">One click. Measured result. <em>Shareable proof.</em></div>
+    <div class="proof-layout">
+      <div>
+        <div class="proof-card">
+          <div class="proof-hdr">
+            <span style="color:var(--mint);font-size:16px">⚡</span>
+            <div class="proof-title">Optimization Applied — Proof Card</div>
+            <span class="ev-badge ev-m" style="margin-left:auto">✓ Verified</span>
+          </div>
+          <div class="proof-grid">
+            <div class="proof-cell"><div class="proof-cell-l">Token reduction</div><div class="proof-cell-v">−43%</div></div>
+            <div class="proof-cell"><div class="proof-cell-l">Cost reduction</div><div class="proof-cell-v">−43%</div></div>
+          </div>
+          <div class="proof-msg">Stable context stripped from payload — system prompt, tool definitions, and repo summary removed from every per-call message. Context fingerprinted with sha256.</div>
+          <div class="proof-id">Proof ID: proof_a4f3b1c9d2 · Measured · Not estimated · 2026-05-14</div>
+        </div>
+        <div class="proof-table" style="margin-top:14px;">
+          <table>
+            <thead><tr><th>Metric</th><th>Before</th><th>After</th><th>Delta</th><th>Evidence</th></tr></thead>
+            <tbody>
+              <tr><td>Input tokens</td><td>48,200</td><td>27,400</td><td style="color:var(--green);font-weight:700">−43.2%</td><td><span class="ev-badge ev-m">Measured</span></td></tr>
+              <tr><td>Cost / run</td><td>$0.0142</td><td>$0.0081</td><td style="color:var(--green);font-weight:700">−42.9%</td><td><span class="ev-badge ev-m">Measured</span></td></tr>
+              <tr><td>Success preserved</td><td>—</td><td>✓ Yes</td><td style="color:var(--green);font-weight:700">✓</td><td><span class="ev-badge ev-m">Verified</span></td></tr>
+              <tr><td>Context cache hit</td><td>0%</td><td>65%</td><td style="color:var(--green);font-weight:700">+65%</td><td><span class="ev-badge ev-e">Estimated</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="proof-why">
+        <div class="pw-item">
+          <div class="pw-title">What gets stripped?</div>
+          <div class="pw-desc">The optimizer fingerprints context blocks using SHA-256. Blocks seen in ≥2 consecutive calls are classified as "stable" and flagged for removal from per-call payloads.</div>
+          <span class="pw-code">Stable: system_prompt (18,400 tok) · tool_defs (8,200 tok)</span>
+        </div>
+        <div class="pw-item">
+          <div class="pw-title">How is it applied?</div>
+          <div class="pw-desc">POST /api/tasks/{id}/apply-optimization strips the stable blocks, re-runs the optimized payload, and stores an OptimizationProofRecord with before/after delta.</div>
+          <span class="pw-code">POST /api/tasks/a4f3b1/apply-optimization</span>
+        </div>
+        <div class="pw-item">
+          <div class="pw-title">Can it be automated?</div>
+          <div class="pw-desc">Yes. Enable "Context Optimizer" in the Control Plane (Settings page). The SDK reads /api/settings on startup and applies auto_optimize=True to every subsequent run automatically.</div>
+          <span class="pw-code">GET /api/settings → {optimizer_enabled: true}</span>
+        </div>
+        <div class="pw-item">
+          <div class="pw-title">What does "Verified" mean?</div>
+          <div class="pw-desc">Evidence quality upgrades from "~ Estimated" to "✓ Verified" once a real before/after pair is measured — not just projected from context analysis.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="sfooter"><div class="sfooter-l">Agentium · Customer Presentation v2</div><div class="sfooter-r">agent-runtime-layer.vercel.app</div></div>
+</div>
+
+<!-- ── S5 ARCHITECTURE ── -->
+<div class="slide" id="s5">
+  <div class="shdr"><div class="logo"><div class="hex"></div><span class="logo-name">Agentium</span></div><div class="slide-label">How It Works</div></div>
+  <div class="sbody" style="padding:24px 48px;">
+    <div class="ey">Technical architecture — self-hosted, no cloud dependencies</div>
+    <div class="h2" style="font-size:20px;margin-bottom:14px;">Three components. One Docker command. <em>Everything stays local.</em></div>
+    <div class="arch">
+      <div class="arch-diagram">
+        <div class="arch-layer" style="margin-bottom:10px;">
+          <div class="arch-layer-label">Your coding agent</div>
+          <div class="arch-boxes">
+            <div class="arch-box ab-agent">Claude Code</div>
+            <div class="arch-box ab-agent">Codex CLI</div>
+            <div class="arch-box ab-agent">Custom Python SDK</div>
+          </div>
+        </div>
+        <div style="text-align:center;color:#4B5563;font-size:11px;margin:4px 0">↓ hooks (PreToolUse · PostToolUse · UserPromptSubmit)</div>
+        <div class="arch-layer" style="margin-bottom:10px;">
+          <div class="arch-layer-label">Agentium SDK + Proxy</div>
+          <div class="arch-boxes">
+            <div class="arch-box ab-sdk">agent_runtime_layer</div>
+            <div class="arch-box ab-proxy">proxy.py :8100</div>
+            <div class="arch-box ab-sdk">budget.py</div>
+          </div>
+        </div>
+        <div style="text-align:center;color:#4B5563;font-size:11px;margin:4px 0">↓ HTTP POST /api/traces</div>
+        <div class="arch-layer" style="margin-bottom:10px;">
+          <div class="arch-layer-label">Backend (FastAPI :8000)</div>
+          <div class="arch-boxes">
+            <div class="arch-box ab-backend">Task API</div>
+            <div class="arch-box ab-backend">Analysis</div>
+            <div class="arch-box ab-backend">Settings</div>
+            <div class="arch-box ab-backend">Optimizer</div>
+          </div>
+        </div>
+        <div style="text-align:center;color:#4B5563;font-size:11px;margin:4px 0">↓ reads/writes</div>
+        <div class="arch-layer" style="margin-bottom:10px;">
+          <div class="arch-layer-label">Storage (SQLite — local only)</div>
+          <div class="arch-boxes">
+            <div class="arch-box ab-db">trace_events</div>
+            <div class="arch-box ab-db">opt_proofs</div>
+            <div class="arch-box ab-db">budget_events</div>
+            <div class="arch-box ab-db">context_memory</div>
+            <div class="arch-box ab-db">settings</div>
+          </div>
+        </div>
+        <div style="text-align:center;color:#4B5563;font-size:11px;margin:4px 0">↑ GET /api/*</div>
+        <div class="arch-layer">
+          <div class="arch-layer-label">Dashboard (Next.js :4001)</div>
+          <div class="arch-boxes">
+            <div class="arch-box ab-dash">Overview</div>
+            <div class="arch-box ab-dash">Runs</div>
+            <div class="arch-box ab-dash">Settings</div>
+            <div class="arch-box ab-dash">Bottlenecks</div>
+            <div class="arch-box ab-dash">Context</div>
+          </div>
+        </div>
+      </div>
+      <div class="arch-points">
+        <div class="ap"><div class="ap-dot"></div><div>
+          <div class="ap-title">Hooks capture everything</div>
+          <div class="ap-desc">Claude Code and Codex fire hooks (PreToolUse, PostToolUse, UserPromptSubmit) on every action. The SDK intercepts these and sends structured events to the backend.</div>
+          <span class="ap-code">agent-runtime integrations install claude-code --repo .</span>
+        </div></div>
+        <div class="ap"><div class="ap-dot"></div><div>
+          <div class="ap-title">FastAPI + SQLite — no external DB</div>
+          <div class="ap-desc">The backend runs entirely locally. All trace data, proof records, budget events, and context memory are stored in a single SQLite file. Zero cloud dependency.</div>
+          <span class="ap-code">./backend/data/agentium.db (local file)</span>
+        </div></div>
+        <div class="ap"><div class="ap-dot"></div><div>
+          <div class="ap-title">Control Plane reads settings on startup</div>
+          <div class="ap-desc">The SDK calls GET /api/settings when the tracer initialises. If optimizer_enabled is true, auto_optimize is applied automatically — no code changes needed.</div>
+          <span class="ap-code">GET http://localhost:8000/api/settings</span>
+        </div></div>
+        <div class="ap"><div class="ap-dot"></div><div>
+          <div class="ap-title">Context proxy intercepts API calls</div>
+          <div class="ap-desc">The Phase 1.9 proxy runs on port 8100. Developer sets ANTHROPIC_BASE_URL=http://localhost:8100. The proxy fingerprints stable context and injects cache_control markers.</div>
+          <span class="ap-code">ANTHROPIC_BASE_URL=http://localhost:8100</span>
+        </div></div>
+        <div class="ap"><div class="ap-dot"></div><div>
+          <div class="ap-title">One command to start everything</div>
+          <div class="ap-desc">Docker Compose runs backend + dashboard in one command. The install script handles Docker auto-install on macOS and Linux.</div>
+          <span class="ap-code">curl -sSL https://agent-runtime-layer.vercel.app/install.sh | bash</span>
+        </div></div>
+      </div>
+    </div>
+  </div>
+  <div class="sfooter"><div class="sfooter-l">Agentium · Customer Presentation v2</div><div class="sfooter-r">agent-runtime-layer.vercel.app</div></div>
+</div>
+
+<!-- ── S6 INSTALL ── -->
+<div class="slide" id="s6">
+  <div class="shdr"><div class="logo"><div class="hex"></div><span class="logo-name">Agentium</span></div><div class="slide-label">Getting Started</div></div>
+  <div class="sbody" style="padding:24px 48px;">
+    <div class="ey">Up and running in under 5 minutes</div>
+    <div class="h2" style="font-size:22px;margin-bottom:14px;">One command installs everything. <em>Browser opens automatically.</em></div>
+    <div class="install-layout">
+      <div class="install-steps">
+        <div class="is">
+          <div class="is-num">1</div>
+          <div>
+            <div class="is-title">Run the installer</div>
+            <div class="is-desc">Paste one command. Docker installs automatically if missing. Images pull. Services start. Browser opens to localhost:4001.</div>
+            <span class="is-cmd">curl -sSL https://agent-runtime-layer.vercel.app/install.sh | bash</span>
+          </div>
+        </div>
+        <div class="is">
+          <div class="is-num">2</div>
+          <div>
+            <div class="is-title">Install hooks in your repo</div>
+            <div class="is-desc">One command installs hooks into your .claude/settings.json (Claude Code) or codex config. Captures every run automatically from that point forward.</div>
+            <span class="is-cmd">agent-runtime integrations install claude-code --repo /path/to/repo</span>
+          </div>
+        </div>
+        <div class="is">
+          <div class="is-num">3</div>
+          <div>
+            <div class="is-title">Run your agent normally</div>
+            <div class="is-desc">No agent code changes. No SDK wrappers to add. Just run Claude Code or Codex as you always do — every run appears in the dashboard automatically.</div>
+          </div>
+        </div>
+        <div class="is" style="border-top:2px solid var(--mint);">
+          <div class="is-num">4</div>
+          <div>
+            <div class="is-title">Enable optimizations in Settings</div>
+            <div class="is-desc">Open localhost:4001/settings. Flip the Context Optimizer toggle. Next run is automatically optimized. Proof card appears with verified results.</div>
+            <span class="is-cmd">open http://localhost:4001/settings</span>
+          </div>
+        </div>
+      </div>
+      <div class="install-right">
+        <div class="compat-card">
+          <div class="compat-title">Compatible agents</div>
+          <div class="compat-item"><span class="compat-check">✓</span> <strong>Claude Code</strong> — hooks (PreToolUse, PostToolUse, UserPromptSubmit, Stop)</div>
+          <div class="compat-item"><span class="compat-check">✓</span> <strong>Codex CLI</strong> — hooks (prompt, session, tool, file, terminal, stop)</div>
+          <div class="compat-item"><span class="compat-check">✓</span> <strong>Custom Python agents</strong> — AgentRuntimeTracer SDK</div>
+          <div class="compat-item"><span class="compat-check">✓</span> <strong>Any agent</strong> — JSON trace import via API</div>
+        </div>
+        <div class="req-card">
+          <div class="compat-title">Requirements</div>
+          <div class="compat-item" style="border-bottom:1px solid var(--border);padding:6px 0;font-size:11.5px;display:flex;align-items:center;gap:8px;"><span class="compat-check">✓</span> Docker Desktop (auto-installed by script)</div>
+          <div class="compat-item" style="border-bottom:1px solid var(--border);padding:6px 0;font-size:11.5px;display:flex;align-items:center;gap:8px;"><span class="compat-check">✓</span> Python 3.10+ for SDK and hooks</div>
+          <div class="compat-item" style="padding:6px 0;font-size:11.5px;display:flex;align-items:center;gap:8px;"><span class="compat-check">✓</span> macOS or Linux (Windows: Docker Desktop manual install)</div>
+        </div>
+        <div style="background:var(--ink);border-radius:9px;padding:14px 16px;">
+          <div style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#6B7280;margin-bottom:6px;">What gets installed</div>
+          <div style="font-size:10.5px;color:#9CA3AF;line-height:1.7;">
+            archokshi/backend:latest → localhost:8000/api<br>
+            archokshi/dashboard:latest → localhost:4001<br>
+            agent-runtime-layer (pip) → SDK + hooks CLI<br>
+            SQLite data → ~/.agentium/data/
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="sfooter"><div class="sfooter-l">Agentium · Customer Presentation v2</div><div class="sfooter-r">agent-runtime-layer.vercel.app</div></div>
+</div>
+
+<!-- ── S7 PRICING ── -->
+<div class="slide" id="s7">
+  <div class="shdr"><div class="logo"><div class="hex"></div><span class="logo-name">Agentium</span></div><div class="slide-label">Pricing</div></div>
+  <div class="sbody" style="padding:24px 48px;">
+    <div class="ey">Free to observe. Pay only when you save.</div>
+    <div class="h2" style="font-size:22px;margin-bottom:14px;">The ROI is positive <em>before you pay.</em></div>
+    <div class="price-grid">
+      <div class="pg">
+        <div class="pg-tier">Observe</div>
+        <div class="pg-price fr">Always free</div>
+        <div class="pg-unlock">Free forever</div>
+        <div class="pg-sub">Full visibility — no limits, no credit card</div>
+        <div class="pg-feats">
+          <div class="pg-feat"><div class="pg-dot" style="background:var(--mint)"></div>Unlimited traces</div>
+          <div class="pg-feat"><div class="pg-dot" style="background:var(--mint)"></div>All 8 dashboard pages</div>
+          <div class="pg-feat"><div class="pg-dot" style="background:var(--mint)"></div>Waterfall timeline</div>
+          <div class="pg-feat"><div class="pg-dot" style="background:var(--mint)"></div>Cost + bottleneck reports</div>
+          <div class="pg-feat"><div class="pg-dot" style="background:var(--mint)"></div>Ranked recommendations</div>
+        </div>
+      </div>
+      <div class="pg ft">
+        <div class="pg-pop">Most popular</div>
+        <div class="pg-tier">Pro</div>
+        <div class="pg-price ea">Early access pricing</div>
+        <div class="pg-unlock">⚡ Phase 1.7 unlock</div>
+        <div class="pg-sub">For devs who want verified cost savings</div>
+        <div class="pg-feats">
+          <div class="pg-feat"><div class="pg-dot" style="background:var(--mint)"></div>Everything in Observe</div>
+          <div class="pg-feat"><div class="pg-dot" style="background:var(--mint)"></div>Context Optimizer — auto-fix</div>
+          <div class="pg-feat"><div class="pg-dot" style="background:var(--mint)"></div>Proof card per run (✓ Verified)</div>
+          <div class="pg-feat"><div class="pg-dot" style="background:var(--mint)"></div>Gains since enabled dashboard</div>
+          <div class="pg-feat"><div class="pg-dot" style="background:var(--mint)"></div>SDK auto_optimize flag</div>
+        </div>
+      </div>
+      <div class="pg">
+        <div class="pg-tier">Team</div>
+        <div class="pg-price ea">Early access pricing</div>
+        <div class="pg-unlock">🛡 Phase 1.8 unlock</div>
+        <div class="pg-sub">Cost governance across your entire team</div>
+        <div class="pg-feats">
+          <div class="pg-feat"><div class="pg-dot" style="background:var(--amber)"></div>Everything in Pro</div>
+          <div class="pg-feat"><div class="pg-dot" style="background:var(--amber)"></div>Budget Governor (hooks)</div>
+          <div class="pg-feat"><div class="pg-dot" style="background:var(--amber)"></div>Max cost/run + retry limits</div>
+          <div class="pg-feat"><div class="pg-dot" style="background:var(--amber)"></div>Shared rules — all developers</div>
+          <div class="pg-feat"><div class="pg-dot" style="background:var(--amber)"></div">"X blocked · $Y saved" dashboard</div>
+        </div>
+      </div>
+      <div class="pg">
+        <div class="pg-tier">Enterprise</div>
+        <div class="pg-price cu">Contact us</div>
+        <div class="pg-unlock">🧠 Phase 1.9 unlock</div>
+        <div class="pg-sub">Persistent memory + cost SLA</div>
+        <div class="pg-feats">
+          <div class="pg-feat"><div class="pg-dot" style="background:var(--blue)"></div>Everything in Team</div>
+          <div class="pg-feat"><div class="pg-dot" style="background:var(--blue)"></div>Context Memory (local proxy)</div>
+          <div class="pg-feat"><div class="pg-dot" style="background:var(--blue)"></div>$0.30/MTok vs $3.00/MTok</div>
+          <div class="pg-feat"><div class="pg-dot" style="background:var(--blue)"></div>Compounding savings moat</div>
+          <div class="pg-feat"><div class="pg-dot" style="background:var(--blue)"></div>SLA: never exceed budget</div>
+        </div>
+      </div>
+    </div>
+    <div class="roi-strip">
+      <div class="roi-item"><div class="roi-val">Day 1</div><div class="roi-label">See the waste</div></div>
+      <div class="roi-item"><div class="roi-val">−43%</div><div class="roi-label">First optimization</div></div>
+      <div class="roi-item"><div class="roi-val">Week 2</div><div class="roi-label">ROI positive (Pro)</div></div>
+      <div class="roi-item"><div class="roi-val">∞</div><div class="roi-label">Compounding (Enterprise)</div></div>
+    </div>
+  </div>
+  <div class="sfooter"><div class="sfooter-l">Agentium · Customer Presentation v2</div><div class="sfooter-r">agent-runtime-layer.vercel.app</div></div>
+</div>
+
+<!-- ── S8 CTA ── -->
+<div class="slide" id="s8">
+  <div class="sbody">
+    <div class="h1">Ready to see what your agent is <em>actually costing you?</em></div>
+    <div class="sub">Install Agentium in under 5 minutes. Your data never leaves your machine. Start free — upgrade when the ROI is obvious.</div>
+    <div class="cmd">curl -sSL https://agent-runtime-layer.vercel.app/install.sh | bash</div>
+    <div class="badges">
+      <div class="badge">🔒 Data stays local</div>
+      <div class="badge">🐳 Self-hosted Docker</div>
+      <div class="badge">🆓 Free to observe</div>
+      <div class="badge">⚙️ Claude Code &amp; Codex</div>
+    </div>
+    <div class="contact">Questions? <strong>optiinfra@gmail.com</strong> · <strong style="color:var(--mint)">agent-runtime-layer.vercel.app</strong></div>
+  </div>
+</div>
+
+<!-- ══ BACKUP SLIDES ══════════════════════════════════════ -->
+
+<!-- ── B1 TECHNICAL DEEP DIVE ── -->
+<div class="slide" id="b1">
+  <div class="shdr"><div class="logo"><div class="hex"></div><span class="logo-name">Agentium</span></div><div class="hdr-right"><div class="slide-label">Technical Detail</div><span class="backup-badge">Backup</span></div></div>
+  <div class="sbody" style="padding:24px 48px;">
+    <div class="ey">Under the hood</div>
+    <div class="h2" style="font-size:22px;margin-bottom:14px;">Every component — <em>explained.</em></div>
+    <div class="td-layout">
+      <div class="td-col">
+        <div class="td-card">
+          <div class="td-title">🗄 Database schema (SQLite)</div>
+          <div class="td-items">
+            <div class="td-item"><span class="td-key">trace_events</span> — every hook event captured (event_type, timestamp, attributes, payload)</div>
+            <div class="td-item"><span class="td-key">analysis_reports</span> — per-task analysis (model_time_ms, tool_time_ms, repeated_context_percent, cost)</div>
+            <div class="td-item"><span class="td-key">optimization_proofs</span> — before/after pairs (baseline_tokens, optimized_tokens, evidence_quality)</div>
+            <div class="td-item"><span class="td-key">budget_events</span> — every hook block (cost_at_block, retries_at_block, reason)</div>
+            <div class="td-item"><span class="td-key">context_memory</span> — fingerprinted stable blocks (sha256, token_count, hit_count, cache_savings)</div>
+            <div class="td-item"><span class="td-key">settings</span> — control plane state (plan, optimizer_enabled, budget_enabled, memory_enabled)</div>
+          </div>
+        </div>
+        <div class="td-card">
+          <div class="td-title">🔌 API endpoints (FastAPI :8000)</div>
+          <div class="td-items">
+            <div class="td-item"><span class="td-key">GET /api/tasks</span> — all traced runs with status, goal, timing</div>
+            <div class="td-item"><span class="td-key">GET /api/tasks/{id}/analysis</span> — bottleneck breakdown, token counts, cost</div>
+            <div class="td-item"><span class="td-key">POST /api/tasks/{id}/apply-optimization</span> — run optimizer, store proof record</div>
+            <div class="td-item"><span class="td-key">GET/PATCH /api/settings</span> — control plane state, plan gates</div>
+            <div class="td-item"><span class="td-key">GET /api/budget/summary</span> — blocked runs, saved dollars</div>
+            <div class="td-item"><span class="td-key">GET /api/context-memory/summary</span> — hit counts, cache savings</div>
+          </div>
+        </div>
+      </div>
+      <div class="td-col">
+        <div class="td-card">
+          <div class="td-title">🪝 Hook event types captured</div>
+          <div class="td-items">
+            <div class="td-item"><span class="td-key">PreToolUse</span> — fires before every tool call. Budget Governor checks here and returns blocked=true if limit exceeded.</div>
+            <div class="td-item"><span class="td-key">PostToolUse</span> — fires after tool completes. Captures exit_code, latency_ms, stdout preview.</div>
+            <div class="td-item"><span class="td-key">UserPromptSubmit</span> — fires on every user prompt. Captures session context, token estimate.</div>
+            <div class="td-item"><span class="td-key">Stop</span> — agent run completed or interrupted. Captures final token counts, cost.</div>
+          </div>
+        </div>
+        <div class="td-card">
+          <div class="td-title">🧩 SDK components</div>
+          <div class="td-items">
+            <div class="td-item"><span class="td-key">tracer.py</span> — AgentRuntimeTracer, reads /api/settings on init, auto_optimize, check_budget()</div>
+            <div class="td-item"><span class="td-key">budget.py</span> — BudgetGovernor, session cost tracking, retry counting</div>
+            <div class="td-item"><span class="td-key">proxy.py</span> — local HTTP proxy :8100, SHA-256 fingerprinting, cache_control injection</div>
+            <div class="td-item"><span class="td-key">integrations/claude_code.py</span> — hook handler, budget enforcement, event capture</div>
+            <div class="td-item"><span class="td-key">integrations/codex.py</span> — same for Codex CLI hooks</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="sfooter"><div class="sfooter-l">Agentium · Backup Slides</div><div class="sfooter-r">agent-runtime-layer.vercel.app</div></div>
+</div>
+
+<!-- ── B2 FAQ ── -->
+<div class="slide" id="b2">
+  <div class="shdr"><div class="logo"><div class="hex"></div><span class="logo-name">Agentium</span></div><div class="hdr-right"><div class="slide-label">FAQ</div><span class="backup-badge">Backup</span></div></div>
+  <div class="sbody" style="padding:24px 48px;">
+    <div class="ey">Common questions</div>
+    <div class="h2" style="font-size:22px;margin-bottom:14px;">Everything you want to know.</div>
+    <div class="faq">
+      <div class="fq">
+        <div class="fq-q">Does my code or prompt data ever leave my machine?</div>
+        <div class="fq-a">Never. Agentium runs entirely on localhost. All data is stored in a local SQLite file. The dashboard is a Next.js app served at localhost:4001. No telemetry, no cloud sync, no external APIs called.</div>
+      </div>
+      <div class="fq">
+        <div class="fq-q">Does it change how my agent behaves?</div>
+        <div class="fq-a">No. Phase 1.6 (observe) is completely passive — hooks capture events but don't modify agent behaviour. Phase 1.7 only activates when you explicitly click "Apply Optimization" or enable the toggle.</div>
+      </div>
+      <div class="fq">
+        <div class="fq-q">What if Docker isn't installed?</div>
+        <div class="fq-a">The install script detects this and installs Docker automatically. On macOS it uses Homebrew. On Linux it uses apt/yum. On Windows it provides the Docker Desktop download link.</div>
+        <span class="fq-code">curl -sSL https://agent-runtime-layer.vercel.app/install.sh | bash</span>
+      </div>
+      <div class="fq">
+        <div class="fq-q">How is "−43% token reduction" measured?</div>
+        <div class="fq-a">The optimizer stores an OptimizationProofRecord with baseline_input_tokens, optimized_input_tokens, evidence_quality ("measured" or "estimated"). The −43% is from a real before/after pair on the same task — not projected.</div>
+      </div>
+      <div class="fq">
+        <div class="fq-q">Can the Budget Governor block my agent mid-run?</div>
+        <div class="fq-a">Yes. The PreToolUse hook fires before every tool call. If session cost exceeds max_cost_per_run, the hook returns blocked=true and Claude Code stops the run immediately. This is the exact mechanism Claude Code uses for its own safety hooks.</div>
+      </div>
+      <div class="fq">
+        <div class="fq-q">What is Context Memory and how does it save money?</div>
+        <div class="fq-a">The Phase 1.9 local proxy intercepts Anthropic API calls at localhost:8100. It fingerprints stable context blocks (SHA-256), marks them with cache_control: ephemeral, and forwards to Anthropic. Anthropic charges $0.30/MTok for cached tokens vs $3.00/MTok for standard — a 10× discount.</div>
+      </div>
+    </div>
+  </div>
+  <div class="sfooter"><div class="sfooter-l">Agentium · Backup Slides</div><div class="sfooter-r">agent-runtime-layer.vercel.app</div></div>
+</div>
+
+<!-- ── B3 SECURITY ── -->
+<div class="slide" id="b3">
+  <div class="shdr"><div class="logo"><div class="hex"></div><span class="logo-name">Agentium</span></div><div class="hdr-right"><div class="slide-label">Security &amp; Privacy</div><span class="backup-badge">Backup</span></div></div>
+  <div class="sbody" style="padding:24px 48px;">
+    <div class="ey">Data handling and security model</div>
+    <div class="h2" style="font-size:22px;margin-bottom:16px;">Your agent data never <em>leaves your machine.</em></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">
+      <div style="background:var(--bg);border:1px solid var(--border);border-top:3px solid var(--green);border-radius:11px;padding:20px;">
+        <div style="font-size:24px;margin-bottom:8px">🔒</div>
+        <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:6px">100% local storage</div>
+        <div style="font-size:11.5px;color:var(--muted);line-height:1.6">All trace data, prompts, tool outputs, and optimization results stored in a local SQLite file at ~/.agentium/data/. No external database. No cloud sync. You own everything.</div>
+      </div>
+      <div style="background:var(--bg);border:1px solid var(--border);border-top:3px solid var(--mint);border-radius:11px;padding:20px;">
+        <div style="font-size:24px;margin-bottom:8px">🌐</div>
+        <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:6px">No external connections</div>
+        <div style="font-size:11.5px;color:var(--muted);line-height:1.6">The backend only calls Anthropic API (when proxy is enabled — and only because you set ANTHROPIC_BASE_URL). The dashboard makes no external calls. No telemetry, no analytics, no phone-home.</div>
+      </div>
+      <div style="background:var(--bg);border:1px solid var(--border);border-top:3px solid var(--blue);border-radius:11px;padding:20px;">
+        <div style="font-size:24px;margin-bottom:8px">🔑</div>
+        <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:6px">Secret redaction</div>
+        <div style="font-size:11.5px;color:var(--muted);line-height:1.6">The SDK automatically redacts obvious secrets (API keys, tokens, passwords) before persisting to SQLite. The redaction module runs before any storage — not after. Configurable redaction patterns.</div>
+      </div>
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:11px;padding:20px;">
+        <div style="font-size:24px;margin-bottom:8px">🐳</div>
+        <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:6px">Docker isolation</div>
+        <div style="font-size:11.5px;color:var(--muted);line-height:1.6">All services run in Docker containers. The only network access is localhost:8000 (backend) and localhost:4001 (dashboard). No port exposed externally by default.</div>
+      </div>
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:11px;padding:20px;">
+        <div style="font-size:24px;margin-bottom:8px">📝</div>
+        <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:6px">Audit trail</div>
+        <div style="font-size:11.5px;color:var(--muted);line-height:1.6">Every optimization proof, budget block, and settings change is stored with timestamps. You can see exactly when each optimization was applied and what the before/after delta was.</div>
+      </div>
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:11px;padding:20px;">
+        <div style="font-size:24px;margin-bottom:8px">🗑</div>
+        <div style="font-size:14px;font-weight:700;color:var(--ink);margin-bottom:6px">Delete anytime</div>
+        <div style="font-size:11.5px;color:var(--muted);line-height:1.6">docker compose down removes all services. rm -rf ~/.agentium removes all data. No account to delete, no support ticket required. Complete removal in two commands.</div>
+      </div>
+    </div>
+  </div>
+  <div class="sfooter"><div class="sfooter-l">Agentium · Backup Slides</div><div class="sfooter-r">agent-runtime-layer.vercel.app</div></div>
+</div>
+
+</div><!-- /deck -->
+
+<div class="nav">
+  <button class="nav-btn" onclick="prev()">‹</button>
+  <div class="nav-section" id="main-dots"></div>
+  <div class="nav-divider"></div>
+  <div style="font-size:8.5px;color:var(--amber);font-weight:700;letter-spacing:.3px">BACKUP</div>
+  <div class="nav-section" id="backup-dots"></div>
+  <button class="nav-btn" onclick="next()">›</button>
+  <div class="slide-count" id="count">1 / 11</div>
+</div>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+const mainDots = document.getElementById('main-dots');
+const backupDots = document.getElementById('backup-dots');
+const countEl = document.getElementById('count');
+let cur = 0;
+const mainCount = 8;
+slides.forEach((_,i) => {
+  const d = document.createElement('button');
+  const isBackup = i >= mainCount;
+  d.className = 'dot' + (isBackup ? ' backup' : '') + (i===0?' active':'');
+  d.onclick = () => go(i);
+  (isBackup ? backupDots : mainDots).appendChild(d);
+});
+function go(n) {
+  slides[cur].classList.remove('active');
+  document.querySelectorAll('.dot')[cur].classList.remove('active');
+  cur = (n+slides.length)%slides.length;
+  slides[cur].classList.add('active');
+  document.querySelectorAll('.dot')[cur].classList.add('active');
+  countEl.textContent = (cur+1)+' / '+slides.length;
+}
+function next(){go(cur+1);}
+function prev(){go(cur-1);}
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key==='ArrowDown')next();
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp')prev();
+});
+</script>
+</body>
+</html>
