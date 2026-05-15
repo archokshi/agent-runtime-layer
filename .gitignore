@@ -19,7 +19,13 @@ frontend/.turbo/
 customer-dashboard/.next/
 customer-dashboard/node_modules/
 customer-dashboard/.turbo/
+customer-dashboard-v3/.next/
+customer-dashboard-v3/node_modules/
+customer-dashboard-v3/.turbo/
 npm-debug.log*
+
+# Claude Code local config (machine-specific, not project config)
+.claude/launch.json
 
 # Local runtime data
 .agent-runtime/

@@ -55,11 +55,19 @@ docker compose up --build -d
 Open:
 
 ```
-http://localhost:4000          ← Agentium dashboard
-http://localhost:8000/docs     ← API
+http://localhost:4001          ← Agentium customer dashboard (canonical — use this)
+http://localhost:8000/docs     ← API reference
 ```
 
 → **[Full 5-minute guide](docs/QUICKSTART_5MIN.md)**
+
+**Dashboard ports:**
+
+| Port | Dashboard | Audience | Notes |
+|---|---|---|---|
+| **4001** | `customer-dashboard-v3` | **Customers · Default** | Light theme · Control Plane · use this first |
+| 4000 | `customer-dashboard` | Legacy | Kept for reference · will be deprecated |
+| 3000 | `frontend` | Internal dev | Full platform including Phase 2 blueprint pages |
 
 ---
 
@@ -123,7 +131,7 @@ changes needed after you flip a toggle.
 
 ## Control Plane
 
-Go to `http://localhost:4000/settings`.
+Go to `http://localhost:4001/settings`.
 
 Each toggle shows your own run data as the value proposition before you enable it:
 
@@ -167,7 +175,7 @@ FastAPI + SQLite                    ← localhost:8000
   Trace ingestion · Analysis · Optimization · Budget · Context Memory · Settings
         │
         ▼
-Agentium dashboard (Next.js)        ← localhost:4000
+Agentium dashboard (Next.js)        ← localhost:4001 (canonical customer)
   Overview · Runs · Bottlenecks · Context · Cost · Recommendations · Settings
 ```
 
