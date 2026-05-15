@@ -21,8 +21,8 @@ curl -sSL https://agent-runtime-layer.vercel.app/install.sh | bash
 
 Docker is handled automatically. Dashboard opens at localhost:4001.
 
-Takes 5 minutes to get your first real trace. Full guide:
-https://github.com/archokshi/agent-runtime-layer/blob/main/docs/QUICKSTART_5MIN.md
+Takes 5 minutes to get your first real trace:
+https://agent-runtime-layer.vercel.app/quickstart
 
 The only ask: 10 minutes of feedback after you've run it. I'll send a short
 form, or we can do a quick call — whatever works for you.

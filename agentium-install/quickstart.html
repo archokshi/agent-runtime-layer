@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Agentium — 5-Minute Quickstart</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F7F7F5; color: #171717; min-height: 100vh; display: flex; justify-content: center; padding: 40px 24px; }
+  .card { background: #fff; border: 1px solid #E4E4DC; border-radius: 16px; padding: 40px 48px; max-width: 640px; width: 100%; box-shadow: 0 4px 24px rgba(0,0,0,.06); align-self: flex-start; }
+  .logo { display: flex; align-items: center; gap: 10px; margin-bottom: 32px; text-decoration: none; }
+  .hex { width: 28px; height: 28px; background: #00A991; clip-path: polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%); flex-shrink: 0; }
+  .logo-text { font-size: 18px; font-weight: 700; color: #171717; }
+  h1 { font-size: 22px; font-weight: 700; letter-spacing: -.4px; margin-bottom: 6px; }
+  .subtitle { font-size: 14px; color: #737373; line-height: 1.6; margin-bottom: 36px; }
+  .divider { border: none; border-top: 1px solid #E4E4DC; margin: 32px 0; }
+
+  /* Step headers */
+  .step-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .step-num { width: 26px; height: 26px; border-radius: 50%; background: #00A991; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0; }
+  .step-title { font-size: 15px; font-weight: 700; color: #171717; }
+  .step-time { font-size: 11px; color: #A3A3A3; margin-left: auto; background: #F0F0ED; border-radius: 20px; padding: 2px 10px; }
+  .step-body { padding-left: 38px; }
+  .step-body p { font-size: 13px; color: #737373; line-height: 1.7; margin-bottom: 12px; }
+
+  /* Code blocks */
+  .cmd-wrap { background: #111; border-radius: 10px; padding: 14px 18px; margin-bottom: 12px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  .cmd { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 12.5px; color: #00A991; flex: 1; word-break: break-all; white-space: pre-wrap; line-height: 1.6; }
+  .copy-btn { background: #1f2937; border: 1px solid #374151; border-radius: 7px; padding: 5px 10px; font-size: 11px; font-weight: 600; color: #9ca3af; cursor: pointer; white-space: nowrap; transition: all .15s; flex-shrink: 0; margin-top: 1px; }
+  .copy-btn:hover { background: #374151; color: #fff; }
+  .copy-btn.copied { background: #00A991; border-color: #00A991; color: #fff; }
+
+  /* OS tabs */
+  .os-tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+  .os-tab { padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; border: 1px solid #E4E4DC; color: #737373; background: #fff; transition: all .15s; }
+  .os-tab.active { background: #171717; color: #fff; border-color: #171717; }
+
+  /* Info callout */
+  .callout { background: #F0FDF9; border: 1px solid #A7F3D0; border-radius: 9px; padding: 12px 16px; font-size: 12.5px; color: #065F46; margin-bottom: 12px; line-height: 1.6; }
+  .callout strong { color: #047857; }
+
+  /* Table */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 4px; }
+  th { text-align: left; font-size: 11px; font-weight: 700; color: #A3A3A3; text-transform: uppercase; letter-spacing: .04em; padding: 0 0 8px; border-bottom: 1px solid #E4E4DC; }
+  td { padding: 9px 0; border-bottom: 1px solid #F0F0ED; color: #737373; vertical-align: top; }
+  td:first-child { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 12px; color: #171717; padding-right: 16px; white-space: nowrap; }
+  tr:last-child td { border-bottom: none; }
+
+  /* Help footer */
+  .help { text-align: center; font-size: 12px; color: #A3A3A3; margin-top: 8px; }
+  .help a { color: #00A991; text-decoration: none; }
+  .help a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<div class="card">
+
+  <a class="logo" href="/">
+    <div class="hex"></div>
+    <span class="logo-text">Agentium</span>
+  </a>
+
+  <h1>5-Minute Quickstart</h1>
+  <p class="subtitle">See what your coding agent costs, where it stalls, and what to fix — in under 5 minutes. No code changes required.</p>
+
+  <!-- Step 1 -->
+  <div class="step-header">
+    <div class="step-num">1</div>
+    <div class="step-title">Install Agentium</div>
+    <div class="step-time">~1 min</div>
+  </div>
+  <div class="step-body">
+    <div class="os-tabs">
+      <div class="os-tab active" onclick="showOS('mac')">macOS / Linux</div>
+      <div class="os-tab" onclick="showOS('wsl')">Windows (WSL)</div>
+      <div class="os-tab" onclick="showOS('ps')">Windows (PowerShell)</div>
+    </div>
+
+    <div id="os-mac">
+      <div class="cmd-wrap">
+        <span class="cmd" id="cmd-mac">curl -sSL https://agent-runtime-layer.vercel.app/install.sh | bash</span>
+        <button class="copy-btn" onclick="copyCmd('cmd-mac',this)">Copy</button>
+      </div>
+      <p>Docker is installed automatically if you don't have it. The dashboard opens at <strong>localhost:4001</strong> when ready.</p>
+    </div>
+
+    <div id="os-wsl" style="display:none;">
+      <div class="cmd-wrap">
+        <span class="cmd" id="cmd-wsl">curl -sSL https://agent-runtime-layer.vercel.app/install.sh | bash</span>
+        <button class="copy-btn" onclick="copyCmd('cmd-wsl',this)">Copy</button>
+      </div>
+      <p>Open your WSL terminal and paste the command above. Docker is installed automatically.</p>
+    </div>
+
+    <div id="os-ps" style="display:none;">
+      <p>Install <a href="https://www.docker.com/products/docker-desktop/" target="_blank" style="color:#00A991;">Docker Desktop</a> first, then run in PowerShell:</p>
+      <div class="cmd-wrap">
+        <span class="cmd" id="cmd-ps">curl.exe -O https://agent-runtime-layer.vercel.app/docker-compose.yml
+docker compose up -d
+Start-Process "http://localhost:4001"</span>
+        <button class="copy-btn" onclick="copyCmd('cmd-ps',this)">Copy</button>
+      </div>
+    </div>
+
+    <div class="callout">
+      <strong>Verify it's running:</strong> open <strong>http://localhost:4001</strong> — you should see the Agentium dashboard.
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Step 2 -->
+  <div class="step-header">
+    <div class="step-num">2</div>
+    <div class="step-title">See your first trace</div>
+    <div class="step-time">~1 min</div>
+  </div>
+  <div class="step-body">
+    <p>Go to <strong>localhost:4001/runs</strong> and click <strong>Import demo trace</strong>.</p>
+    <p>You'll immediately see a real agent session: token cost per call, tool wait time, repeated context percentage, and ranked recommendations — no agent connection needed yet.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Step 3 -->
+  <div class="step-header">
+    <div class="step-num">3</div>
+    <div class="step-title">Connect your agent</div>
+    <div class="step-time">~2 min</div>
+  </div>
+  <div class="step-body">
+    <p>Install the SDK:</p>
+    <div class="cmd-wrap">
+      <span class="cmd" id="cmd-sdk">pip install agent-runtime-layer</span>
+      <button class="copy-btn" onclick="copyCmd('cmd-sdk',this)">Copy</button>
+    </div>
+
+    <p>Install hooks in the repo where you run Claude Code:</p>
+    <div class="cmd-wrap">
+      <span class="cmd" id="cmd-hooks">agent-runtime integrations install claude-code --repo /path/to/your/repo</span>
+      <button class="copy-btn" onclick="copyCmd('cmd-hooks',this)">Copy</button>
+    </div>
+
+    <p>Run Claude Code normally — every prompt, tool call, and response is captured automatically. Open <strong>localhost:4001/runs</strong> and your run appears within seconds.</p>
+
+    <p style="margin-top:4px;">Using <strong>Codex</strong> instead?</p>
+    <div class="cmd-wrap">
+      <span class="cmd" id="cmd-codex">agent-runtime integrations install codex --repo /path/to/your/repo</span>
+      <button class="copy-btn" onclick="copyCmd('cmd-codex',this)">Copy</button>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Step 4 -->
+  <div class="step-header">
+    <div class="step-num">4</div>
+    <div class="step-title">Enable optimizations</div>
+    <div class="step-time">~1 min</div>
+  </div>
+  <div class="step-body">
+    <p>Open <strong>localhost:4001/settings</strong>. Your plan is already set to <strong>Pro</strong> — all features are unlocked for the alpha period.</p>
+    <p>Toggle on <strong>Context Optimizer</strong> → Save → run your agent again. The <strong>Gains since enabled</strong> card on the overview page shows your before/after delta.</p>
+
+    <div class="callout">
+      <strong>Typical result:</strong> −43% tokens · −43% cost/run · retries eliminated
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Dashboard map -->
+  <div class="step-header">
+    <div class="step-num" style="background:#F0F0ED;color:#00A991;">→</div>
+    <div class="step-title">Dashboard pages</div>
+  </div>
+  <div class="step-body">
+    <table>
+      <tr><th>Page</th><th>What it shows</th></tr>
+      <tr><td>/overview</td><td>Savings summary, time split, gains since enabled</td></tr>
+      <tr><td>/runs</td><td>Every traced run — cost, retries, repeated context %</td></tr>
+      <tr><td>/runs/&lt;id&gt;</td><td>Waterfall timeline, event feed, proof card</td></tr>
+      <tr><td>/bottlenecks</td><td>Where time goes — model vs tool vs idle</td></tr>
+      <tr><td>/context</td><td>Which tokens are re-sent on every call</td></tr>
+      <tr><td>/cost</td><td>Cost per task, per failure, before/after</td></tr>
+      <tr><td>/recommendations</td><td>Ranked action list — what to fix first</td></tr>
+      <tr><td>/settings</td><td>Toggles, budget limits, plan</td></tr>
+    </table>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="help">
+    Something broken? Email <a href="mailto:optiinfra@gmail.com">optiinfra@gmail.com</a> and I'll fix it fast.
+  </div>
+
+</div>
+
+<script>
+function showOS(os) {
+  ['mac','wsl','ps'].forEach(o => {
+    document.getElementById('os-' + o).style.display = o === os ? '' : 'none';
+  });
+  document.querySelectorAll('.os-tab').forEach((t, i) => {
+    t.classList.toggle('active', ['mac','wsl','ps'][i] === os);
+  });
+}
+
+function copyCmd(id, btn) {
+  const text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+</script>
+</body>
+</html>
