@@ -81,7 +81,12 @@ def get_settings():
     with get_conn() as conn:
         row = conn.execute("SELECT * FROM settings WHERE id = 1").fetchone()
         if row is None:
-            conn.execute("INSERT INTO settings (id) VALUES (1)")
+            # Alpha default: 'pro' so all toggles work out of the box
+            conn.execute("INSERT INTO settings (id, plan) VALUES (1, 'pro')")
+            row = conn.execute("SELECT * FROM settings WHERE id = 1").fetchone()
+        # Migration: upgrade existing 'free' installs to 'pro' for alpha period
+        if row["plan"] == "free":
+            conn.execute("UPDATE settings SET plan = 'pro' WHERE id = 1")
             row = conn.execute("SELECT * FROM settings WHERE id = 1").fetchone()
         return _row_to_out(row)
 

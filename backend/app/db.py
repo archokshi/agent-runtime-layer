@@ -221,7 +221,7 @@ CREATE TABLE IF NOT EXISTS context_memory (
 
 CREATE TABLE IF NOT EXISTS settings (
   id INTEGER PRIMARY KEY DEFAULT 1,
-  plan TEXT NOT NULL DEFAULT 'free',
+  plan TEXT NOT NULL DEFAULT 'pro',  -- alpha default: pro unlocks optimizer for all early users
   optimizer_enabled INTEGER NOT NULL DEFAULT 0,
   budget_enabled INTEGER NOT NULL DEFAULT 0,
   memory_enabled INTEGER NOT NULL DEFAULT 0,
@@ -234,7 +234,8 @@ CREATE TABLE IF NOT EXISTS settings (
   updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-INSERT OR IGNORE INTO settings (id) VALUES (1);
+-- Alpha: default plan is 'pro' so all toggles work out of the box for early users
+INSERT OR IGNORE INTO settings (id, plan) VALUES (1, 'pro');
 """
 
 

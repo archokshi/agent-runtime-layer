@@ -213,8 +213,18 @@ main() {
   elif command -v pip &>/dev/null; then
     pip install agent-runtime-layer --quiet 2>/dev/null && log "SDK installed (pip)" || warn "SDK install skipped — install manually: pip install agent-runtime-layer"
   else
-    warn "Python pip not found. Install SDK manually:"
-    echo "     pip install agent-runtime-layer"
+    echo ""
+    echo -e "\033[1;31m  ╔══════════════════════════════════════════════════════╗\033[0m"
+    echo -e "\033[1;31m  ║  ⚠️  ACTION REQUIRED: Python pip not found            ║\033[0m"
+    echo -e "\033[1;31m  ║                                                      ║\033[0m"
+    echo -e "\033[1;31m  ║  The Agentium SDK was NOT installed.                 ║\033[0m"
+    echo -e "\033[1;31m  ║  After Python is installed, run:                     ║\033[0m"
+    echo -e "\033[1;31m  ║                                                      ║\033[0m"
+    echo -e "\033[1;31m  ║    pip install agent-runtime-layer                   ║\033[0m"
+    echo -e "\033[1;31m  ║                                                      ║\033[0m"
+    echo -e "\033[1;31m  ║  Install Python: https://python.org/downloads        ║\033[0m"
+    echo -e "\033[1;31m  ╚══════════════════════════════════════════════════════╝\033[0m"
+    echo ""
   fi
 
   # ── Done ─────────────────────────────────────────────────
