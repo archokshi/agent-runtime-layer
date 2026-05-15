@@ -11,6 +11,7 @@ import { TaskSummary } from "@/components/TaskSummary";
 import { Timeline } from "@/components/Timeline";
 import { ValidationReport } from "@/components/ValidationReport";
 import { getAnalysis, getBackendHints, getBlueprint, getEvents, getHardwareAnalysis, getOptimizations, getOptimizedContext, getScheduleReport, getTask, getValidation } from "@/lib/api";
+import { notFound } from "next/navigation";
 
 async function optional<T>(promise: Promise<T>): Promise<T | null> {
   try {
@@ -20,12 +21,23 @@ async function optional<T>(promise: Promise<T>): Promise<T | null> {
   }
 }
 
+async function requiredTaskData<T>(promise: Promise<T>): Promise<T> {
+  try {
+    return await promise;
+  } catch (error) {
+    if (error instanceof Error && error.message.includes("Request failed: 404")) {
+      notFound();
+    }
+    throw error;
+  }
+}
+
 export default async function TaskPage({ params }: { params: Promise<{ task_id: string }> }) {
   const { task_id } = await params;
   const [task, events, analysis] = await Promise.all([
-    getTask(task_id),
-    getEvents(task_id),
-    getAnalysis(task_id)
+    requiredTaskData(getTask(task_id)),
+    requiredTaskData(getEvents(task_id)),
+    requiredTaskData(getAnalysis(task_id))
   ]);
   const [blueprint, optimizations, validation, optimizedContext, scheduleReport, backendHints, hardwareAnalysis] = await Promise.all([
     optional(getBlueprint(task_id)),

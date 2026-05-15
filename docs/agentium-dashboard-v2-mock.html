@@ -1,0 +1,1414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Agentium Dashboard v2 — Mock</title>
+<style>
+  /* ── Reset & tokens ─────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #0c0c0e;
+    --surface:   #111114;
+    --card:      #18181c;
+    --border:    #1f1f26;
+    --border2:   #2a2a34;
+    --mint:      #00c9a7;
+    --mint-dim:  #00c9a710;
+    --mint-glow: #00c9a725;
+    --amber:     #f59e0b;
+    --red:       #ef4444;
+    --blue:      #6366f1;
+    --text:      #ededed;
+    --muted:     #71717a;
+    --muted2:    #52525b;
+    --success:   #10b981;
+    --sidebar-w: 200px;
+    --font:  'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --mono:  'JetBrains Mono', 'Fira Code', 'Cascadia Code', 'SF Mono', monospace;
+  }
+
+  html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font); font-size: 14px; line-height: 1.5; }
+
+  /* ── Layout ─────────────────────────────────────────────────── */
+  .app { display: flex; height: 100vh; overflow: hidden; }
+
+  /* ── Sidebar ─────────────────────────────────────────────────── */
+  .sidebar {
+    width: var(--sidebar-w);
+    flex-shrink: 0;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow-y: auto;
+  }
+  .sidebar-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 18px 16px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .logo-hex {
+    width: 28px; height: 28px;
+    background: var(--mint);
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    flex-shrink: 0;
+  }
+  .logo-text { font-size: 16px; font-weight: 700; letter-spacing: -0.3px; color: var(--text); }
+
+  .nav-section { padding: 16px 10px 4px; }
+  .nav-label { font-size: 10px; font-weight: 600; letter-spacing: .8px; color: var(--muted2); text-transform: uppercase; padding: 0 8px 6px; }
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 7px 10px;
+    border-radius: 7px;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 13.5px;
+    font-weight: 500;
+    transition: all .15s;
+    border: 1px solid transparent;
+  }
+  .nav-item:hover { background: #ffffff08; color: var(--text); }
+  .nav-item.active {
+    background: var(--mint-dim);
+    color: var(--mint);
+    border-color: var(--mint-glow);
+  }
+  .nav-item svg { opacity: .7; flex-shrink: 0; }
+  .nav-item.active svg { opacity: 1; }
+  .nav-badge {
+    margin-left: auto;
+    background: var(--mint);
+    color: #000;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 99px;
+  }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 12px 16px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 6px var(--mint); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+  .live-label { font-size: 12px; color: var(--muted); }
+
+  /* ── Main ────────────────────────────────────────────────────── */
+  .main { flex: 1; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; min-width: 0; }
+
+  /* ── Topbar ──────────────────────────────────────────────────── */
+  .topbar {
+    position: sticky; top: 0; z-index: 10;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 0 28px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .topbar-title { font-size: 15px; font-weight: 600; color: var(--text); }
+  .topbar-actions { display: flex; align-items: center; gap: 10px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 14px; border-radius: 7px;
+    font-size: 13px; font-weight: 600; cursor: pointer;
+    border: 1px solid var(--border2); background: var(--card);
+    color: var(--text); transition: all .15s;
+  }
+  .btn:hover { border-color: var(--mint); color: var(--mint); }
+  .btn-primary { background: var(--mint); color: #000; border-color: var(--mint); }
+  .btn-primary:hover { opacity: .88; color: #000; }
+
+  /* ── Page content ────────────────────────────────────────────── */
+  .page { display: none; padding: 22px 24px; width: 100%; box-sizing: border-box; }
+  .page.active { display: block; }
+
+  /* ── Cards ───────────────────────────────────────────────────── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .card-sm { padding: 14px 16px; }
+
+  /* ── Grid helpers ────────────────────────────────────────────── */
+  .grid-3 { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; }
+  .grid-2 { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 10px; }
+  .grid-6 { display: grid; grid-template-columns: repeat(6,minmax(0,1fr)); gap: 8px; }
+  .gap-5  { display: flex; flex-direction: column; gap: 20px; }
+  .gap-4  { display: flex; flex-direction: column; gap: 16px; }
+  .gap-3  { display: flex; flex-direction: column; gap: 12px; }
+
+  /* ── Typography ──────────────────────────────────────────────── */
+  .page-title { font-size: 22px; font-weight: 700; letter-spacing: -.4px; color: var(--text); }
+  .page-sub   { font-size: 13px; color: var(--muted); margin-top: 3px; }
+  .card-title { font-size: 13px; font-weight: 600; color: var(--text); }
+  .card-sub   { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .label      { font-size: 11px; font-weight: 600; letter-spacing: .4px; text-transform: uppercase; color: var(--muted); }
+  .big-num    { font-size: 36px; font-weight: 700; letter-spacing: -1px; color: var(--text); line-height: 1; font-family: var(--mono); }
+  .med-num    { font-size: 24px; font-weight: 700; letter-spacing: -.5px; color: var(--text); line-height: 1; font-family: var(--mono); }
+
+  /* ── Badges ──────────────────────────────────────────────────── */
+  .badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 8px; border-radius: 99px;
+    font-size: 11px; font-weight: 600; border: 1px solid;
+  }
+  .badge-green  { background: #10b98120; color: #10b981; border-color: #10b98130; }
+  .badge-amber  { background: #f59e0b20; color: var(--amber); border-color: #f59e0b30; }
+  .badge-red    { background: #ef444420; color: var(--red); border-color: #ef444430; }
+  .badge-mint   { background: var(--mint-dim); color: var(--mint); border-color: var(--mint-glow); }
+  .badge-blue   { background: #6366f120; color: var(--blue); border-color: #6366f130; }
+  .badge-muted  { background: #ffffff08; color: var(--muted); border-color: var(--border2); }
+
+  /* ── Hero savings banner ──────────────────────────────────────── */
+  .hero-banner {
+    background: var(--card);
+    border: 1px solid var(--border2);
+    border-radius: 14px;
+    padding: 20px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-banner::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--mint-glow), transparent);
+  }
+  .hero-left { display: flex; flex-direction: column; gap: 4px; }
+  .hero-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: .6px; text-transform: uppercase; color: var(--mint); }
+  .hero-num { font-size: 36px; font-weight: 700; letter-spacing: -1.5px; color: var(--text); line-height: 1; white-space: nowrap; font-family: var(--mono); }
+  .hero-sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  .hero-stats { display: flex; gap: 20px; }
+  .hero-stat {
+    display: flex; flex-direction: column; align-items: flex-end; gap: 2px;
+    padding-left: 20px;
+    border-left: 1px solid var(--border2);
+  }
+  .hero-stat-val { font-size: 20px; font-weight: 700; letter-spacing: -.5px; color: var(--mint); font-family: var(--mono); }
+  .hero-stat-label { font-size: 11px; color: var(--muted); }
+
+  /* ── Metric cards ─────────────────────────────────────────────── */
+  .metric-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .metric-top { display: flex; align-items: center; justify-content: space-between; }
+  .metric-icon {
+    width: 32px; height: 32px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .metric-val { font-size: 28px; font-weight: 700; letter-spacing: -1px; line-height: 1; color: var(--text); white-space: nowrap; font-family: var(--mono); }
+  .metric-delta {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 12px; font-weight: 600;
+  }
+  .delta-good { color: var(--mint); }
+  .delta-bad  { color: var(--red); }
+  .delta-neu  { color: var(--muted); }
+
+  /* ── Time split bar ───────────────────────────────────────────── */
+  .split-bar { height: 6px; border-radius: 99px; overflow: hidden; background: #ffffff10; display: flex; }
+  .split-seg { height: 100%; border-radius: 99px; transition: width .3s; }
+
+  /* ── Run table ────────────────────────────────────────────────── */
+  .table-wrap {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { border-bottom: 1px solid var(--border); }
+  thead th { padding: 11px 16px; text-align: left; font-size: 11px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase; color: var(--muted2); white-space: nowrap; }
+  tbody tr { border-bottom: 1px solid var(--border); cursor: pointer; transition: background .12s; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #ffffff04; }
+  tbody td { padding: 13px 16px; font-size: 13px; color: var(--text); }
+  .td-goal { font-weight: 500; }
+  .td-id   { font-size: 11px; color: var(--muted); margin-top: 2px; font-family: monospace; }
+  .td-num  { font-variant-numeric: tabular-nums; }
+  .td-warn { color: var(--amber); font-weight: 600; }
+  .td-good { color: var(--mint); font-weight: 600; }
+  .optimize-btn {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 10px; border-radius: 6px;
+    background: var(--mint-dim); color: var(--mint);
+    border: 1px solid var(--mint-glow);
+    font-size: 11px; font-weight: 700; cursor: pointer;
+    transition: all .15s;
+  }
+  .optimize-btn:hover { background: var(--mint); color: #000; }
+  .table-footer { padding: 10px 16px; font-size: 12px; color: var(--muted); border-top: 1px solid var(--border); }
+
+  /* ── Pattern cards ────────────────────────────────────────────── */
+  .pattern-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    cursor: pointer;
+    transition: border-color .15s;
+  }
+  .pattern-card:hover { border-color: var(--border2); }
+  .pattern-card.high { border-left: 3px solid var(--red); }
+  .pattern-card.med  { border-left: 3px solid var(--amber); }
+  .pattern-card.low  { border-left: 3px solid var(--mint); }
+  .pattern-title { font-size: 13px; font-weight: 600; color: var(--text); }
+  .pattern-desc  { font-size: 12px; color: var(--muted); }
+  .pattern-stat  { font-size: 11px; font-weight: 600; }
+
+  /* ── Gains card ───────────────────────────────────────────────── */
+  .gains-card {
+    background: var(--card);
+    border: 1px solid var(--border2);
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .gains-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--mint-glow), transparent);
+  }
+  .gains-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+  .gains-title { font-size: 13px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 8px; }
+  .gains-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .gains-cell {
+    background: #ffffff06;
+    border: 1px solid var(--border2);
+    border-radius: 9px;
+    padding: 12px 14px;
+  }
+  .gains-label { font-size: 11px; color: var(--muted); }
+  .gains-before { font-size: 11px; color: var(--muted2); margin-top: 3px; }
+  .gains-val { font-size: 22px; font-weight: 700; letter-spacing: -.5px; color: var(--mint); margin-top: 2px; font-family: var(--mono); }
+  .gains-footer { margin-top: 12px; font-size: 12px; color: var(--muted); display: flex; align-items: center; justify-content: space-between; }
+
+  /* ── Waterfall ────────────────────────────────────────────────── */
+  .waterfall-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .waterfall-label { width: 130px; text-align: right; font-size: 12px; color: var(--muted); flex-shrink: 0; }
+  .waterfall-track { flex: 1; height: 22px; background: #ffffff06; border-radius: 5px; overflow: hidden; position: relative; }
+  .waterfall-bar {
+    position: absolute; height: 100%; border-radius: 5px;
+    display: flex; align-items: center; padding: 0 8px;
+    font-size: 11px; font-weight: 600; color: rgba(255,255,255,.9);
+    white-space: nowrap;
+  }
+
+  /* ── Toggles / Control Plane ──────────────────────────────────── */
+  .toggle-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    transition: border-color .15s;
+  }
+  .toggle-card:hover { border-color: var(--border2); }
+  .toggle-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+  .toggle-info { display: flex; align-items: flex-start; gap: 12px; }
+  .toggle-icon {
+    width: 36px; height: 36px; border-radius: 9px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .toggle-name { font-size: 15px; font-weight: 600; color: var(--text); }
+  .toggle-desc { font-size: 13px; color: var(--muted); margin-top: 3px; }
+
+  .toggle-switch {
+    width: 44px; height: 24px; border-radius: 99px;
+    background: #ffffff15; cursor: pointer; position: relative;
+    flex-shrink: 0; transition: background .2s;
+    border: 1px solid var(--border2);
+  }
+  .toggle-switch.on { background: var(--mint); border-color: var(--mint); }
+  .toggle-switch::after {
+    content: '';
+    position: absolute; top: 3px; left: 3px;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--muted2); transition: left .2s, background .2s;
+  }
+  .toggle-switch.on::after { left: 23px; background: #000; }
+
+  .toggle-vals { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .toggle-val-cell {
+    background: #ffffff04;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+  }
+  .toggle-val-label { font-size: 11px; color: var(--muted); }
+  .toggle-val-num { font-size: 20px; font-weight: 700; letter-spacing: -.5px; margin-top: 2px; font-family: var(--mono); }
+  .locked-overlay {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; color: var(--muted);
+    background: #ffffff05;
+    border: 1px solid var(--border);
+    border-radius: 7px;
+    padding: 6px 12px;
+  }
+
+  /* ── Input ────────────────────────────────────────────────────── */
+  .input-row { display: flex; flex-direction: column; gap: 5px; }
+  .input-label { font-size: 12px; font-weight: 600; color: var(--muted); }
+  .input-field {
+    background: var(--surface);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 13px; font-family: monospace;
+    color: var(--text);
+    outline: none; transition: border-color .15s;
+  }
+  .input-field:focus { border-color: var(--mint); }
+
+  /* ── Proof card ───────────────────────────────────────────────── */
+  .proof-card {
+    background: var(--card);
+    border: 1px solid var(--border2);
+    border-radius: 12px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .proof-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--mint-glow), transparent);
+  }
+  .proof-header { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+  .proof-title { font-size: 14px; font-weight: 600; color: var(--mint); }
+  .proof-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .proof-cell {
+    background: #ffffff06; border: 1px solid var(--border2);
+    border-radius: 9px; padding: 12px 14px; text-align: center;
+  }
+  .proof-cell-label { font-size: 11px; color: var(--muted); }
+  .proof-cell-val { font-size: 26px; font-weight: 700; letter-spacing: -1px; color: var(--mint); margin-top: 4px; font-family: var(--mono); }
+  .proof-msg { font-size: 12px; color: var(--muted); margin-top: 12px; }
+  .proof-id  { font-size: 11px; color: var(--muted2); margin-top: 4px; font-family: monospace; }
+
+  /* ── Dev section ──────────────────────────────────────────────── */
+  .dev-section {
+    border: 1px dashed var(--border2);
+    border-radius: 10px; overflow: hidden;
+  }
+  .dev-header {
+    padding: 12px 16px;
+    display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer; font-size: 12px; color: var(--muted2); font-weight: 600;
+  }
+  .dev-body { display: none; padding: 16px; border-top: 1px dashed var(--border2); }
+  .dev-body.open { display: block; }
+  .plan-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .plan-pill {
+    padding: 5px 14px; border-radius: 99px;
+    border: 1px solid var(--border2); background: var(--surface);
+    font-size: 12px; font-weight: 600; color: var(--muted);
+    cursor: pointer; transition: all .15s;
+  }
+  .plan-pill.active { border-color: var(--mint); background: var(--mint-dim); color: var(--mint); }
+  .plan-pill:hover { border-color: var(--mint); color: var(--mint); }
+
+  /* ── Event feed ───────────────────────────────────────────────── */
+  .event-row {
+    display: flex; gap: 12px; padding: 7px 0;
+    border-bottom: 1px solid var(--border);
+    font-family: monospace; font-size: 12px;
+  }
+  .event-row:last-child { border-bottom: none; }
+  .event-time  { color: var(--muted2); width: 70px; flex-shrink: 0; }
+  .event-type  { width: 150px; flex-shrink: 0; font-weight: 600; }
+  .event-detail{ color: var(--muted); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .evt-model  { color: var(--mint); }
+  .evt-tool   { color: var(--muted); }
+  .evt-task   { color: var(--blue); }
+  .evt-error  { color: var(--red); }
+
+  /* ── Context growth ───────────────────────────────────────────── */
+  .ctx-row { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+  .ctx-label { display: flex; justify-content: space-between; font-size: 12px; }
+  .ctx-bar-track { height: 8px; background: #ffffff08; border-radius: 99px; overflow: hidden; }
+  .ctx-bar-fill  { height: 100%; background: var(--mint); border-radius: 99px; }
+
+  /* ── Overview CTA ─────────────────────────────────────────────── */
+  .cta-bar {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  }
+  .cta-left { display: flex; align-items: center; gap: 10px; }
+  .cta-text { font-size: 13.5px; font-weight: 500; color: var(--muted); }
+  .cta-text strong { color: var(--text); }
+
+  /* ── Separator ────────────────────────────────────────────────── */
+  .sep { border: none; border-top: 1px solid var(--border); margin: 4px 0; }
+
+  /* ── Scrollbar ────────────────────────────────────────────────── */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 99px; }
+
+  /* ── Run detail stat chips ────────────────────────────────────── */
+  .stat-chip {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 16px; text-align: center;
+  }
+  .stat-chip-label { font-size: 11px; color: var(--muted); font-weight: 600; letter-spacing: .3px; }
+  .stat-chip-val   { font-size: 22px; font-weight: 700; letter-spacing: -.5px; color: var(--text); margin-top: 4px; font-family: var(--mono); }
+
+  /* ── Apply optimization button ────────────────────────────────── */
+  .apply-panel {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 12px; padding: 20px;
+  }
+  .apply-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .apply-title  { font-size: 14px; font-weight: 600; color: var(--text); }
+
+  /* ── Quick links ──────────────────────────────────────────────── */
+  .quick-link {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+    padding: 14px 16px; cursor: pointer; transition: border-color .15s;
+  }
+  .quick-link:hover { border-color: var(--mint); }
+  .quick-link-title { font-size: 13px; font-weight: 600; color: var(--text); }
+  .quick-link-sub   { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .arrow { color: var(--muted2); font-size: 16px; }
+
+  /* ── Right panel (run detail) ──────────────────────────────────── */
+  .run-layout { display: grid; grid-template-columns: 1fr 280px; gap: 16px; }
+
+  /* ── Page tab bar — removed, sidebar is the only nav ─────────── */
+
+  /* ── Breadcrumb ────────────────────────────────────────────────── */
+  .breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+  .breadcrumb a { color: var(--muted); text-decoration: none; }
+  .breadcrumb a:hover { color: var(--mint); }
+  .breadcrumb span { color: var(--muted2); }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ── Sidebar ─────────────────────────────────────────────── -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-hex"></div>
+      <span class="logo-text">Agentium</span>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-label">Main</div>
+      <div class="nav-item active" onclick="showPage('overview', this)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Overview
+      </div>
+      <div class="nav-item" onclick="showPage('runs', this)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        Runs
+        <span class="nav-badge">12</span>
+      </div>
+      <div class="nav-item" onclick="showPage('settings', this)" id="nav-settings">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+        Settings
+      </div>
+    </div>
+
+    <hr class="sep" style="margin: 8px 14px;" />
+
+    <div class="nav-section">
+      <div class="nav-label">Analysis</div>
+      <div class="nav-item" onclick="showPage('bottlenecks', this)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Bottlenecks
+      </div>
+      <div class="nav-item" onclick="showPage('context', this)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Context
+      </div>
+      <div class="nav-item" onclick="showPage('cost', this)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Cost
+      </div>
+      <div class="nav-item" onclick="showPage('recommendations', this)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        Recommendations
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="live-dot"></div>
+      <span class="live-label">Live · ↺ 30s</span>
+    </div>
+  </aside>
+
+  <!-- ── Main ──────────────────────────────────────────────────── -->
+  <div class="main">
+
+    <!-- ── Topbar ─────────────────────────────────────────────── -->
+    <div class="topbar">
+      <!-- breadcrumb only shows on deep pages -->
+      <div id="topbar-breadcrumb" style="font-size:12px;color:var(--muted);display:none;">
+        <a href="#" onclick="showPage('runs', document.querySelectorAll('.nav-item')[1])" style="color:var(--muted);text-decoration:none;">Runs</a>
+        <span style="margin:0 6px;color:var(--muted2);">›</span>
+        <span style="color:var(--text);font-weight:500;">Fix checkout tax calculation bug</span>
+      </div>
+      <div id="topbar-empty"></div>
+      <div class="topbar-actions">
+        <div class="badge badge-muted" style="cursor:pointer;" onclick="showPage('settings', document.getElementById('nav-settings'))">Free plan</div>
+        <button class="btn btn-primary" style="font-size:12px;padding:5px 12px;" onclick="showPage('settings', document.getElementById('nav-settings'))">Upgrade to Pro</button>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- PAGE: OVERVIEW                                          -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <div class="page active" id="page-overview">
+      <div class="gap-5">
+
+        <!-- Header -->
+        <div>
+          <div class="page-title">Overview</div>
+          <div class="page-sub">12 agent runs traced · live data</div>
+        </div>
+
+        <!-- Hero savings banner -->
+        <div class="hero-banner">
+          <div class="hero-left">
+            <div class="hero-eyebrow">⚡ Optimizations active — 3 days</div>
+            <div class="hero-num">$3.82 <span style="font-size:18px;font-weight:500;color:var(--muted)">saved this week</span></div>
+            <div class="hero-sub">Based on 47 runs since you enabled the Control Plane</div>
+          </div>
+          <div class="hero-stats">
+            <div class="hero-stat">
+              <div class="hero-stat-val">−43%</div>
+              <div class="hero-stat-label">tokens</div>
+            </div>
+            <div class="hero-stat">
+              <div class="hero-stat-val">−43%</div>
+              <div class="hero-stat-label">cost/run</div>
+            </div>
+            <div class="hero-stat">
+              <div class="hero-stat-val">−100%</div>
+              <div class="hero-stat-label">retries</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3 metric cards -->
+        <div class="grid-3">
+          <div class="metric-card">
+            <div class="metric-top">
+              <div class="label">Repeated tokens</div>
+              <div class="metric-icon" style="background:var(--surface);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+              </div>
+            </div>
+            <div class="metric-val" style="color:var(--red)">65<span style="font-size:20px;color:var(--muted);font-family:var(--font)">%</span></div>
+            <div class="metric-delta delta-bad">↑ of input tokens re-sent</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-top">
+              <div class="label">Cost / run</div>
+              <div class="metric-icon" style="background:var(--surface);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              </div>
+            </div>
+            <div class="metric-val">$0.0081</div>
+            <div class="metric-delta delta-good">↓ 43% vs last week</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-top">
+              <div class="label">Success rate</div>
+              <div class="metric-icon" style="background:var(--surface);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              </div>
+            </div>
+            <div class="metric-val" style="color:var(--success)">87<span style="font-size:20px;color:var(--muted);font-family:var(--font)">%</span></div>
+            <div class="metric-delta delta-neu">10 of 12 runs</div>
+          </div>
+        </div>
+
+        <!-- Gains since enabled -->
+        <div class="gains-card">
+          <div class="gains-header">
+            <div class="gains-title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+              Gains since you enabled optimizations
+            </div>
+            <div class="badge badge-mint">8 runs · ✓ Verified</div>
+          </div>
+          <div class="gains-grid">
+            <div class="gains-cell">
+              <div class="gains-label">Avg input tokens</div>
+              <div class="gains-before">48,200 → 27,400</div>
+              <div class="gains-val">−43%</div>
+            </div>
+            <div class="gains-cell">
+              <div class="gains-label">Avg cost / run</div>
+              <div class="gains-before">$0.0142 → $0.0081</div>
+              <div class="gains-val">−43%</div>
+            </div>
+            <div class="gains-cell">
+              <div class="gains-label">Avg retries</div>
+              <div class="gains-before">3.0 → 0.0</div>
+              <div class="gains-val">−100%</div>
+            </div>
+          </div>
+          <div class="gains-footer">
+            <span>Enabled 3 days ago · 8 runs after optimizations applied</span>
+            <span style="color:var(--mint);font-weight:600;cursor:pointer;" onclick="showPage('settings', document.getElementById('nav-settings'))">Manage controls →</span>
+          </div>
+        </div>
+
+        <!-- Where time goes + Recent runs -->
+        <div class="grid-2">
+
+          <!-- Time split -->
+          <div class="card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+              <div class="card-title">Where does time go?</div>
+              <div class="badge badge-amber">~ Estimated</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+                  <span style="font-size:12px;color:var(--muted);">Model inference</span>
+                  <span style="font-size:12px;font-weight:600;color:var(--text);">42% · 8.4s avg</span>
+                </div>
+                <div class="split-bar">
+                  <div class="split-seg" style="width:42%;background:var(--mint);"></div>
+                </div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+                  <span style="font-size:12px;color:var(--amber);">Tool wait ⚠</span>
+                  <span style="font-size:12px;font-weight:600;color:var(--amber);">43% · 8.6s avg</span>
+                </div>
+                <div class="split-bar">
+                  <div class="split-seg" style="width:43%;background:var(--amber);"></div>
+                </div>
+              </div>
+              <div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+                  <span style="font-size:12px;color:var(--muted);">Idle / CPU</span>
+                  <span style="font-size:12px;font-weight:600;color:var(--muted);">15% · 3.0s avg</span>
+                </div>
+                <div class="split-bar">
+                  <div class="split-seg" style="width:15%;background:var(--muted2);"></div>
+                </div>
+              </div>
+            </div>
+            <div style="margin-top:14px;padding:10px 12px;background:#f59e0b12;border:1px solid #f59e0b25;border-radius:8px;display:flex;align-items:center;justify-content:space-between;">
+              <span style="font-size:12px;color:var(--amber);">⚠ Tool wait is consuming 43% of elapsed time</span>
+              <span style="font-size:11px;font-weight:700;color:var(--amber);cursor:pointer;">Bottlenecks →</span>
+            </div>
+          </div>
+
+          <!-- Detected patterns -->
+          <div class="card">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+              <div class="card-title">Detected patterns</div>
+              <span style="font-size:12px;font-weight:600;color:var(--mint);cursor:pointer;">Full analysis →</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <div class="pattern-card high">
+                <div style="display:flex;align-items:center;justify-content:space-between;">
+                  <div class="pattern-title">Repeated context waste</div>
+                  <span style="font-size:11px;color:var(--muted)">9/12 runs</span>
+                </div>
+                <div class="pattern-desc">65% of input tokens re-sent on every call</div>
+                <span style="font-size:11px;font-weight:600;color:var(--mint);cursor:pointer;">⚡ Fix now →</span>
+              </div>
+              <div class="pattern-card med">
+                <div style="display:flex;align-items:center;justify-content:space-between;">
+                  <div class="pattern-title">Tool wait blocking</div>
+                  <span style="font-size:11px;color:var(--muted)">7/12 runs</span>
+                </div>
+                <div class="pattern-desc">Tool windows avg 8.6s while model may be idle</div>
+                <span style="font-size:11px;font-weight:600;color:var(--amber);cursor:pointer;">See bottlenecks →</span>
+              </div>
+              <div class="pattern-card low">
+                <div style="display:flex;align-items:center;justify-content:space-between;">
+                  <div class="pattern-title">Retry overhead</div>
+                  <span style="font-size:11px;color:var(--muted)">4/12 runs</span>
+                </div>
+                <div class="pattern-desc">1.2 retries per run avg · 3 Budget Governor blocks</div>
+                <span style="font-size:11px;font-weight:600;color:var(--mint);cursor:pointer;">See cost impact →</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick links -->
+        <div class="grid-4">
+          <div class="quick-link">
+            <div><div class="quick-link-title">Bottlenecks</div><div class="quick-link-sub">Time + cost split</div></div>
+            <span class="arrow">→</span>
+          </div>
+          <div class="quick-link">
+            <div><div class="quick-link-title">Context</div><div class="quick-link-sub">Which tokens repeat?</div></div>
+            <span class="arrow">→</span>
+          </div>
+          <div class="quick-link">
+            <div><div class="quick-link-title">Cost</div><div class="quick-link-sub">Per task, per failure</div></div>
+            <span class="arrow">→</span>
+          </div>
+          <div class="quick-link" onclick="showPage('settings', document.getElementById('nav-settings'))">
+            <div><div class="quick-link-title">Control Plane</div><div class="quick-link-sub">3 toggles active</div></div>
+            <span class="arrow">→</span>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /overview -->
+
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- PAGE: RUNS                                              -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <div class="page" id="page-runs">
+      <div class="gap-5">
+        <div>
+          <div class="page-title">Runs</div>
+          <div class="page-sub">12 traced runs · 10 succeeded · 2 failed</div>
+        </div>
+
+        <!-- Summary chips -->
+        <div class="grid-4">
+          <div class="stat-chip"><div class="stat-chip-label">Total</div><div class="stat-chip-val">12</div></div>
+          <div class="stat-chip"><div class="stat-chip-label">Succeeded</div><div class="stat-chip-val" style="color:var(--mint)">10</div></div>
+          <div class="stat-chip"><div class="stat-chip-label">Failed</div><div class="stat-chip-val" style="color:var(--red)">2</div></div>
+          <div class="stat-chip"><div class="stat-chip-label">Avg cost</div><div class="stat-chip-val">$0.0081</div></div>
+        </div>
+
+        <!-- Table -->
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Task goal</th>
+                <th>Status</th>
+                <th>Duration</th>
+                <th>Cost</th>
+                <th>Retries</th>
+                <th>Repeated ctx%</th>
+                <th>Model calls</th>
+                <th>Optimize</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr onclick="showPage('run-detail', null)">
+                <td><div class="td-goal">Fix checkout tax calculation bug</div><div class="td-id">task_sdk_a4f3b1…</div></td>
+                <td><span class="badge badge-green">✓ Success</span></td>
+                <td class="td-num">18.4s</td>
+                <td class="td-num">$0.0142</td>
+                <td class="td-num">3</td>
+                <td class="td-num td-warn">65.2% ⚠</td>
+                <td class="td-num">4</td>
+                <td><div class="optimize-btn">⚡ Fix it</div></td>
+              </tr>
+              <tr>
+                <td><div class="td-goal">Add OAuth2 to auth service</div><div class="td-id">task_sdk_c9d2e5…</div></td>
+                <td><span class="badge badge-green">✓ Success</span></td>
+                <td class="td-num">24.1s</td>
+                <td class="td-num">$0.0188</td>
+                <td class="td-num">1</td>
+                <td class="td-num td-warn">71.4% ⚠</td>
+                <td class="td-num">5</td>
+                <td><div class="optimize-btn">⚡ Fix it</div></td>
+              </tr>
+              <tr>
+                <td><div class="td-goal">Write unit tests for payment module</div><div class="td-id">task_sdk_f8a1c0…</div></td>
+                <td><span class="badge badge-red">✗ Failed</span></td>
+                <td class="td-num">11.7s</td>
+                <td class="td-num">$0.0089</td>
+                <td class="td-num">5</td>
+                <td class="td-num">38.1%</td>
+                <td class="td-num">3</td>
+                <td><span style="color:var(--muted2);font-size:12px">—</span></td>
+              </tr>
+              <tr>
+                <td><div class="td-goal">Refactor database connection pool</div><div class="td-id">task_sdk_2b5d9f…</div></td>
+                <td><span class="badge badge-green">✓ Success</span></td>
+                <td class="td-num">31.2s</td>
+                <td class="td-num">$0.0241</td>
+                <td class="td-num">0</td>
+                <td class="td-num td-warn">58.9% ⚠</td>
+                <td class="td-num">6</td>
+                <td><div class="optimize-btn">⚡ Fix it</div></td>
+              </tr>
+              <tr>
+                <td><div class="td-goal">Generate API documentation</div><div class="td-id">task_sdk_7e3a2b…</div></td>
+                <td><span class="badge badge-green">✓ Success</span></td>
+                <td class="td-num">8.3s</td>
+                <td class="td-num">$0.0052</td>
+                <td class="td-num">0</td>
+                <td class="td-num td-good">12.3%</td>
+                <td class="td-num">2</td>
+                <td><span style="color:var(--muted2);font-size:12px">—</span></td>
+              </tr>
+            </tbody>
+          </table>
+          <div class="table-footer">⚠ = repeated context ≥55% — highest optimization priority · Click any row to inspect</div>
+        </div>
+      </div>
+    </div><!-- /runs -->
+
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- PAGE: RUN DETAIL                                        -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <div class="page" id="page-run-detail">
+      <div class="gap-5">
+
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+          <a href="#" onclick="showPage('overview',null)">Overview</a>
+          <span>›</span>
+          <a href="#" onclick="showPage('runs',null)">Runs</a>
+          <span>›</span>
+          <span style="color:var(--text);">Fix checkout tax calculation bug</span>
+        </div>
+
+        <!-- Title + status -->
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;">
+          <div>
+            <div class="page-title">Fix checkout tax calculation bug</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:4px;font-family:monospace;">task_sdk_a4f3b1c9d2e5</div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;flex-shrink:0;">
+            <span class="badge badge-green" style="font-size:13px;padding:5px 12px;">✓ Success</span>
+          </div>
+        </div>
+
+        <!-- Stat chips -->
+        <div class="grid-6">
+          <div class="stat-chip"><div class="stat-chip-label">Duration</div><div class="stat-chip-val">18.4s</div></div>
+          <div class="stat-chip"><div class="stat-chip-label">Model calls</div><div class="stat-chip-val">4</div></div>
+          <div class="stat-chip"><div class="stat-chip-label">Tool calls</div><div class="stat-chip-val">8</div></div>
+          <div class="stat-chip"><div class="stat-chip-label">Input tokens</div><div class="stat-chip-val">48k</div></div>
+          <div class="stat-chip"><div class="stat-chip-label">Retries</div><div class="stat-chip-val" style="color:var(--amber)">3</div></div>
+          <div class="stat-chip"><div class="stat-chip-label">Cost</div><div class="stat-chip-val">$0.0142</div></div>
+        </div>
+
+        <!-- Time split inline -->
+        <div class="card card-sm">
+          <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:8px;">
+            <div style="display:flex;align-items:center;gap:6px;font-size:12px;">
+              <span style="width:10px;height:10px;border-radius:3px;background:var(--mint);display:inline-block;"></span>
+              <span style="font-weight:600;color:var(--text)">Model 42%</span>
+              <span style="color:var(--muted)">· 7.7s</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;font-size:12px;">
+              <span style="width:10px;height:10px;border-radius:3px;background:var(--amber);display:inline-block;"></span>
+              <span style="font-weight:600;color:var(--amber)">Tool wait 44% ⚠</span>
+              <span style="color:var(--muted)">· 8.1s</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px;font-size:12px;">
+              <span style="width:10px;height:10px;border-radius:3px;background:var(--muted2);display:inline-block;"></span>
+              <span style="color:var(--muted)">Idle 14% · 2.6s</span>
+            </div>
+            <div style="margin-left:auto;">
+              <span style="background:#f59e0b18;border:1px solid #f59e0b30;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;color:var(--amber);">Input-heavy 92:1 in/out</span>
+            </div>
+          </div>
+          <div style="display:flex;height:8px;border-radius:99px;overflow:hidden;background:#ffffff08;">
+            <div style="width:42%;background:var(--mint);"></div>
+            <div style="width:44%;background:var(--amber);"></div>
+            <div style="width:14%;background:var(--muted2);"></div>
+          </div>
+        </div>
+
+        <!-- Apply Optimization (prominent) -->
+        <div class="proof-card">
+          <div class="proof-header">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--mint)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            <div class="proof-title">Optimization Applied — Proof Card</div>
+            <div class="badge badge-mint" style="margin-left:auto;">✓ Verified</div>
+          </div>
+          <div class="proof-grid">
+            <div class="proof-cell">
+              <div class="proof-cell-label">Token reduction</div>
+              <div class="proof-cell-val">−43%</div>
+            </div>
+            <div class="proof-cell">
+              <div class="proof-cell-label">Cost reduction</div>
+              <div class="proof-cell-val">−43%</div>
+            </div>
+          </div>
+          <div class="proof-msg">Stable context (system prompt, tool definitions, repo summary) stripped from payload. 48,200 → 27,400 input tokens.</div>
+          <div class="proof-id">Proof ID: proof_a4f3b1c9d2 · Measured · Not estimated</div>
+        </div>
+
+        <!-- Waterfall + context growth -->
+        <div class="run-layout">
+          <div class="card">
+            <div class="card-title" style="margin-bottom:4px;">Timeline waterfall</div>
+            <div class="card-sub" style="margin-bottom:14px;">Each bar = elapsed time from task start</div>
+            <div class="waterfall-row">
+              <div class="waterfall-label">task_start</div>
+              <div class="waterfall-track"><div class="waterfall-bar" style="left:0%;width:1%;background:var(--blue);">start</div></div>
+            </div>
+            <div class="waterfall-row">
+              <div class="waterfall-label">model_call_1</div>
+              <div class="waterfall-track"><div class="waterfall-bar" style="left:1%;width:20%;background:var(--mint);">12k tok</div></div>
+            </div>
+            <div class="waterfall-row">
+              <div class="waterfall-label">tool_call: read</div>
+              <div class="waterfall-track"><div class="waterfall-bar" style="left:22%;width:14%;background:var(--muted2);">read</div></div>
+            </div>
+            <div class="waterfall-row">
+              <div class="waterfall-label">model_call_2</div>
+              <div class="waterfall-track"><div class="waterfall-bar" style="left:37%;width:22%;background:var(--mint);">24k tok +12k</div></div>
+            </div>
+            <div class="waterfall-row">
+              <div class="waterfall-label">tool_call: terminal</div>
+              <div class="waterfall-track"><div class="waterfall-bar" style="left:60%;width:18%;background:var(--muted2);">pytest</div></div>
+            </div>
+            <div class="waterfall-row">
+              <div class="waterfall-label">model_call_3</div>
+              <div class="waterfall-track"><div class="waterfall-bar" style="left:79%;width:18%;background:var(--mint);">48k tok +24k</div></div>
+            </div>
+            <div class="waterfall-row">
+              <div class="waterfall-label">task_end</div>
+              <div class="waterfall-track"><div class="waterfall-bar" style="left:98%;width:2%;background:var(--blue);">end</div></div>
+            </div>
+            <div style="display:flex;gap:16px;margin-top:12px;">
+              <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)"><span style="width:10px;height:4px;background:var(--mint);border-radius:2px;display:inline-block;"></span>Model</span>
+              <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)"><span style="width:10px;height:4px;background:var(--muted2);border-radius:2px;display:inline-block;"></span>Tool/IO</span>
+              <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted)"><span style="width:10px;height:4px;background:var(--blue);border-radius:2px;display:inline-block;"></span>Task</span>
+            </div>
+          </div>
+
+          <!-- Context growth + event feed -->
+          <div style="display:flex;flex-direction:column;gap:14px;">
+            <div class="card">
+              <div class="card-title" style="margin-bottom:12px;">Context growth</div>
+              <div class="ctx-row">
+                <div class="ctx-label"><span style="color:var(--muted)">Call 1</span><span style="font-weight:600;">12.0k</span></div>
+                <div class="ctx-bar-track"><div class="ctx-bar-fill" style="width:25%"></div></div>
+              </div>
+              <div class="ctx-row">
+                <div class="ctx-label"><span style="color:var(--muted)">Call 2</span><span style="font-weight:600;">24.1k <span style="color:var(--amber);font-size:11px">+12.1k</span></span></div>
+                <div class="ctx-bar-track"><div class="ctx-bar-fill" style="width:50%"></div></div>
+              </div>
+              <div class="ctx-row">
+                <div class="ctx-label"><span style="color:var(--muted)">Call 3</span><span style="font-weight:600;">48.2k <span style="color:var(--amber);font-size:11px">+24.1k</span></span></div>
+                <div class="ctx-bar-track"><div class="ctx-bar-fill" style="width:100%"></div></div>
+              </div>
+              <div style="margin-top:10px;padding:8px 10px;background:#ef444412;border:1px solid #ef444425;border-radius:7px;font-size:11px;color:var(--red);">
+                65.2% of tokens repeated · highest priority
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-title" style="margin-bottom:10px;">Event feed</div>
+              <div class="event-row"><div class="event-time">09:14:01</div><div class="event-type evt-task">task_start</div><div class="event-detail">Fix checkout tax calculation</div></div>
+              <div class="event-row"><div class="event-time">09:14:01</div><div class="event-type evt-model">model_call_start</div><div class="event-detail">12000 tok in · planner</div></div>
+              <div class="event-row"><div class="event-time">09:14:05</div><div class="event-type evt-model">model_call_end</div><div class="event-detail">520 tok out · 3.8s · $0.0036</div></div>
+              <div class="event-row"><div class="event-time">09:14:05</div><div class="event-type evt-tool">tool_call_start</div><div class="event-detail">read_file checkout.py</div></div>
+              <div class="event-row"><div class="event-time">09:14:08</div><div class="event-type evt-tool">tool_call_end</div><div class="event-detail">exit 0 · 2.8s</div></div>
+              <div class="event-row"><div class="event-time">09:14:08</div><div class="event-type evt-model">model_call_start</div><div class="event-detail">24100 tok in +12k</div></div>
+              <div class="event-row"><div class="event-time">09:14:15</div><div class="event-type evt-task">task_end</div><div class="event-detail">completed · 18.4s</div></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /run-detail -->
+
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- PAGE: SETTINGS                                          -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <div class="page" id="page-settings">
+      <div style="max-width:640px;">
+        <div class="gap-5">
+
+          <div>
+            <div class="page-title">Control Plane</div>
+            <div class="page-sub">Enable optimizations — each applies from your next agent run.</div>
+          </div>
+
+          <!-- Success banner -->
+          <div style="display:flex;align-items:center;gap:8px;background:#00c9a712;border:1px solid var(--mint-glow);border-radius:10px;padding:12px 16px;font-size:13px;font-weight:500;color:var(--mint);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Settings saved — changes active from your next run.
+          </div>
+
+          <!-- Phase 1.7 — Context Optimizer -->
+          <div class="toggle-card" style="border-color:var(--border2);">
+            <div class="toggle-header">
+              <div class="toggle-info">
+                <div class="toggle-icon" style="background:var(--mint-dim);">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--mint)" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                </div>
+                <div>
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <div class="toggle-name">Context Optimizer</div>
+                    <span class="badge badge-muted">Phase 1.7</span>
+                    <span class="badge badge-mint">Pro</span>
+                  </div>
+                  <div class="toggle-desc">Strip repeated context automatically on every run</div>
+                </div>
+              </div>
+              <div class="toggle-switch on" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="toggle-vals">
+              <div class="toggle-val-cell">
+                <div class="toggle-val-label">Estimated saving</div>
+                <div class="toggle-val-num" style="color:var(--mint);">~$0.0061<span style="font-size:12px;font-weight:400;color:var(--muted)">/run</span></div>
+              </div>
+              <div class="toggle-val-cell">
+                <div class="toggle-val-label">Repeated tokens</div>
+                <div class="toggle-val-num" style="color:var(--mint);">65%<span style="font-size:12px;font-weight:400;color:var(--muted)"> of input</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Phase 1.8 — Budget Governor -->
+          <div class="toggle-card">
+            <div class="toggle-header">
+              <div class="toggle-info">
+                <div class="toggle-icon" style="background:#f59e0b18;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <div>
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <div class="toggle-name">Budget Governor</div>
+                    <span class="badge badge-muted">Phase 1.8</span>
+                    <span class="badge badge-amber">Team</span>
+                  </div>
+                  <div class="toggle-desc">Cap cost and retries — hooks block runaway runs</div>
+                </div>
+              </div>
+              <div class="toggle-switch on" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="toggle-vals" style="margin-bottom:12px;">
+              <div class="toggle-val-cell">
+                <div class="toggle-val-label">Retries detected</div>
+                <div class="toggle-val-num" style="color:var(--amber);">3<span style="font-size:12px;font-weight:400;color:var(--muted)"> total</span></div>
+                <div style="font-size:11px;color:var(--muted);margin-top:2px;">~$0.0043 wasted</div>
+              </div>
+              <div class="toggle-val-cell">
+                <div class="toggle-val-label">Highest run cost</div>
+                <div class="toggle-val-num" style="color:var(--amber);">$0.0241<span style="font-size:12px;font-weight:400;color:var(--muted)"> uncapped</span></div>
+              </div>
+            </div>
+            <div class="grid-2">
+              <div class="input-row">
+                <div class="input-label">Max cost / run ($)</div>
+                <input class="input-field" type="number" value="0.10" />
+              </div>
+              <div class="input-row">
+                <div class="input-label">Max retries / task</div>
+                <input class="input-field" type="number" value="3" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Phase 1.9 — Context Memory -->
+          <div class="toggle-card">
+            <div class="toggle-header">
+              <div class="toggle-info">
+                <div class="toggle-icon" style="background:#6366f118;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2"><path d="M9.5 2A2.5 2.5 0 0 1 12 4.5v15a2.5 2.5 0 0 1-4.96.44 2.5 2.5 0 0 1-2.96-3.08 3 3 0 0 1-.34-5.58 2.5 2.5 0 0 1 1.32-4.24 2.5 2.5 0 0 1 1.98-3A2.5 2.5 0 0 1 9.5 2Z"/><path d="M14.5 2A2.5 2.5 0 0 0 12 4.5v15a2.5 2.5 0 0 0 4.96.44 2.5 2.5 0 0 0 2.96-3.08 3 3 0 0 0 .34-5.58 2.5 2.5 0 0 0-1.32-4.24 2.5 2.5 0 0 0-1.98-3A2.5 2.5 0 0 0 14.5 2Z"/></svg>
+                </div>
+                <div>
+                  <div style="display:flex;align-items:center;gap:8px;">
+                    <div class="toggle-name">Context Memory</div>
+                    <span class="badge badge-muted">Phase 1.9</span>
+                    <span class="badge badge-blue">Enterprise</span>
+                  </div>
+                  <div class="toggle-desc">Cache stable context at $0.30/MTok vs $3.00/MTok</div>
+                </div>
+              </div>
+              <div class="locked-overlay">
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                Enterprise
+              </div>
+            </div>
+            <div class="toggle-vals">
+              <div class="toggle-val-cell">
+                <div class="toggle-val-label">Estimated saving</div>
+                <div class="toggle-val-num" style="color:var(--muted);">~$0.0061<span style="font-size:12px;font-weight:400;color:var(--muted)">/run</span></div>
+              </div>
+              <div class="toggle-val-cell">
+                <div class="toggle-val-label">Cache discount</div>
+                <div class="toggle-val-num" style="color:var(--muted);">10×<span style="font-size:12px;font-weight:400;color:var(--muted)"> cheaper</span></div>
+              </div>
+            </div>
+            <div style="margin-top:10px;font-size:12px;color:var(--muted2);">
+              Upgrade to <span style="color:var(--blue);font-weight:600;">Enterprise</span> — context memory compounds every run. The longer you use it, the more it saves.
+            </div>
+          </div>
+
+          <!-- Save button -->
+          <div style="display:flex;align-items:center;gap:12px;">
+            <button class="btn btn-primary" style="padding:9px 20px;">Save changes</button>
+            <span style="font-size:13px;color:var(--muted);cursor:pointer;">Cancel</span>
+          </div>
+
+          <!-- Developer section -->
+          <div class="dev-section">
+            <div class="dev-header" onclick="toggleDev(this)">
+              <span>Developer — plan override (alpha testing)</span>
+              <span id="dev-chevron">▼</span>
+            </div>
+            <div class="dev-body" id="dev-body">
+              <div style="font-size:12px;color:var(--muted2);">Set your plan to unlock features locally. In production, plan is set via billing.</div>
+              <div class="plan-pills">
+                <div class="plan-pill" onclick="setPlan(this)">Free</div>
+                <div class="plan-pill active" onclick="setPlan(this)">Pro</div>
+                <div class="plan-pill" onclick="setPlan(this)">Team</div>
+                <div class="plan-pill" onclick="setPlan(this)">Enterprise</div>
+              </div>
+              <div style="margin-top:10px;font-size:12px;color:var(--muted2);">Current plan: <strong style="color:var(--text)">Pro</strong></div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div><!-- /settings -->
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- PAGE: BOTTLENECKS                                       -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <div class="page" id="page-bottlenecks">
+      <div class="gap-5">
+        <div><div class="page-title">Bottlenecks</div><div class="page-sub">Where is your agent's time going?</div></div>
+        <div class="grid-3">
+          <div class="metric-card">
+            <div class="metric-top"><div class="label">Model inference</div></div>
+            <div class="metric-val">42<span style="font-size:18px;color:var(--muted)">%</span></div>
+            <div class="metric-delta delta-neu">8.4s avg per run</div>
+          </div>
+          <div class="metric-card" style="border-color:#f59e0b40;">
+            <div class="metric-top"><div class="label" style="color:var(--amber)">Tool wait ⚠</div></div>
+            <div class="metric-val" style="color:var(--amber)">43<span style="font-size:18px;color:var(--muted)">%</span></div>
+            <div class="metric-delta delta-bad">8.6s avg — highest bottleneck</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-top"><div class="label">Idle / CPU</div></div>
+            <div class="metric-val">15<span style="font-size:18px;color:var(--muted)">%</span></div>
+            <div class="metric-delta delta-neu">3.0s avg per run</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:14px;">Time split across all 12 runs</div>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;"><span style="color:var(--muted)">Model inference</span><span style="font-weight:600;">42% · 8.4s</span></div><div class="split-bar"><div class="split-seg" style="width:42%;background:var(--mint);"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;"><span style="color:var(--amber)">Tool wait ⚠</span><span style="font-weight:600;color:var(--amber)">43% · 8.6s</span></div><div class="split-bar"><div class="split-seg" style="width:43%;background:var(--amber);"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;"><span style="color:var(--muted)">Idle / CPU</span><span style="font-weight:600;">15% · 3.0s</span></div><div class="split-bar"><div class="split-seg" style="width:15%;background:var(--muted2);"></div></div></div>
+          </div>
+          <div style="margin-top:14px;padding:10px 14px;background:#f59e0b10;border:1px solid #f59e0b25;border-radius:8px;font-size:12px;color:var(--amber);">⚠ Tool wait is the #1 bottleneck. Parallelising tool calls or reducing I/O wait could save ~4.3s per run.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- PAGE: CONTEXT                                           -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <div class="page" id="page-context">
+      <div class="gap-5">
+        <div><div class="page-title">Context Inspector</div><div class="page-sub">Which tokens are you re-sending on every call?</div></div>
+        <div class="grid-2">
+          <div class="metric-card" style="border-color:#ef444440;">
+            <div class="metric-top"><div class="label">Repeated tokens</div></div>
+            <div class="metric-val" style="color:var(--red)">65<span style="font-size:18px;color:var(--muted)">%</span></div>
+            <div class="metric-delta delta-bad">31,330 of 48,200 tokens wasted</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-top"><div class="label">Stable blocks found</div></div>
+            <div class="metric-val">3</div>
+            <div class="metric-delta delta-neu">system prompt · tool defs · repo summary</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:14px;">Stable context blocks (re-sent every call)</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:#ef444410;border:1px solid #ef444425;border-radius:9px;">
+              <div><div style="font-size:13px;font-weight:600;color:var(--text);">System prompt</div><div style="font-size:12px;color:var(--muted);margin-top:2px;">sha256:a4f3b1… · seen 12/12 runs</div></div>
+              <div style="text-align:right;"><div style="font-size:18px;font-weight:700;color:var(--red);">18,400</div><div style="font-size:11px;color:var(--muted);">tokens/call</div></div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:#f59e0b10;border:1px solid #f59e0b25;border-radius:9px;">
+              <div><div style="font-size:13px;font-weight:600;color:var(--text);">Tool definitions</div><div style="font-size:12px;color:var(--muted);margin-top:2px;">sha256:c9d2e5… · seen 12/12 runs</div></div>
+              <div style="text-align:right;"><div style="font-size:18px;font-weight:700;color:var(--amber);">8,200</div><div style="font-size:11px;color:var(--muted);">tokens/call</div></div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:#f59e0b08;border:1px solid #f59e0b20;border-radius:9px;">
+              <div><div style="font-size:13px;font-weight:600;color:var(--text);">Repo summary</div><div style="font-size:12px;color:var(--muted);margin-top:2px;">sha256:7e3a2b… · seen 10/12 runs</div></div>
+              <div style="text-align:right;"><div style="font-size:18px;font-weight:700;color:var(--amber);">4,730</div><div style="font-size:11px;color:var(--muted);">tokens/call</div></div>
+            </div>
+          </div>
+          <div style="margin-top:14px;padding:10px 14px;background:var(--mint-dim);border:1px solid var(--mint-glow);border-radius:8px;font-size:12px;color:var(--mint);">⚡ Enable Context Optimizer in Settings to strip these blocks automatically — estimated −43% tokens per run.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- PAGE: COST                                              -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <div class="page" id="page-cost">
+      <div class="gap-5">
+        <div><div class="page-title">Cost Explorer</div><div class="page-sub">Cost per task, per failure, and before/after comparison</div></div>
+        <div class="grid-3">
+          <div class="metric-card"><div class="metric-top"><div class="label">Total cost (12 runs)</div></div><div class="metric-val">$0.17</div><div class="metric-delta delta-good">↓ 43% since optimizations</div></div>
+          <div class="metric-card"><div class="metric-top"><div class="label">Avg cost / success</div></div><div class="metric-val">$0.0081</div><div class="metric-delta delta-neu">10 successful runs</div></div>
+          <div class="metric-card" style="border-color:#ef444440;"><div class="metric-top"><div class="label">Cost wasted on failures</div></div><div class="metric-val" style="color:var(--red)">$0.018</div><div class="metric-delta delta-bad">2 failed runs · unrecoverable</div></div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="margin-bottom:14px;">Before vs after optimization</div>
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:#ffffff04;border:1px solid var(--border);border-radius:9px;">
+              <div style="flex:1;font-size:13px;font-weight:500;color:var(--text);">Fix checkout tax bug</div>
+              <div style="font-size:12px;color:var(--muted);text-decoration:line-through;">$0.0142</div>
+              <div style="font-size:14px;font-weight:700;color:var(--mint);">$0.0081</div>
+              <div class="badge badge-mint">−43%</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:#ffffff04;border:1px solid var(--border);border-radius:9px;">
+              <div style="flex:1;font-size:13px;font-weight:500;color:var(--text);">Add OAuth2 to auth service</div>
+              <div style="font-size:12px;color:var(--muted);text-decoration:line-through;">$0.0188</div>
+              <div style="font-size:14px;font-weight:700;color:var(--mint);">$0.0107</div>
+              <div class="badge badge-mint">−43%</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:#ef444408;border:1px solid #ef444425;border-radius:9px;">
+              <div style="flex:1;font-size:13px;font-weight:500;color:var(--text);">Write unit tests — payment</div>
+              <div style="font-size:12px;color:var(--muted);">$0.0089</div>
+              <div style="font-size:14px;font-weight:700;color:var(--red);">Failed</div>
+              <div class="badge badge-red">wasted</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ════════════════════════════════════════════════════════ -->
+    <!-- PAGE: RECOMMENDATIONS                                   -->
+    <!-- ════════════════════════════════════════════════════════ -->
+    <div class="page" id="page-recommendations">
+      <div class="gap-5">
+        <div><div class="page-title">Recommendations</div><div class="page-sub">Ranked by impact — highest ROI first</div></div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="background:var(--card);border:1px solid var(--border);border-left:3px solid var(--red);border-radius:12px;padding:18px 20px;">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+              <div>
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="badge badge-red">P0 · High impact</span><span class="badge badge-muted">context_optimization</span></div>
+                <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:4px;">Strip stable context from every model call</div>
+                <div style="font-size:13px;color:var(--muted);">65% of input tokens are identical across all 12 runs. System prompt (18,400 tok), tool definitions (8,200 tok), and repo summary (4,730 tok) are re-sent on every call.</div>
+              </div>
+              <div style="text-align:right;flex-shrink:0;">
+                <div style="font-size:20px;font-weight:700;color:var(--mint);">−43%</div>
+                <div style="font-size:11px;color:var(--muted);">cost/run</div>
+              </div>
+            </div>
+            <div style="margin-top:12px;display:flex;gap:8px;">
+              <button class="btn btn-primary" style="font-size:12px;padding:5px 14px;" onclick="showPage('settings', document.getElementById('nav-settings'))">⚡ Enable in Settings</button>
+              <button class="btn" style="font-size:12px;padding:5px 14px;" onclick="showPage('context', document.querySelectorAll('.nav-item')[5])">Inspect context →</button>
+            </div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--border);border-left:3px solid var(--amber);border-radius:12px;padding:18px 20px;">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+              <div>
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="badge badge-amber">P1 · Medium impact</span><span class="badge badge-muted">tool_wait</span></div>
+                <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:4px;">Parallelise independent tool calls</div>
+                <div style="font-size:13px;color:var(--muted);">Tool wait accounts for 43% of elapsed time (8.6s avg). 7 of 12 runs show sequential tool calls that could run in parallel.</div>
+              </div>
+              <div style="text-align:right;flex-shrink:0;">
+                <div style="font-size:20px;font-weight:700;color:var(--amber);">−4.3s</div>
+                <div style="font-size:11px;color:var(--muted);">per run</div>
+              </div>
+            </div>
+          </div>
+          <div style="background:var(--card);border:1px solid var(--border);border-left:3px solid var(--mint);border-radius:12px;padding:18px 20px;">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+              <div>
+                <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;"><span class="badge badge-mint">P2 · Low impact</span><span class="badge badge-muted">retry_reduction</span></div>
+                <div style="font-size:15px;font-weight:600;color:var(--text);margin-bottom:4px;">Set retry limits to stop cost spirals</div>
+                <div style="font-size:13px;color:var(--muted);">4 of 12 runs had retries. Average 1.2 retries/run. Budget Governor can cap this automatically.</div>
+              </div>
+              <div style="text-align:right;flex-shrink:0;">
+                <div style="font-size:20px;font-weight:700;color:var(--mint);">−$0.009</div>
+                <div style="font-size:11px;color:var(--muted);">wasted/run</div>
+              </div>
+            </div>
+            <div style="margin-top:12px;">
+              <button class="btn" style="font-size:12px;padding:5px 14px;" onclick="showPage('settings', document.getElementById('nav-settings'))">Enable Budget Governor →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<script>
+  function showPage(id, navEl) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const pg = document.getElementById('page-' + id);
+    if (pg) pg.classList.add('active');
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    if (navEl) navEl.classList.add('active');
+    const bc = document.getElementById('topbar-breadcrumb');
+    bc.style.display = id === 'run-detail' ? 'flex' : 'none';
+    // scroll content to top on page change
+    document.querySelector('.main').scrollTop = 0;
+  }
+
+  function toggleDev(btn) {
+    const body = document.getElementById('dev-body');
+    const chev = document.getElementById('dev-chevron');
+    body.classList.toggle('open');
+    chev.textContent = body.classList.contains('open') ? '▲' : '▼';
+  }
+
+  function setPlan(el) {
+    document.querySelectorAll('.plan-pill').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    el.closest('.dev-body').querySelector('strong').textContent = el.textContent;
+  }
+</script>
+</body>
+</html>

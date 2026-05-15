@@ -54,3 +54,4 @@ docs/assets/*-full.png
 
 # Python build artifacts
 *.egg-info/
+.gstack/
