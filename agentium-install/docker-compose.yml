@@ -1,0 +1,35 @@
+# Agentium — Customer Docker Compose
+# This file is downloaded automatically by the installer.
+# Do not edit unless you know what you're doing.
+
+services:
+  backend:
+    image: agentiumhq/backend:latest
+    ports:
+      - "8000:8000"
+    volumes:
+      - agentium_data:/app/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health', timeout=2).read()"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+    restart: unless-stopped
+
+  dashboard:
+    image: agentiumhq/dashboard:latest
+    ports:
+      - "4001:4001"
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:8000/api
+      INTERNAL_API_BASE_URL: http://backend:8000/api
+      PORT: "4001"
+      HOSTNAME: "0.0.0.0"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  agentium_data:
