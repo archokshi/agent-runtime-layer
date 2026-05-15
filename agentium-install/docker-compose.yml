@@ -4,7 +4,7 @@
 
 services:
   backend:
-    image: agentiumhq/backend:latest
+    image: archokshi/backend:latest
     ports:
       - "8000:8000"
     volumes:
@@ -18,7 +18,7 @@ services:
     restart: unless-stopped
 
   dashboard:
-    image: agentiumhq/dashboard:latest
+    image: archokshi/dashboard:latest
     ports:
       - "4001:4001"
     environment:
