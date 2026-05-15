@@ -13,7 +13,7 @@ BOLD="\033[1m"
 RESET="\033[0m"
 
 INSTALL_DIR="$HOME/.agentium"
-COMPOSE_URL="https://get.agentium.ai/docker-compose.yml"
+COMPOSE_URL="https://agent-runtime-layer.vercel.app/docker-compose.yml"
 DASHBOARD_URL="http://localhost:4001"
 
 log()    { echo -e "${MINT}${BOLD}  ✓${RESET}  $1"; }
