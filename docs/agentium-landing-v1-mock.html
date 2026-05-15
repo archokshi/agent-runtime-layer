@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Agentium — Your coding agent is wasting money on every run.</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --mint:    #00A991;
+  --mint-lt: #00A99112;
+  --mint-md: #00A99120;
+  --green:   #059669;
+  --amber:   #D97706;
+  --red:     #DC2626;
+  --ink:     #171717;
+  --muted:   #6B7280;
+  --border:  #E5E5DE;
+  --bg:      #FAFAF8;
+  --card:    #FFFFFF;
+  --mono: 'JetBrains Mono','Fira Code','SF Mono',monospace;
+  --font: 'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+
+html, body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { text-decoration: none; color: inherit; }
+
+/* ── Nav ────────────────────────────────────────────────────── */
+nav {
+  position: sticky; top: 0; z-index: 20;
+  background: rgba(250,250,248,.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 5%;
+  height: 60px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.nav-logo { display: flex; align-items: center; gap: 9px; }
+.logo-hex {
+  width: 28px; height: 28px;
+  background: var(--mint);
+  clip-path: polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);
+}
+.nav-brand { font-size: 18px; font-weight: 700; letter-spacing: -.3px; }
+.nav-links { display: flex; align-items: center; gap: 28px; }
+.nav-links a { font-size: 14px; font-weight: 500; color: var(--muted); transition: color .15s; }
+.nav-links a:hover { color: var(--ink); }
+.btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 9px 20px; border-radius: 9px;
+  font-size: 14px; font-weight: 600; font-family: var(--font);
+  border: 1px solid; cursor: pointer; transition: all .15s;
+  white-space: nowrap;
+}
+.btn-primary { background: var(--mint); color: #fff; border-color: var(--mint); }
+.btn-primary:hover { background: #009882; border-color: #009882; }
+.btn-ghost { background: transparent; color: var(--ink); border-color: var(--border); }
+.btn-ghost:hover { border-color: var(--mint); color: var(--mint); }
+.btn-lg { padding: 14px 28px; font-size: 16px; border-radius: 11px; }
+
+/* ── Sections ───────────────────────────────────────────────── */
+section { padding: 80px 5%; }
+.container { max-width: 1080px; margin: 0 auto; }
+
+/* ── Hero ───────────────────────────────────────────────────── */
+.hero {
+  padding: 100px 5% 80px;
+  text-align: center;
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: var(--mint-lt); border: 1px solid var(--mint-md);
+  border-radius: 99px; padding: 5px 14px;
+  font-size: 13px; font-weight: 600; color: var(--mint);
+  margin-bottom: 24px;
+}
+.hero-eyebrow-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--mint); animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+
+.hero h1 {
+  font-size: clamp(36px, 5vw, 56px);
+  font-weight: 800;
+  letter-spacing: -1.5px;
+  line-height: 1.1;
+  color: var(--ink);
+  max-width: 800px;
+  margin: 0 auto 20px;
+}
+.hero h1 span { color: var(--mint); }
+.hero-sub {
+  font-size: clamp(16px, 2vw, 19px);
+  color: var(--muted);
+  max-width: 560px;
+  margin: 0 auto 36px;
+  line-height: 1.6;
+}
+.hero-ctas { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
+.hero-social {
+  margin-top: 28px;
+  font-size: 13px;
+  color: var(--muted);
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.hero-social strong { color: var(--ink); }
+
+/* ── Dashboard preview ──────────────────────────────────────── */
+.dashboard-preview {
+  max-width: 900px;
+  margin: 48px auto 0;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 40px rgba(0,0,0,.09), 0 2px 8px rgba(0,0,0,.05);
+}
+.preview-topbar {
+  background: var(--bg);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 16px;
+  display: flex; align-items: center; gap: 6px;
+}
+.dot { width: 11px; height: 11px; border-radius: 50%; }
+.preview-body { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+.preview-hero-row {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--mint);
+  border-radius: 12px; padding: 16px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.preview-big-num { font-size: 32px; font-weight: 700; font-family: var(--mono); letter-spacing: -1px; }
+.preview-label { font-size: 10px; font-weight: 600; letter-spacing: .6px; text-transform: uppercase; color: var(--muted); }
+.preview-stats { display: flex; gap: 0; }
+.preview-stat { display: flex; flex-direction: column; align-items: center; padding: 0 16px; border-left: 1px solid var(--border); }
+.preview-stat-val { font-size: 18px; font-weight: 700; font-family: var(--mono); color: var(--green); }
+.preview-stat-label { font-size: 10px; color: var(--muted); }
+.preview-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; }
+.preview-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+.preview-card-num { font-size: 22px; font-weight: 700; font-family: var(--mono); margin-top: 6px; }
+.preview-gains {
+  background: var(--card); border: 1px solid var(--border);
+  border-top: 3px solid var(--green); border-radius: 10px; padding: 14px 16px;
+}
+.preview-gains-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; margin-top: 10px; }
+.preview-gains-cell { background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; }
+.preview-gains-val { font-size: 18px; font-weight: 700; font-family: var(--mono); color: var(--green); margin-top: 4px; }
+
+/* ── Problem section ────────────────────────────────────────── */
+.problem-section { background: var(--card); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.problem-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 2px; background: var(--border); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+.problem-cell { background: var(--card); padding: 28px 32px; }
+.problem-number { font-size: 42px; font-weight: 800; font-family: var(--mono); letter-spacing: -2px; }
+.problem-title { font-size: 17px; font-weight: 700; margin-top: 8px; color: var(--ink); }
+.problem-desc { font-size: 14px; color: var(--muted); margin-top: 6px; line-height: 1.6; }
+
+/* ── How it works ───────────────────────────────────────────── */
+.steps { display: grid; grid-template-columns: repeat(4,1fr); gap: 2px; background: var(--border); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; margin-top: 48px; }
+.step { background: var(--card); padding: 28px; position: relative; }
+.step-num { font-size: 11px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: var(--mint); margin-bottom: 12px; }
+.step-icon { font-size: 28px; margin-bottom: 12px; }
+.step-title { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 7px; }
+.step-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
+.step-arrow { position: absolute; right: -10px; top: 50%; transform: translateY(-50%); z-index: 2; color: var(--border); font-size: 20px; }
+
+/* ── Section header ─────────────────────────────────────────── */
+.section-header { text-align: center; margin-bottom: 48px; }
+.section-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--mint-lt); border: 1px solid var(--mint-md);
+  border-radius: 99px; padding: 4px 12px;
+  font-size: 12px; font-weight: 600; color: var(--mint);
+  margin-bottom: 14px;
+}
+.section-header h2 { font-size: clamp(28px, 4vw, 38px); font-weight: 800; letter-spacing: -.8px; line-height: 1.15; }
+.section-header p { font-size: 16px; color: var(--muted); margin-top: 12px; max-width: 520px; margin-left: auto; margin-right: auto; }
+
+/* ── Pricing ────────────────────────────────────────────────── */
+.pricing-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-top: 48px; }
+.pricing-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 14px; padding: 28px 24px;
+}
+.pricing-card.featured {
+  border-color: var(--mint);
+  box-shadow: 0 0 0 2px var(--mint-md);
+  position: relative;
+}
+.pricing-featured-badge {
+  position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+  background: var(--mint); color: #fff;
+  font-size: 11px; font-weight: 700; padding: 3px 12px; border-radius: 99px;
+  white-space: nowrap;
+}
+.pricing-tier { font-size: 12px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; color: var(--muted); }
+.pricing-price { font-size: 36px; font-weight: 800; font-family: var(--mono); letter-spacing: -1.5px; margin: 10px 0 4px; }
+.pricing-price span { font-size: 16px; font-weight: 500; color: var(--muted); font-family: var(--font); }
+.pricing-desc { font-size: 13px; color: var(--muted); margin-bottom: 20px; line-height: 1.5; }
+.pricing-features { display: flex; flex-direction: column; gap: 9px; }
+.pricing-feature { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; }
+.pricing-feature-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--mint); flex-shrink: 0; margin-top: 6px; }
+.pricing-cta { margin-top: 24px; width: 100%; text-align: center; }
+
+/* ── Early access ───────────────────────────────────────────── */
+.early-access-section {
+  background: var(--ink);
+  color: #fff;
+  text-align: center;
+}
+.early-access-section h2 { font-size: clamp(28px, 4vw, 42px); font-weight: 800; letter-spacing: -.8px; line-height: 1.1; }
+.early-access-section p { font-size: 16px; color: #9ca3af; margin-top: 14px; max-width: 480px; margin-left: auto; margin-right: auto; }
+.email-form { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 32px; }
+.email-input {
+  padding: 13px 18px; border-radius: 9px;
+  border: 1px solid #374151; background: #1f2937;
+  color: #fff; font-size: 15px; font-family: var(--font);
+  width: 300px; outline: none; transition: border-color .15s;
+}
+.email-input::placeholder { color: #6b7280; }
+.email-input:focus { border-color: var(--mint); }
+.trust-note { margin-top: 14px; font-size: 12px; color: #6b7280; }
+
+/* ── Footer ─────────────────────────────────────────────────── */
+footer {
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  padding: 32px 5%;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 16px;
+}
+.footer-logo { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 15px; }
+.footer-links { display: flex; gap: 24px; }
+.footer-links a { font-size: 13px; color: var(--muted); transition: color .15s; }
+.footer-links a:hover { color: var(--ink); }
+.footer-copy { font-size: 12px; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<!-- Nav -->
+<nav>
+  <a href="/" class="nav-logo">
+    <div class="logo-hex"></div>
+    <span class="nav-brand">Agentium</span>
+  </a>
+  <div class="nav-links">
+    <a href="#how-it-works">How it works</a>
+    <a href="#pricing">Pricing</a>
+    <a href="https://github.com/archokshi/agent-runtime-layer" target="_blank">GitHub</a>
+    <a href="https://github.com/archokshi/agent-runtime-layer/blob/main/docs/QUICKSTART_5MIN.md" target="_blank">Docs</a>
+  </div>
+  <a href="#early-access" class="btn btn-primary" style="font-size:13px;padding:8px 18px;">Get early access</a>
+</nav>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-eyebrow">
+    <span class="hero-eyebrow-dot"></span>
+    Now in early access
+  </div>
+  <h1>Your coding agent is wasting money <span>on every run.</span></h1>
+  <p class="hero-sub">
+    Agentium shows you exactly where — then fixes it in one click.
+    Free to observe. Pay only when you save.
+  </p>
+  <div class="hero-ctas">
+    <a href="#early-access" class="btn btn-primary btn-lg">Get early access →</a>
+    <a href="https://github.com/archokshi/agent-runtime-layer" target="_blank" class="btn btn-ghost btn-lg">View on GitHub</a>
+  </div>
+  <div class="hero-social">
+    <strong>200+</strong> developers on the waitlist ·
+    <strong>Self-hosted</strong> · Your data stays local
+  </div>
+
+  <!-- Dashboard preview -->
+  <div class="dashboard-preview">
+    <div class="preview-topbar">
+      <div class="dot" style="background:#FF5F57"></div>
+      <div class="dot" style="background:#FEBC2E"></div>
+      <div class="dot" style="background:#28C840"></div>
+      <span style="margin-left:8px;font-size:12px;color:#9ca3af;font-family:var(--mono)">localhost:4001/overview</span>
+    </div>
+    <div class="preview-body">
+      <!-- Savings banner -->
+      <div class="preview-hero-row">
+        <div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--mint);margin-bottom:6px">⚡ OPTIMIZATIONS ACTIVE — 3 DAYS</div>
+          <div class="preview-big-num">$3.82 <span style="font-size:16px;font-weight:500;color:var(--muted);font-family:var(--font)">saved this week</span></div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px">Based on 47 runs since you enabled the Control Plane</div>
+        </div>
+        <div class="preview-stats">
+          <div class="preview-stat"><div class="preview-stat-val">−43%</div><div class="preview-stat-label">tokens</div></div>
+          <div class="preview-stat"><div class="preview-stat-val">−43%</div><div class="preview-stat-label">cost/run</div></div>
+          <div class="preview-stat"><div class="preview-stat-val">−100%</div><div class="preview-stat-label">retries</div></div>
+        </div>
+      </div>
+      <!-- 3 metric cards -->
+      <div class="preview-cards">
+        <div class="preview-card">
+          <div class="preview-label">Repeated tokens</div>
+          <div class="preview-card-num" style="color:var(--red)">65<span style="font-size:14px;opacity:.6;font-family:var(--font)">%</span></div>
+          <div style="font-size:11px;color:var(--red);font-weight:600;margin-top:4px">↑ of input tokens re-sent</div>
+        </div>
+        <div class="preview-card">
+          <div class="preview-label">Cost / run</div>
+          <div class="preview-card-num">$0.0081</div>
+          <div style="font-size:11px;color:var(--green);font-weight:600;margin-top:4px">↓ 43% vs last week</div>
+        </div>
+        <div class="preview-card">
+          <div class="preview-label">Success rate</div>
+          <div class="preview-card-num" style="color:var(--green)">87<span style="font-size:14px;opacity:.6;font-family:var(--font)">%</span></div>
+          <div style="font-size:11px;color:var(--muted);margin-top:4px">10 of 12 runs</div>
+        </div>
+      </div>
+      <!-- Gains card -->
+      <div class="preview-gains">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="font-size:13px;font-weight:600">↗ Gains since you enabled optimizations</div>
+          <span style="font-size:11px;font-weight:600;color:var(--green);background:#05966912;border:1px solid #05966920;padding:2px 8px;border-radius:99px">8 runs · ✓ Verified</span>
+        </div>
+        <div class="preview-gains-row">
+          <div class="preview-gains-cell">
+            <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;font-weight:600">Avg input tokens</div>
+            <div style="font-size:11px;color:#9ca3af;font-family:var(--mono);margin-top:2px">48,200 → 27,400</div>
+            <div class="preview-gains-val">−43%</div>
+          </div>
+          <div class="preview-gains-cell">
+            <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;font-weight:600">Avg cost / run</div>
+            <div style="font-size:11px;color:#9ca3af;font-family:var(--mono);margin-top:2px">$0.0142 → $0.0081</div>
+            <div class="preview-gains-val">−43%</div>
+          </div>
+          <div class="preview-gains-cell">
+            <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;font-weight:600">Avg retries</div>
+            <div style="font-size:11px;color:#9ca3af;font-family:var(--mono);margin-top:2px">3.0 → 0.0</div>
+            <div class="preview-gains-val">−100%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Problem -->
+<section class="problem-section">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag">The problem</div>
+      <h2>Every coding agent run has four hidden costs</h2>
+      <p>You're paying for waste you can't see. Agentium makes it visible — then eliminates it.</p>
+    </div>
+    <div class="problem-grid">
+      <div class="problem-cell">
+        <div class="problem-number" style="color:var(--red)">65%</div>
+        <div class="problem-title">Repeated tokens</div>
+        <div class="problem-desc">Your system prompt, tool definitions, and repo summary are re-sent on every model call. You're paying for the same tokens over and over.</div>
+      </div>
+      <div class="problem-cell">
+        <div class="problem-number" style="color:var(--amber)">43%</div>
+        <div class="problem-title">Tool wait time</div>
+        <div class="problem-desc">Nearly half of your agent's time is spent waiting on tool calls — file reads, terminal commands, tests — while the model sits idle.</div>
+      </div>
+      <div class="problem-cell">
+        <div class="problem-number" style="color:var(--amber)">$0.038</div>
+        <div class="problem-title">Retry spirals</div>
+        <div class="problem-desc">Failed runs retry at full cost. Without a budget cap, a single stuck task can run up $0.10+ before you notice. It happens silently.</div>
+      </div>
+      <div class="problem-cell">
+        <div class="problem-number" style="color:var(--muted)">0</div>
+        <div class="problem-title">Visibility</div>
+        <div class="problem-desc">You only see the Anthropic bill at the end of the month. No breakdown by run, no bottleneck map, no way to know what to fix.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How it works -->
+<section id="how-it-works">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag">How it works</div>
+      <h2>See it. Fix it. Control it. Remember it.</h2>
+      <p>Four phases. Each one unlocks more value. Each one pays for itself.</p>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">Phase 1</div>
+        <div class="step-icon">👁</div>
+        <div class="step-title">See it</div>
+        <div class="step-desc">Install hooks in 5 minutes. Every model call, tool wait, retry, and token is captured automatically. Full waterfall timeline and cost breakdown.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">Phase 2</div>
+        <div class="step-icon">⚡</div>
+        <div class="step-title">Fix it</div>
+        <div class="step-desc">One click to strip repeated context. Agentium measures the before/after delta and shows a verified proof card: −43% tokens, −43% cost.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">Phase 3</div>
+        <div class="step-icon">🛡</div>
+        <div class="step-title">Control it</div>
+        <div class="step-desc">Set a cost cap and retry limit. Hooks block runaway runs automatically. Dashboard shows every dollar saved from blocked runs.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">Phase 4</div>
+        <div class="step-icon">🧠</div>
+        <div class="step-title">Remember it</div>
+        <div class="step-desc">Proxy caches stable context at $0.30/MTok instead of $3.00/MTok. Savings compound every run. Your optimization history becomes your moat.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Pricing -->
+<section id="pricing" style="background:var(--card);border-top:1px solid var(--border)">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag">Pricing</div>
+      <h2>Free to observe.<br/>Pay only when you save.</h2>
+      <p>No per-trace tax. No per-span billing. You pay for value delivered, not data ingested.</p>
+    </div>
+    <div class="pricing-grid">
+
+      <div class="pricing-card">
+        <div class="pricing-tier">Observe</div>
+        <div class="pricing-price">$0 <span>/ month</span></div>
+        <div class="pricing-desc">Full dashboard for any developer who wants to see what their agent is doing.</div>
+        <div class="pricing-features">
+          <div class="pricing-feature"><div class="pricing-feature-dot"></div><span>Unlimited traces</span></div>
+          <div class="pricing-feature"><div class="pricing-feature-dot"></div><span>Full dashboard — all analysis pages</span></div>
+          <div class="pricing-feature"><div class="pricing-feature-dot"></div><span>Waterfall timeline</span></div>
+          <div class="pricing-feature"><div class="pricing-feature-dot"></div><span>Cost and bottleneck reports</span></div>
+          <div class="pricing-feature"><div class="pricing-feature-dot"></div><span>Ranked recommendations</span></div>
+        </div>
+        <div class="pricing-cta">
+          <a href="#early-access" class="btn btn-ghost" style="width:100%;justify-content:center">Get started free</a>
+        </div>
+      </div>
+
+      <div class="pricing-card featured">
+        <div class="pricing-featured-badge">Most popular</div>
+        <div class="pricing-tier">Pro</div>
+        <div class="pricing-price">$49 <span>/ month</span></div>
+        <div class="pricing-desc">For solo developers who want to stop wasting tokens and see verified proof it worked.</div>
+        <div class="pricing-features">
+          <div class="pricing-feature"><div class="pricing-feature-dot"></div><span>Everything in Observe</span></div>
+          <div class="pricing-feature"><div class="pricing-feature-dot" style="background:var(--mint)"></div><span><strong>⚡ Context Optimizer</strong> — auto-fix</span></div>
+          <div class="pricing-feature"><div class="pricing-feature-dot" style="background:var(--mint)"></div><span>Proof card per run — verified ✓</span></div>
+          <div class="pricing-feature"><div class="pricing-feature-dot" style="background:var(--mint)"></div><span>Gains since enabled dashboard</span></div>
+          <div class="pricing-feature"><div class="pricing-feature-dot" style="background:var(--mint)"></div><span>ROI positive in 2 weeks at 50 runs/day</span></div>
+        </div>
+        <div class="pricing-cta">
+          <a href="#early-access" class="btn btn-primary" style="width:100%;justify-content:center">Get early access</a>
+        </div>
+      </div>
+
+      <div class="pricing-card">
+        <div class="pricing-tier">Team</div>
+        <div class="pricing-price">$149 <span>/ month</span></div>
+        <div class="pricing-desc">For engineering teams that need cost governance across all developers.</div>
+        <div class="pricing-features">
+          <div class="pricing-feature"><div class="pricing-feature-dot"></div><span>Everything in Pro</span></div>
+          <div class="pricing-feature"><div class="pricing-feature-dot" style="background:var(--amber)"></div><span><strong>🛡 Budget Governor</strong> — cost caps</span></div>
+          <div class="pricing-feature"><div class="pricing-feature-dot" style="background:var(--amber)"></div><span>Retry limits via hooks</span></div>
+          <div class="pricing-feature"><div class="pricing-feature-dot" style="background:var(--amber)"></div><span>Shared rules for all team members</span></div>
+          <div class="pricing-feature"><div class="pricing-feature-dot" style="background:var(--amber)"></div><span>"X runs blocked · $Y saved" dashboard</span></div>
+        </div>
+        <div class="pricing-cta">
+          <a href="#early-access" class="btn btn-ghost" style="width:100%;justify-content:center">Get early access</a>
+        </div>
+      </div>
+
+      <div class="pricing-card">
+        <div class="pricing-tier">Enterprise</div>
+        <div class="pricing-price" style="font-size:28px">Custom</div>
+        <div class="pricing-desc">For companies that need persistent context memory and an agent cost SLA.</div>
+        <div class="pricing-features">
+          <div class="pricing-feature"><div class="pricing-feature-dot"></div><span>Everything in Team</span></div>
+          <div class="pricing-feature"><div class="pricing-feature-dot" style="background:#4F46E5"></div><span><strong>🧠 Context Memory</strong> — 10× cache</span></div>
+          <div class="pricing-feature"><div class="pricing-feature-dot" style="background:#4F46E5"></div><span>Savings compound every run</span></div>
+          <div class="pricing-feature"><div class="pricing-feature-dot" style="background:#4F46E5"></div><span>Private, local — data never leaves</span></div>
+          <div class="pricing-feature"><div class="pricing-feature-dot" style="background:#4F46E5"></div><span>SLA: never exceed your budget</span></div>
+        </div>
+        <div class="pricing-cta">
+          <a href="mailto:hello@agentium.ai" class="btn btn-ghost" style="width:100%;justify-content:center">Contact us</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Early access -->
+<section class="early-access-section" id="early-access">
+  <div class="container">
+    <h2>We&apos;re onboarding developers<br/>one at a time.</h2>
+    <p>Share your email and we&apos;ll send you a personal install link. No spam. No credit card. Just a 5-minute setup.</p>
+    <div class="email-form">
+      <input type="email" class="email-input" placeholder="you@company.com" />
+      <button class="btn btn-primary btn-lg" onclick="handleSignup(this)">Join the waitlist →</button>
+    </div>
+    <div class="trust-note">
+      Self-hosted · your data never leaves your machine ·
+      <a href="https://github.com/archokshi/agent-runtime-layer" target="_blank" style="color:#9ca3af;text-decoration:underline">open source on GitHub</a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-logo">
+    <div class="logo-hex" style="width:22px;height:22px"></div>
+    Agentium
+  </div>
+  <div class="footer-links">
+    <a href="https://github.com/archokshi/agent-runtime-layer" target="_blank">GitHub</a>
+    <a href="https://github.com/archokshi/agent-runtime-layer/blob/main/docs/QUICKSTART_5MIN.md" target="_blank">Quickstart</a>
+    <a href="https://github.com/archokshi/agent-runtime-layer/blob/main/docs/AGENTIUM_PHASE_ROADMAP.md" target="_blank">Roadmap</a>
+  </div>
+  <div class="footer-copy">© 2026 Agentium. Free to observe. Pay only when you save.</div>
+</footer>
+
+<script>
+function handleSignup(btn) {
+  const input = document.querySelector('.email-input');
+  if (!input.value || !input.value.includes('@')) {
+    input.style.borderColor = '#DC2626';
+    input.focus();
+    return;
+  }
+  btn.textContent = '✓ You&apos;re on the list!';
+  btn.style.background = '#059669';
+  btn.style.borderColor = '#059669';
+  btn.disabled = true;
+  input.disabled = true;
+  input.style.opacity = '.6';
+}
+</script>
+
+</body>
+</html>
