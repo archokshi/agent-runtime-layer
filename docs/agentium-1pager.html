@@ -226,7 +226,7 @@ html, body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
 }
 .install-label { font-size: 8.5px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; color: #6B7280; }
 .install-cmd {
@@ -430,6 +430,41 @@ html, body {
       </div>
     </div>
 
+    <!-- How it works — 4 steps horizontal -->
+    <div>
+      <div class="section-label">How it works</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;">
+        <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px;display:flex;gap:8px;align-items:flex-start;">
+          <div style="width:20px;height:20px;background:var(--mint);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;flex-shrink:0;margin-top:1px;">1</div>
+          <div>
+            <div style="font-size:11px;font-weight:700;color:var(--ink);margin-bottom:2px;">Install in 5 min</div>
+            <div style="font-size:9.5px;color:var(--muted);line-height:1.45;">One curl command. Docker installs automatically. Browser opens to your dashboard.</div>
+          </div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px;display:flex;gap:8px;align-items:flex-start;">
+          <div style="width:20px;height:20px;background:var(--mint);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;flex-shrink:0;margin-top:1px;">2</div>
+          <div>
+            <div style="font-size:11px;font-weight:700;color:var(--ink);margin-bottom:2px;">Connect your agent</div>
+            <div style="font-size:9.5px;color:var(--muted);line-height:1.45;">Install hooks in your repo. Works with Claude Code and Codex. No code changes needed.</div>
+          </div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px;display:flex;gap:8px;align-items:flex-start;">
+          <div style="width:20px;height:20px;background:var(--mint);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;flex-shrink:0;margin-top:1px;">3</div>
+          <div>
+            <div style="font-size:11px;font-weight:700;color:var(--ink);margin-bottom:2px;">Run normally</div>
+            <div style="font-size:9.5px;color:var(--muted);line-height:1.45;">Agentium captures every model call, tool call, token count, and cost in real time automatically.</div>
+          </div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--border);border-top:2px solid var(--mint);border-radius:8px;padding:10px;display:flex;gap:8px;align-items:flex-start;">
+          <div style="width:20px;height:20px;background:var(--mint);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;flex-shrink:0;margin-top:1px;">4</div>
+          <div>
+            <div style="font-size:11px;font-weight:700;color:var(--ink);margin-bottom:2px;">See gains instantly</div>
+            <div style="font-size:9.5px;color:var(--muted);line-height:1.45;">Flip toggles in Control Plane. Next run is optimized. Gains card shows verified before/after delta.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Pricing + Install -->
     <div class="bottom-row">
 
@@ -476,6 +511,17 @@ html, body {
       </div>
 
     </div>
+    <!-- Trust strip -->
+    <div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 16px;">
+      <div style="display:flex;align-items:center;gap:5px;font-size:9.5px;color:var(--muted);">🔒 <strong style="color:var(--ink);">Data never leaves</strong> your machine</div>
+      <div style="width:1px;height:16px;background:var(--border);"></div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:9.5px;color:var(--muted);">🐳 <strong style="color:var(--ink);">Self-hosted</strong> — no cloud dependency</div>
+      <div style="width:1px;height:16px;background:var(--border);"></div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:9.5px;color:var(--muted);">⚙️ Works with <strong style="color:var(--ink);">Claude Code &amp; Codex</strong></div>
+      <div style="width:1px;height:16px;background:var(--border);"></div>
+      <div style="display:flex;align-items:center;gap:5px;font-size:9.5px;color:var(--muted);">🆓 <strong style="color:var(--ink);">Free to observe.</strong> Pay only when you save.</div>
+    </div>
+
   </div>
 
   <!-- Footer -->
