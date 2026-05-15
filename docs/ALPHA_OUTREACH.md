@@ -12,17 +12,12 @@ I've been building Agentium — a profiler and control plane for coding agents
 (Claude Code, Codex). It shows you exactly what each agent run costs, where
 it stalls, and trims 30–45% of redundant tokens automatically.
 
-You're one of the first people I'm giving access to. One command installs
-everything:
+You're one of the first people I'm giving access to. Everything is here:
 
-```
-curl -sSL https://agent-runtime-layer.vercel.app/install.sh | bash
-```
+https://agent-runtime-layer.vercel.app
 
-Docker is handled automatically. Dashboard opens at localhost:4001.
-
-Takes 5 minutes to get your first real trace:
-https://agent-runtime-layer.vercel.app/quickstart
+One command installs it, Docker is handled automatically, dashboard opens
+at localhost:4001. Takes about 5 minutes.
 
 The only ask: 10 minutes of feedback after you've run it. I'll send a short
 form, or we can do a quick call — whatever works for you.
