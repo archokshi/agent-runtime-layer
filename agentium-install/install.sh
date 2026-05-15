@@ -231,6 +231,9 @@ main() {
   echo "    Codex:"
   echo "    agent-runtime integrations install codex --repo /path/to/your/repo"
   echo ""
+  echo "    Custom Python agent:"
+  echo "    pip install agent-runtime-layer"
+  echo ""
   echo "  Then run your agent normally. Come back to ${DASHBOARD_URL} to see the data."
   echo ""
 
