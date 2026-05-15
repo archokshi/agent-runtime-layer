@@ -39,3 +39,17 @@ services:
     depends_on:
       backend:
         condition: service_healthy
+
+  customer-dashboard-v3:
+    build:
+      context: ./customer-dashboard-v3
+    environment:
+      NEXT_PUBLIC_API_BASE_URL: http://localhost:8000/api
+      INTERNAL_API_BASE_URL: http://backend:8000/api
+      PORT: 4001
+      HOSTNAME: "0.0.0.0"
+    ports:
+      - "4001:4001"
+    depends_on:
+      backend:
+        condition: service_healthy
