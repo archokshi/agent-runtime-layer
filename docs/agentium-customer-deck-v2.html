@@ -198,8 +198,8 @@ html,body{width:100%;height:100%;font-family:'Inter',sans-serif;background:#E5E7
 .pg-feats{display:flex;flex-direction:column;gap:5px;}
 .pg-feat{display:flex;align-items:flex-start;gap:6px;font-size:10.5px;color:var(--text);}
 .pg-dot{width:4px;height:4px;border-radius:50%;flex-shrink:0;margin-top:5px;}
-.roi-strip{margin-top:14px;background:var(--ink);border-radius:9px;padding:12px 16px;display:grid;grid-template-columns:repeat(4,1fr);gap:0;}
-.roi-item{text-align:center;border-right:1px solid rgba(255,255,255,.08);padding:4px 8px;}
+.roi-strip{margin-top:12px;background:var(--ink);border-radius:9px;padding:11px 16px;display:flex;align-items:center;gap:0;width:100%;}
+.roi-item{flex:1;text-align:center;border-right:1px solid rgba(255,255,255,.08);padding:4px 8px;}
 .roi-item:last-child{border-right:none;}
 .roi-val{font-size:18px;font-weight:800;font-family:var(--mono);color:var(--mint);}
 .roi-label{font-size:8px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:#6B7280;margin-top:2px;}
@@ -662,7 +662,7 @@ html,body{width:100%;height:100%;font-family:'Inter',sans-serif;background:#E5E7
           <div class="pg-feat"><div class="pg-dot" style="background:var(--amber)"></div>Budget Governor (hooks)</div>
           <div class="pg-feat"><div class="pg-dot" style="background:var(--amber)"></div>Max cost/run + retry limits</div>
           <div class="pg-feat"><div class="pg-dot" style="background:var(--amber)"></div>Shared rules — all developers</div>
-          <div class="pg-feat"><div class="pg-dot" style="background:var(--amber)"></div">"X blocked · $Y saved" dashboard</div>
+          <div class="pg-feat"><div class="pg-dot" style="background:var(--amber)"></div>"X blocked · $Y saved" dashboard</div>
         </div>
       </div>
       <div class="pg">
@@ -849,7 +849,7 @@ html,body{width:100%;height:100%;font-family:'Inter',sans-serif;background:#E5E7
   <button class="nav-btn" onclick="prev()">‹</button>
   <div class="nav-section" id="main-dots"></div>
   <div class="nav-divider"></div>
-  <div style="font-size:8.5px;color:var(--amber);font-weight:700;letter-spacing:.3px">BACKUP</div>
+  <button onclick="go(8)" style="background:none;border:1px solid rgba(245,158,11,.4);border-radius:6px;color:var(--amber);font-size:9px;font-weight:700;padding:3px 8px;cursor:pointer;letter-spacing:.3px;">BACKUP ▸</button>
   <div class="nav-section" id="backup-dots"></div>
   <button class="nav-btn" onclick="next()">›</button>
   <div class="slide-count" id="count">1 / 11</div>
