@@ -190,6 +190,26 @@ Start-Process "http://localhost:4001"</span>
 
   <div class="divider"></div>
 
+  <!-- Uninstall -->
+  <div class="step-header">
+    <div class="step-num" style="background:#fee2e2;color:#dc2626;">✕</div>
+    <div class="step-title" style="color:#737373;">Want to uninstall?</div>
+  </div>
+  <div class="step-body">
+    <p>Run this in your terminal — stops all services, removes containers, images, data, and the SDK:</p>
+    <div class="cmd-wrap">
+      <span class="cmd" id="cmd-uninstall">curl -sSL https://agent-runtime-layer.vercel.app/uninstall.sh | bash</span>
+      <button class="copy-btn" onclick="copyCmd('cmd-uninstall',this)">Copy</button>
+    </div>
+    <p>If you installed hooks in any repos, also run inside each repo:</p>
+    <div class="cmd-wrap">
+      <span class="cmd" id="cmd-unhook">agent-runtime integrations uninstall claude-code --repo .</span>
+      <button class="copy-btn" onclick="copyCmd('cmd-unhook',this)">Copy</button>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
   <div class="help">
     Something broken? Email <a href="mailto:optiinfra@gmail.com">optiinfra@gmail.com</a> and I'll fix it fast.
   </div>
