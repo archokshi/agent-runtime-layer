@@ -6,11 +6,16 @@
 
 **Subject:** You're in — try Agentium before anyone else
 
+📎 Attach: `docs/agentium-1pager.pdf`
+
+---
+
 Hi [Name],
 
-I've been building Agentium — a profiler and control plane for coding agents
-(Claude Code, Codex). It shows you exactly what each agent run costs, where
-it stalls, and trims 30–45% of redundant tokens automatically.
+I've attached a one-pager that explains what Agentium is — the short version:
+it's a profiler and control plane for coding agents (Claude Code, Codex) that
+shows you exactly what each run costs, where it stalls, and cuts 30–45% of
+redundant tokens automatically.
 
 You're one of the first people I'm giving access to. Everything is here:
 
