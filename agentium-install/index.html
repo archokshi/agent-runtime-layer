@@ -72,25 +72,20 @@
   <div style="text-align:left;">
     <p style="font-size:13px;font-weight:700;color:#171717;margin-bottom:12px;">Windows users</p>
 
-    <p style="font-size:12px;color:#737373;margin-bottom:10px;">
-      <strong>Option A — WSL (recommended):</strong> Open WSL terminal, paste the curl command above.
-    </p>
-
     <p style="font-size:12px;color:#737373;margin-bottom:8px;">
-      <strong>Option B — PowerShell:</strong> Install
-      <a href="https://www.docker.com/products/docker-desktop/" target="_blank" style="color:#00A991;text-decoration:underline;">Docker Desktop</a>
-      first, then run in PowerShell:
+      <strong>Option A — PowerShell</strong> (installs Docker, Python, SDK and hooks automatically):
     </p>
-    <div style="background:#111;border-radius:8px;padding:12px 16px;margin-bottom:12px;">
-      <span style="font-family:'Consolas','Courier New',monospace;font-size:11.5px;color:#00A991;line-height:1.7;">
-        curl.exe -O https://agent-runtime-layer.vercel.app/docker-compose.yml<br>
-        docker compose up -d<br>
-        Start-Process "http://localhost:4001"
-      </span>
+    <div class="cmd-wrap" style="margin-bottom:12px;">
+      <span class="cmd" id="cmd-win">irm https://agent-runtime-layer.vercel.app/install.ps1 | iex</span>
+      <button class="copy-btn" onclick="copyCmd('cmd-win',this)">Copy</button>
     </div>
 
     <p style="font-size:12px;color:#737373;margin-bottom:8px;">
-      <strong>Option C — Git Bash:</strong> Paste the curl command at the top of this page directly into Git Bash.
+      <strong>Option B — WSL:</strong> Open WSL terminal and paste the macOS/Linux command above.
+    </p>
+
+    <p style="font-size:12px;color:#737373;margin-bottom:8px;">
+      <strong>Option C — Git Bash:</strong> Paste the macOS/Linux command above directly into Git Bash.
     </p>
   </div>
 
