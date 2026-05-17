@@ -65,6 +65,10 @@ def parse_transcript(transcript_path: str) -> dict:
                 model_calls       += 1
             except Exception:
                 continue
+        # Repeated CTX% = cache_read / total context size per call
+        total_context = total_input + total_cache_read + total_cache_write
+        repeated_pct = round((total_cache_read / total_context) * 100, 2) if total_context else 0.0
+
         return {
             "model": model,
             "model_calls": model_calls,
@@ -73,6 +77,9 @@ def parse_transcript(transcript_path: str) -> dict:
             "total_cache_read_tokens": total_cache_read,
             "total_cache_write_tokens": total_cache_write,
             "estimated_cost_usd": round(total_cost, 6),
+            "total_context_tokens": total_context,
+            "repeated_tokens": total_cache_read,
+            "repeated_context_percent": repeated_pct,
         }
     except Exception:
         return {}
@@ -385,6 +392,9 @@ class ClaudeHookCollector:
                         "total_cache_read_tokens": metrics.get("total_cache_read_tokens", 0),
                         "total_cache_write_tokens": metrics.get("total_cache_write_tokens", 0),
                         "estimated_cost_usd": metrics.get("estimated_cost_usd", 0.0),
+                        "total_context_tokens": metrics.get("total_context_tokens", 0),
+                        "repeated_tokens": metrics.get("repeated_tokens", 0),
+                        "repeated_context_percent": metrics.get("repeated_context_percent", 0.0),
                     },
                     payload={
                         "status": "completed",
