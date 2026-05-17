@@ -242,9 +242,9 @@ main() {
   fi
 
   if [[ -n "$pip_cmd" ]]; then
-    $pip_cmd install agent-runtime-layer --quiet 2>/dev/null && log "SDK installed" || warn "SDK install failed — run manually: pip3 install agent-runtime-layer"
+    $pip_cmd install agentium-tracer --quiet 2>/dev/null && log "SDK installed" || warn "SDK install failed — run manually: pip3 install agentium-tracer"
   else
-    warn "Python still not found. Install from https://python.org/downloads then run: pip3 install agent-runtime-layer"
+    warn "Python still not found. Install from https://python.org/downloads then run: pip3 install agentium-tracer"
   fi
 
   # ── Install hooks ────────────────────────────────────────

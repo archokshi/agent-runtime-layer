@@ -43,9 +43,9 @@ fi
 # -- 4. Uninstall SDK -----------------------------------------------
 step "🐍 Uninstalling Agentium SDK..."
 if command -v pip3 &>/dev/null; then
-  pip3 uninstall agent-runtime-layer -y 2>/dev/null && log "SDK uninstalled" || warn "SDK not found via pip3"
+  pip3 uninstall agentium-tracer -y 2>/dev/null && log "SDK uninstalled" || warn "SDK not found via pip3"
 elif command -v pip &>/dev/null; then
-  pip uninstall agent-runtime-layer -y 2>/dev/null && log "SDK uninstalled" || warn "SDK not found via pip"
+  pip uninstall agentium-tracer -y 2>/dev/null && log "SDK uninstalled" || warn "SDK not found via pip"
 else
   warn "pip not found — SDK may still be installed"
 fi
