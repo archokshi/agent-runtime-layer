@@ -1,99 +1,133 @@
 # Agentium Installer for Windows (PowerShell)
-# Usage: irm https://agent-runtime-layer.vercel.app/install.ps1 | iex
+# Run: Set-ExecutionPolicy Bypass -Scope Process -Force; irm https://agent-runtime-layer.vercel.app/install.ps1 | iex
 
 $ErrorActionPreference = "Stop"
-
-$MINT    = "Cyan"
 $DASHBOARD_URL = "http://localhost:4001"
 $COMPOSE_URL   = "https://agent-runtime-layer.vercel.app/docker-compose.yml"
 $INSTALL_DIR   = "$env:USERPROFILE\.agentium"
 
 function Log($msg)  { Write-Host "  [OK] $msg" -ForegroundColor Cyan }
 function Warn($msg) { Write-Host "  [!!] $msg" -ForegroundColor Yellow }
-function Step($msg) { Write-Host "`n$msg" -ForegroundColor White }
+function Step($msg) { Write-Host "`n>> $msg" -ForegroundColor White }
+function Fail($msg) { Write-Host "  [ERROR] $msg" -ForegroundColor Red; exit 1 }
 
 Write-Host ""
-Write-Host "  +---------------------------------+" -ForegroundColor Cyan
-Write-Host "  |      Agentium Installer         |" -ForegroundColor Cyan
-Write-Host "  |  Free to observe. Pay to save.  |" -ForegroundColor Cyan
-Write-Host "  +---------------------------------+" -ForegroundColor Cyan
+Write-Host "  +----------------------------------+" -ForegroundColor Cyan
+Write-Host "  |       Agentium Installer         |" -ForegroundColor Cyan
+Write-Host "  |  Free to observe. Pay to save.   |" -ForegroundColor Cyan
+Write-Host "  +----------------------------------+" -ForegroundColor Cyan
 Write-Host ""
 
-# -- 1. Check Docker ---------------------------------------------------
-Step "Checking for Docker..."
-try {
-    $null = docker info 2>$null
-    Log "Docker is already running"
-} catch {
-    Write-Host "  Docker not found or not running." -ForegroundColor Yellow
-    Write-Host "  Please install Docker Desktop from: https://www.docker.com/products/docker-desktop/" -ForegroundColor Yellow
-    Write-Host "  Then re-run this installer." -ForegroundColor Yellow
-    exit 1
+# ── Helper: find Python executable ───────────────────────────
+function Find-Python {
+  # Check common commands first
+  foreach ($cmd in @("python3", "python")) {
+    try {
+      $p = (Get-Command $cmd -ErrorAction SilentlyContinue).Source
+      if ($p) { return $p }
+    } catch {}
+  }
+  # Search known install locations
+  $bases = @(
+    "$env:LOCALAPPDATA\Programs\Python",
+    "$env:PROGRAMFILES\Python",
+    "$env:PROGRAMFILES (x86)\Python"
+  )
+  foreach ($base in $bases) {
+    if (Test-Path $base) {
+      $found = Get-ChildItem $base -Filter "python.exe" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+      if ($found) { return $found.FullName }
+    }
+  }
+  # Check PATH entries
+  foreach ($dir in $env:PATH.Split(";")) {
+    $p = Join-Path $dir "python.exe"
+    if (Test-Path $p) { return $p }
+  }
+  return $null
 }
 
-# -- 2. Download and start Agentium -----------------------------------
+# ── 1. Docker check ──────────────────────────────────────────
+Step "Checking Docker..."
+try {
+  $dockerInfo = docker info 2>$null
+  Log "Docker is running"
+} catch {
+  Write-Host ""
+  Write-Host "  Docker Desktop is not running or not installed." -ForegroundColor Yellow
+  Write-Host ""
+  Write-Host "  Install Docker Desktop (one-time setup):" -ForegroundColor White
+  Write-Host "  https://www.docker.com/products/docker-desktop/" -ForegroundColor Cyan
+  Write-Host ""
+  Write-Host "  Once Docker Desktop is running, run this command again." -ForegroundColor White
+  Start-Process "https://www.docker.com/products/docker-desktop/"
+  exit 1
+}
+
+# ── 2. Download + start Agentium ────────────────────────────
 Step "Downloading Agentium..."
 New-Item -ItemType Directory -Force -Path $INSTALL_DIR | Out-Null
 Invoke-WebRequest -Uri $COMPOSE_URL -OutFile "$INSTALL_DIR\docker-compose.yml" -UseBasicParsing
-Log "Downloaded configuration"
+Log "Configuration downloaded"
 
 Step "Starting Agentium..."
-Set-Location $INSTALL_DIR
-docker compose pull --quiet
-docker compose up -d
-Log "All services started"
+Push-Location $INSTALL_DIR
+docker compose pull --quiet 2>$null
+docker compose up -d 2>$null
+Pop-Location
+Log "Dashboard running at $DASHBOARD_URL"
 
-# -- 3. Check / install Python -----------------------------------------
-Step "Checking for Python..."
-$pipCmd = $null
-if (Get-Command pip3 -ErrorAction SilentlyContinue) {
-    $pipCmd = "pip3"
-    Log "Python found (pip3)"
-} elseif (Get-Command pip -ErrorAction SilentlyContinue) {
-    $pipCmd = "pip"
-    Log "Python found (pip)"
-} else {
-    Warn "Python not found. Installing via winget..."
-    try {
-        winget install --id Python.Python.3 --silent --accept-package-agreements --accept-source-agreements
-        $env:PATH = [System.Environment]::GetEnvironmentVariable("PATH","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("PATH","User")
-        if (Get-Command pip3 -ErrorAction SilentlyContinue) { $pipCmd = "pip3" }
-        elseif (Get-Command pip -ErrorAction SilentlyContinue) { $pipCmd = "pip" }
-        Log "Python installed"
-    } catch {
-        Warn "Could not auto-install Python. Install from https://python.org/downloads then re-run."
-        $pipCmd = $null
-    }
+# ── 3. Python ────────────────────────────────────────────────
+Step "Checking Python..."
+$PYTHON = Find-Python
+
+if (-not $PYTHON) {
+  Warn "Python not found. Installing via winget..."
+  try {
+    winget install --id Python.Python.3 --silent --accept-package-agreements --accept-source-agreements 2>$null
+    # Refresh PATH from registry
+    $env:PATH = [System.Environment]::GetEnvironmentVariable("PATH","Machine") + ";" +
+                [System.Environment]::GetEnvironmentVariable("PATH","User")
+    $PYTHON = Find-Python
+  } catch {
+    Warn "winget install failed. Trying direct download..."
+    $pythonInstaller = "$env:TEMP\python-installer.exe"
+    Invoke-WebRequest -Uri "https://www.python.org/ftp/python/3.12.0/python-3.12.0-amd64.exe" -OutFile $pythonInstaller -UseBasicParsing
+    Start-Process $pythonInstaller -ArgumentList "/quiet InstallAllUsers=0 PrependPath=1 Include_pip=1" -Wait
+    $env:PATH = [System.Environment]::GetEnvironmentVariable("PATH","Machine") + ";" +
+                [System.Environment]::GetEnvironmentVariable("PATH","User")
+    $PYTHON = Find-Python
+  }
 }
 
-# -- 4. Install SDK ----------------------------------------------------
+if (-not $PYTHON) {
+  Fail "Python could not be installed automatically. Install from https://python.org/downloads then re-run."
+}
+Log "Python found: $PYTHON"
+
+# ── 4. Install SDK ───────────────────────────────────────────
 Step "Installing Agentium SDK..."
-if ($pipCmd) {
-    & $pipCmd install agentium-tracer --quiet
-    Log "SDK installed (agentium-tracer)"
-} else {
-    Warn "Skipped — install Python first, then run: pip install agentium-tracer"
-}
+& $PYTHON -m pip install agentium-tracer --quiet --upgrade
+if ($LASTEXITCODE -ne 0) { Fail "SDK install failed. Check your Python installation." }
+Log "SDK installed (agentium-tracer)"
 
-# -- 5. Install hooks globally -----------------------------------------
-Step "Installing agent hooks globally..."
-if (Get-Command agent-runtime -ErrorAction SilentlyContinue) {
-    agent-runtime integrations install claude-code --global
-    Log "Claude Code hooks installed globally"
-    agent-runtime integrations install codex --global
-    Log "Codex hooks installed globally"
-} else {
-    Warn "SDK not in PATH yet. Open a new terminal and run:"
-    Write-Host "    agent-runtime integrations install claude-code --global"
-    Write-Host "    agent-runtime integrations install codex --global"
-}
+# ── 5. Install hooks globally ────────────────────────────────
+Step "Installing hooks for Claude Code + Codex (global)..."
+& $PYTHON -m agent_runtime_layer.cli integrations install claude-code --global 2>$null
+if ($LASTEXITCODE -eq 0) { Log "Claude Code hooks installed globally" }
+else { Warn "Claude Code hook install skipped" }
 
-# -- Done --------------------------------------------------------------
+& $PYTHON -m agent_runtime_layer.cli integrations install codex --global 2>$null
+if ($LASTEXITCODE -eq 0) { Log "Codex hooks installed globally" }
+else { Warn "Codex hook install skipped" }
+
+# ── Done ────────────────────────────────────────────────────
 Write-Host ""
 Write-Host "  [OK] Agentium is live!" -ForegroundColor Cyan
 Write-Host ""
-Write-Host "  Dashboard -> $DASHBOARD_URL"
+Write-Host "  Dashboard -> $DASHBOARD_URL" -ForegroundColor White
 Write-Host ""
-Write-Host "  Run your agent normally — traces appear in the dashboard automatically."
+Write-Host "  Run Claude Code or Codex normally — every session" -ForegroundColor Gray
+Write-Host "  appears in the dashboard automatically." -ForegroundColor Gray
 Write-Host ""
 Start-Process $DASHBOARD_URL

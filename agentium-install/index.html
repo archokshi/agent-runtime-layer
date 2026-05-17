@@ -73,10 +73,10 @@
     <p style="font-size:13px;font-weight:700;color:#171717;margin-bottom:12px;">Windows users</p>
 
     <p style="font-size:12px;color:#737373;margin-bottom:8px;">
-      <strong>Option A — PowerShell</strong> (installs Docker, Python, SDK and hooks automatically):
+      <strong>Option A — PowerShell</strong> (installs Python, SDK and hooks automatically — requires <a href="https://www.docker.com/products/docker-desktop/" target="_blank" style="color:#00A991;">Docker Desktop</a> running):
     </p>
     <div class="cmd-wrap" style="margin-bottom:12px;">
-      <span class="cmd" id="cmd-win">irm https://agent-runtime-layer.vercel.app/install.ps1 | iex</span>
+      <span class="cmd" id="cmd-win">Set-ExecutionPolicy Bypass -Scope Process -Force; irm https://agent-runtime-layer.vercel.app/install.ps1 | iex</span>
       <button class="copy-btn" onclick="copyCmd('cmd-win',this)">Copy</button>
     </div>
 
