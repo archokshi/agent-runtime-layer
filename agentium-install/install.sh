@@ -44,26 +44,35 @@ open_browser() {
 }
 
 # ── Find Python executable ────────────────────────────────────
+# Verifies each candidate actually runs — guards against Windows Store
+# redirects that are found by `command -v` but fail when executed.
+python_works() {
+  local ver
+  ver=$("$1" --version 2>&1) || return 1
+  # Windows Store shim prints nothing or "Python was not found..."
+  [[ "$ver" == Python\ 3* ]] || return 1
+}
+
 find_python() {
-  # Try common command names first
+  # Try common command names, verify each actually works
   for cmd in python3 python python3.13 python3.12 python3.11 python3.10; do
-    if command -v "$cmd" &>/dev/null; then
+    if command -v "$cmd" &>/dev/null && python_works "$cmd"; then
       echo "$cmd"; return
     fi
   done
   # macOS Homebrew paths
   for p in /opt/homebrew/bin/python3 /usr/local/bin/python3; do
-    if [[ -x "$p" ]]; then echo "$p"; return; fi
+    if [[ -x "$p" ]] && python_works "$p"; then echo "$p"; return; fi
   done
   # Windows paths (Git Bash / MSYS)
   for p in \
-    "/c/Python313/python.exe" "/c/Python312/python.exe" "/c/Python311/python.exe" \
-    "/c/Python310/python.exe" \
+    "/c/Python313/python.exe" "/c/Python312/python.exe" \
+    "/c/Python311/python.exe" "/c/Python310/python.exe" \
     "$USERPROFILE/AppData/Local/Programs/Python/Python313/python.exe" \
     "$USERPROFILE/AppData/Local/Programs/Python/Python312/python.exe" \
     "$USERPROFILE/AppData/Local/Programs/Python/Python311/python.exe" \
     "$USERPROFILE/AppData/Local/Programs/Python/Python310/python.exe"; do
-    if [[ -x "$p" ]]; then echo "$p"; return; fi
+    if [[ -x "$p" ]] && python_works "$p"; then echo "$p"; return; fi
   done
   echo ""
 }
