@@ -51,7 +51,28 @@ export default async function RunsPage() {
             </thead>
             <tbody>
               {tasks.length === 0 ? (
-                <tr><td colSpan={8} style={{ textAlign: "center", padding: "32px 16px", color: "var(--muted)" }}>No runs yet. Install the SDK and run your agent.</td></tr>
+                <tr><td colSpan={8} style={{ padding: "0" }}>
+                  <div style={{ padding: "40px 24px", display: "flex", flexDirection: "column", alignItems: "center", gap: 24 }}>
+                    <div style={{ textAlign: "center" }}>
+                      <div style={{ fontSize: 28, marginBottom: 8 }}>👋</div>
+                      <div style={{ fontSize: 15, fontWeight: 700, color: "var(--ink)", marginBottom: 4 }}>No runs yet — connect your agent</div>
+                      <div style={{ fontSize: 13, color: "var(--muted)" }}>Run one command in your repo to start capturing traces automatically.</div>
+                    </div>
+                    <div style={{ width: "100%", maxWidth: 520, display: "flex", flexDirection: "column", gap: 12 }}>
+                      <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--muted)" }}>Claude Code</div>
+                      <div style={{ background: "#111", borderRadius: 8, padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+                        <code style={{ fontFamily: "monospace", fontSize: 12, color: "#00A991", flex: 1 }}>agent-runtime integrations install claude-code --repo /path/to/your/repo</code>
+                      </div>
+                      <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--muted)", marginTop: 4 }}>Codex</div>
+                      <div style={{ background: "#111", borderRadius: 8, padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+                        <code style={{ fontFamily: "monospace", fontSize: 12, color: "#00A991", flex: 1 }}>agent-runtime integrations install codex --repo /path/to/your/repo</code>
+                      </div>
+                      <div style={{ fontSize: 12, color: "var(--muted)", textAlign: "center", marginTop: 4 }}>
+                        Then run your agent normally — traces appear here automatically.
+                      </div>
+                    </div>
+                  </div>
+                </td></tr>
               ) : tasks.map(task => {
                 const a = analyses.find(x => x.task_id === task.task_id);
                 const ctx = a?.repeated_context_percent ?? 0;
