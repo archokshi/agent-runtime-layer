@@ -74,7 +74,12 @@ def parse_codex_session_for_metrics(session_id: str | None) -> dict:
                         total_cache_read += cr
                         total_cost   += _calc_cost(model, inp, out, cr)
                         model_calls  += 1
-                # agent_message records may have model info
+                # turn_context records have the model name (primary source)
+                if d.get("type") == "turn_context" and isinstance(payload, dict):
+                    m = payload.get("model")
+                    if m and m != "unknown":
+                        model = m
+                # agent_message records may also have model info (fallback)
                 if payload.get("type") == "agent_message":
                     info = payload.get("info") or {}
                     if info.get("role") == "assistant" and info.get("model"):
