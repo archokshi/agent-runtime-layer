@@ -45,6 +45,7 @@ open_browser() {
 
 # ── Find Python executable ────────────────────────────────────
 find_python() {
+  # Try common command names first
   for cmd in python3 python python3.13 python3.12 python3.11 python3.10; do
     if command -v "$cmd" &>/dev/null; then
       echo "$cmd"; return
@@ -54,12 +55,34 @@ find_python() {
   for p in /opt/homebrew/bin/python3 /usr/local/bin/python3; do
     if [[ -x "$p" ]]; then echo "$p"; return; fi
   done
+  # Windows paths (Git Bash / MSYS)
+  for p in \
+    "/c/Python313/python.exe" "/c/Python312/python.exe" "/c/Python311/python.exe" \
+    "/c/Python310/python.exe" \
+    "$USERPROFILE/AppData/Local/Programs/Python/Python313/python.exe" \
+    "$USERPROFILE/AppData/Local/Programs/Python/Python312/python.exe" \
+    "$USERPROFILE/AppData/Local/Programs/Python/Python311/python.exe" \
+    "$USERPROFILE/AppData/Local/Programs/Python/Python310/python.exe"; do
+    if [[ -x "$p" ]]; then echo "$p"; return; fi
+  done
   echo ""
 }
 
 # ── Install Python ────────────────────────────────────────────
 install_python() {
   step "🐍 Installing Python..."
+  # Windows Git Bash / MSYS — use winget
+  if [[ "$OS" == "unknown" ]] || [[ -n "$WINDIR" ]] || [[ -n "$USERPROFILE" ]]; then
+    if command -v winget &>/dev/null; then
+      winget install --id Python.Python.3 --silent --accept-package-agreements --accept-source-agreements || true
+      warn "Python installed. Open a new terminal and re-run the installer if the next step fails."
+      return
+    else
+      warn "Could not auto-install Python on Windows."
+      echo "  Install from https://python.org/downloads then re-run this command."
+      exit 1
+    fi
+  fi
   if [[ "$OS" == "mac" ]]; then
     if ! command -v brew &>/dev/null; then
       warn "Installing Homebrew first..."
