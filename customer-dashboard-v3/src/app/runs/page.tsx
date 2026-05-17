@@ -14,8 +14,13 @@ export default async function RunsPage() {
 
   const success = tasks.filter(t => t.status === "completed").length;
   const failed  = tasks.filter(t => t.status === "failed").length;
-  const avgCost = analyses.length > 0
-    ? analyses.reduce((s, a) => s + a.estimated_total_cost_dollars, 0) / analyses.length : null;
+  // Only average completed runs that have real cost data (exclude $0 running/stale runs)
+  const completedWithCost = analyses.filter(a => {
+    const task = tasks.find(t => t.task_id === a.task_id);
+    return task?.status === "completed" && a.estimated_total_cost_dollars > 0;
+  });
+  const avgCost = completedWithCost.length > 0
+    ? completedWithCost.reduce((s, a) => s + a.estimated_total_cost_dollars, 0) / completedWithCost.length : null;
 
   return (
     <Shell runCount={tasks.length}>
@@ -61,11 +66,11 @@ export default async function RunsPage() {
                     <div style={{ width: "100%", maxWidth: 520, display: "flex", flexDirection: "column", gap: 12 }}>
                       <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--muted)" }}>Claude Code</div>
                       <div style={{ background: "#111", borderRadius: 8, padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-                        <code style={{ fontFamily: "monospace", fontSize: 12, color: "#00A991", flex: 1 }}>agent-runtime integrations install claude-code --repo /path/to/your/repo</code>
+                        <code style={{ fontFamily: "monospace", fontSize: 12, color: "#00A991", flex: 1 }}>agent-runtime integrations install claude-code --global</code>
                       </div>
                       <div style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.06em", color: "var(--muted)", marginTop: 4 }}>Codex</div>
                       <div style={{ background: "#111", borderRadius: 8, padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-                        <code style={{ fontFamily: "monospace", fontSize: 12, color: "#00A991", flex: 1 }}>agent-runtime integrations install codex --repo /path/to/your/repo</code>
+                        <code style={{ fontFamily: "monospace", fontSize: 12, color: "#00A991", flex: 1 }}>agent-runtime integrations install codex --global</code>
                       </div>
                       <div style={{ fontSize: 12, color: "var(--muted)", textAlign: "center", marginTop: 4 }}>
                         Then run your agent normally — traces appear here automatically.
