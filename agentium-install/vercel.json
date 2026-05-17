@@ -31,7 +31,6 @@
     }
   ],
   "rewrites": [
-    { "source": "/", "destination": "/index.html" },
-    { "source": "/quickstart", "destination": "/quickstart.html" }
+    { "source": "/", "destination": "/index.html" }
   ]
 }

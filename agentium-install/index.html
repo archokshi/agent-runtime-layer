@@ -6,110 +6,185 @@
 <title>Install Agentium — Agent Runtime Layer</title>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F7F7F5; color: #171717; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
-  .card { background: #fff; border: 1px solid #E4E4DC; border-radius: 16px; padding: 40px 48px; max-width: 560px; width: 100%; box-shadow: 0 4px 24px rgba(0,0,0,.06); }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F7F7F5; color: #171717; min-height: 100vh; display: flex; justify-content: center; padding: 40px 24px; }
+  .card { background: #fff; border: 1px solid #E4E4DC; border-radius: 16px; padding: 40px 48px; max-width: 620px; width: 100%; box-shadow: 0 4px 24px rgba(0,0,0,.06); align-self: flex-start; }
+
+  /* Logo */
   .logo { display: flex; align-items: center; gap: 10px; margin-bottom: 32px; }
-  .hex { width: 28px; height: 28px; background: #00A991; clip-path: polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%); }
+  .hex { width: 28px; height: 28px; background: #00A991; clip-path: polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%); flex-shrink: 0; }
   .logo-text { font-size: 18px; font-weight: 700; }
-  h1 { font-size: 22px; font-weight: 700; letter-spacing: -.4px; margin-bottom: 8px; }
-  p { font-size: 14px; color: #737373; line-height: 1.6; margin-bottom: 28px; }
-  .cmd-wrap { background: #111; border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-  .cmd { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 13px; color: #00A991; flex: 1; word-break: break-all; }
-  .copy-btn { background: #1f2937; border: 1px solid #374151; border-radius: 7px; padding: 6px 12px; font-size: 12px; font-weight: 600; color: #9ca3af; cursor: pointer; white-space: nowrap; transition: all .15s; }
-  .copy-btn:hover { background: #374151; color: #fff; }
-  .copy-btn.copied { background: #00A991; border-color: #00A991; color: #fff; }
-  .note { font-size: 12px; color: #A3A3A3; margin-bottom: 28px; }
-  .steps { display: flex; flex-direction: column; gap: 12px; }
+
+  /* Headings */
+  h1 { font-size: 22px; font-weight: 700; letter-spacing: -.4px; margin-bottom: 6px; }
+  .subtitle { font-size: 14px; color: #737373; margin-bottom: 32px; line-height: 1.6; }
+
+  /* Section headers */
+  .section-title { font-size: 13px; font-weight: 700; color: #171717; margin-bottom: 12px; }
+
+  /* Divider */
+  .divider { border: none; border-top: 1px solid #E4E4DC; margin: 28px 0; }
+
+  /* Steps */
+  .steps { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
   .step { display: flex; align-items: flex-start; gap: 12px; font-size: 13px; color: #737373; }
   .step-num { width: 22px; height: 22px; border-radius: 50%; background: #F0F0ED; border: 1px solid #E4E4DC; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #00A991; flex-shrink: 0; margin-top: 1px; }
-  .divider { border: none; border-top: 1px solid #E4E4DC; margin: 28px 0; }
-  .os-note { font-size: 12px; color: #A3A3A3; text-align: center; }
-  .win-note { margin-top: 12px; background: #F0F0ED; border-radius: 9px; padding: 14px 16px; font-size: 12px; color: #737373; display: none; }
-  .win-note code { font-family: monospace; background: #E4E4DC; padding: 1px 5px; border-radius: 4px; }
+
+  /* Code blocks */
+  .cmd-wrap { background: #111; border-radius: 10px; padding: 14px 18px; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .cmd { font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace; font-size: 12px; color: #00A991; flex: 1; word-break: break-all; white-space: pre-wrap; line-height: 1.6; }
+  .copy-btn { background: #1f2937; border: 1px solid #374151; border-radius: 7px; padding: 6px 12px; font-size: 11px; font-weight: 600; color: #9ca3af; cursor: pointer; white-space: nowrap; transition: all .15s; flex-shrink: 0; }
+  .copy-btn:hover { background: #374151; color: #fff; }
+  .copy-btn.copied { background: #00A991; border-color: #00A991; color: #fff; }
+
+  /* What's installed callout */
+  .auto-list { background: #F0FDF9; border: 1px solid #A7F3D0; border-radius: 9px; padding: 14px 16px; margin-bottom: 0; }
+  .auto-list p { font-size: 12px; font-weight: 700; color: #047857; margin-bottom: 8px; }
+  .auto-list ul { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+  .auto-list li { font-size: 12px; color: #065F46; display: flex; align-items: center; gap: 8px; }
+  .auto-list li::before { content: "✓"; color: #00A991; font-weight: 700; }
+
+  /* Troubleshooting */
+  .trouble-item { margin-bottom: 14px; }
+  .trouble-q { font-size: 13px; font-weight: 600; color: #171717; margin-bottom: 6px; }
+  .trouble-a { font-size: 12px; color: #737373; line-height: 1.6; }
+  .trouble-a code { font-family: monospace; background: #F0F0ED; padding: 1px 5px; border-radius: 3px; font-size: 11px; color: #171717; }
+  .inline-cmd { background: #111; border-radius: 6px; padding: 8px 12px; margin-top: 6px; }
+  .inline-cmd span { font-family: monospace; font-size: 11px; color: #00A991; }
+
+  /* Note */
+  .note { font-size: 12px; color: #A3A3A3; margin-top: 6px; }
+
+  /* Footer */
+  .help { text-align: center; font-size: 12px; color: #A3A3A3; margin-top: 4px; }
+  .help a { color: #00A991; text-decoration: none; }
+  .help a:hover { text-decoration: underline; }
+
+  /* Docker note */
+  .docker-note { background: #FFF8F0; border: 1px solid #FDE68A; border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #92400E; margin-bottom: 12px; }
+  .docker-note a { color: #B45309; }
 </style>
 </head>
 <body>
 <div class="card">
+
   <div class="logo">
     <div class="hex"></div>
     <span class="logo-text">Agentium</span>
   </div>
 
   <h1>Install Agentium</h1>
-  <p>One command installs everything — Docker, Python, the SDK, and agent hooks — automatically.</p>
+  <p class="subtitle">One command installs everything — Docker, Python, SDK, and hooks for Claude Code and Codex — automatically.</p>
 
-  <p style="font-size:13px;font-weight:700;color:#171717;margin-bottom:12px;">macOS and Linux users</p>
+  <!-- ── macOS / Linux / WSL ── -->
+  <p class="section-title">macOS / Linux / WSL</p>
 
-  <div class="steps" style="margin-bottom:20px;">
-    <div class="step">
-      <div class="step-num">1</div>
-      <span>Open your terminal and <strong>cd into your project folder</strong></span>
-    </div>
-    <div class="step">
-      <div class="step-num">2</div>
-      <span>Run the command below — Docker, Python and the SDK install automatically if missing</span>
-    </div>
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><span>Open your terminal</span></div>
+    <div class="step"><div class="step-num">2</div><span>Run the command below and press Enter</span></div>
   </div>
 
   <div class="cmd-wrap">
-    <span class="cmd" id="cmd-text">curl -sSL https://agent-runtime-layer.vercel.app/install.sh | bash</span>
-    <button class="copy-btn" id="copy-btn" onclick="copyCmd('cmd-text', this)">Copy</button>
+    <span class="cmd" id="cmd-mac">curl -sSL https://agent-runtime-layer.vercel.app/install.sh | bash</span>
+    <button class="copy-btn" onclick="copyCmd('cmd-mac',this)">Copy</button>
   </div>
 
-  <div class="steps" style="margin-top:16px;margin-bottom:0;">
-    <div class="step">
-      <div class="step-num">3</div>
-      <span>Your browser opens to <strong>localhost:4001</strong> — dashboard is live, hooks are installed</span>
-    </div>
-    <div class="step">
-      <div class="step-num">4</div>
-      <span>Run your agent normally — traces appear in the dashboard automatically</span>
-    </div>
+  <div class="steps" style="margin-top:12px;">
+    <div class="step"><div class="step-num">3</div><span>Dashboard opens at <strong>localhost:4001</strong> — Claude Code and Codex hooks installed globally</span></div>
+    <div class="step"><div class="step-num">4</div><span>Run your agent normally — every session appears in the dashboard automatically</span></div>
   </div>
 
   <hr class="divider" />
 
-  <div style="text-align:left;">
-    <p style="font-size:13px;font-weight:700;color:#171717;margin-bottom:12px;">Windows users</p>
+  <!-- ── Windows ── -->
+  <p class="section-title">Windows (PowerShell)</p>
 
-    <p style="font-size:12px;color:#737373;margin-bottom:8px;">
-      <strong>Option A — PowerShell</strong> (installs Python, SDK and hooks automatically — requires <a href="https://www.docker.com/products/docker-desktop/" target="_blank" style="color:#00A991;">Docker Desktop</a> running):
-    </p>
-    <div class="cmd-wrap" style="margin-bottom:12px;">
-      <span class="cmd" id="cmd-win">Set-ExecutionPolicy Bypass -Scope Process -Force; irm https://agent-runtime-layer.vercel.app/install.ps1 | iex</span>
-      <button class="copy-btn" onclick="copyCmd('cmd-win',this)">Copy</button>
-    </div>
-
-    <p style="font-size:12px;color:#737373;margin-bottom:8px;">
-      <strong>Option B — WSL:</strong> Open WSL terminal and paste the macOS/Linux command above.
-    </p>
-
-    <p style="font-size:12px;color:#737373;margin-bottom:8px;">
-      <strong>Option C — Git Bash:</strong> Paste the macOS/Linux command above directly into Git Bash.
-    </p>
+  <div class="docker-note">
+    🐳 Requires <a href="https://www.docker.com/products/docker-desktop/" target="_blank"><strong>Docker Desktop</strong></a> to be installed and running first. Everything else installs automatically.
   </div>
 
-  <hr style="border:none;border-top:1px solid #E4E4DC;margin:28px 0;" />
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><span>Open PowerShell</span></div>
+    <div class="step"><div class="step-num">2</div><span>Run the command below and press Enter</span></div>
+  </div>
 
-  <a href="/quickstart" style="display:flex;align-items:center;justify-content:space-between;background:#F7F7F5;border:1px solid #E4E4DC;border-radius:10px;padding:16px 20px;text-decoration:none;transition:border-color .15s;" onmouseover="this.style.borderColor='#00A991'" onmouseout="this.style.borderColor='#E4E4DC'">
-    <div>
-      <div style="font-size:13px;font-weight:700;color:#171717;margin-bottom:3px;">What to do after install →</div>
-      <div style="font-size:12px;color:#737373;">Connect your agent, see your first trace, enable optimizations</div>
-    </div>
-    <div style="font-size:18px;color:#00A991;font-weight:700;">›</div>
-  </a>
+  <div class="cmd-wrap">
+    <span class="cmd" id="cmd-win">Set-ExecutionPolicy Bypass -Scope Process -Force; irm https://agent-runtime-layer.vercel.app/install.ps1 | iex</span>
+    <button class="copy-btn" onclick="copyCmd('cmd-win',this)">Copy</button>
+  </div>
+
+  <div class="steps" style="margin-top:12px;">
+    <div class="step"><div class="step-num">3</div><span>Dashboard opens at <strong>localhost:4001</strong> — Claude Code and Codex hooks installed globally</span></div>
+    <div class="step"><div class="step-num">4</div><span>Run your agent normally — every session appears in the dashboard automatically</span></div>
+  </div>
+
+  <p class="note" style="margin-top:8px;">Also works via WSL or Git Bash using the macOS/Linux command above.</p>
+
+  <hr class="divider" />
+
+  <!-- ── What gets installed ── -->
+  <p class="section-title">What installs automatically</p>
+
+  <div class="auto-list">
+    <p>Both commands handle everything end to end:</p>
+    <ul>
+      <li>Docker — checked and started (or installed if missing)</li>
+      <li>Agentium backend + dashboard — pulled from Docker Hub</li>
+      <li>Python — installed via Homebrew / apt / winget if missing</li>
+      <li>agentium-tracer SDK — installed via pip</li>
+      <li>Claude Code hooks — installed globally (captures all sessions)</li>
+      <li>Codex hooks — installed globally (captures all sessions)</li>
+      <li>Dashboard opens automatically at localhost:4001</li>
+    </ul>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- ── Troubleshooting ── -->
+  <p class="section-title">Troubleshooting</p>
+
+  <div class="trouble-item">
+    <div class="trouble-q">Dashboard not opening?</div>
+    <div class="trouble-a">Go to <code>http://localhost:4001</code> in your browser. If blank, run: <code>docker compose -f ~/.agentium/docker-compose.yml up -d</code></div>
+  </div>
+
+  <div class="trouble-item">
+    <div class="trouble-q">No traces appearing after running Claude Code or Codex?</div>
+    <div class="trouble-a">Reinstall hooks globally by opening a new terminal and running:</div>
+    <div class="inline-cmd"><span>python -m agent_runtime_layer.cli integrations install claude-code --global</span></div>
+    <div class="inline-cmd" style="margin-top:4px;"><span>python -m agent_runtime_layer.cli integrations install codex --global</span></div>
+  </div>
+
+  <div class="trouble-item">
+    <div class="trouble-q">Python not found after install?</div>
+    <div class="trouble-a">Open a new terminal window — PATH updates only take effect in new sessions. Then run the installer again.</div>
+  </div>
+
+  <div class="trouble-item">
+    <div class="trouble-q">Docker Desktop not running on Windows?</div>
+    <div class="trouble-a">Open Docker Desktop from your Start menu, wait for the whale 🐳 icon in the taskbar, then run the PowerShell command again.</div>
+  </div>
+
+  <div class="trouble-item" style="margin-bottom:0;">
+    <div class="trouble-q">Want to uninstall?</div>
+    <div class="inline-cmd"><span>curl -sSL https://agent-runtime-layer.vercel.app/uninstall.sh | bash</span></div>
+  </div>
+
+  <hr class="divider" />
+
+  <div class="help">
+    Questions? Email <a href="mailto:optiinfra@gmail.com">optiinfra@gmail.com</a> — we'll fix it fast.
+  </div>
+
 </div>
 
 <script>
-  function copyCmd(id, btn) {
-    const el = id ? document.getElementById(id) : document.getElementById('cmd-text');
-    const b  = btn || document.getElementById('copy-btn');
-    navigator.clipboard.writeText(el.textContent).then(() => {
-      b.textContent = 'Copied!';
-      b.classList.add('copied');
-      setTimeout(() => { b.textContent = 'Copy'; b.classList.remove('copied'); }, 2000);
-    });
-  }
+function copyCmd(id, btn) {
+  navigator.clipboard.writeText(document.getElementById(id).textContent).then(() => {
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
 </script>
 </body>
 </html>
