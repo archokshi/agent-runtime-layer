@@ -36,10 +36,25 @@
   </div>
 
   <h1>Install Agentium</h1>
-  <p>One command installs everything — Docker, the SDK, and agent hooks. Run it from inside your project folder for a fully automatic setup.</p>
+  <p>One command installs everything — Docker, Python, the SDK, and agent hooks — automatically.</p>
 
-  <div style="background:#F0FDF9;border:1px solid #A7F3D0;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:12.5px;color:#065F46;">
-    💡 <strong>First:</strong> open your terminal, <code style="background:#D1FAE5;padding:1px 5px;border-radius:3px;">cd</code> into your project folder, then run the command below.
+  <div class="steps" style="margin-bottom:20px;">
+    <div class="step">
+      <div class="step-num">1</div>
+      <span>Open your terminal and <strong>cd into your project folder</strong></span>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <span>Run the command below — Docker, Python and the SDK install automatically if missing</span>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <span>Your browser opens to <strong>localhost:4001</strong> — dashboard is live, hooks are installed</span>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <span>Run your agent normally — traces appear in the dashboard automatically</span>
+    </div>
   </div>
 
   <div class="cmd-wrap">
@@ -47,25 +62,6 @@
     <button class="copy-btn" id="copy-btn" onclick="copyCmd('cmd-text', this)">Copy</button>
   </div>
   <div class="note">Works on macOS and Linux. See below for Windows.</div>
-
-  <div class="steps">
-    <div class="step">
-      <div class="step-num">1</div>
-      <span><code style="background:#F0F0ED;padding:1px 5px;border-radius:3px;font-size:12px;">cd</code> into your project folder, paste the command above and press Enter</span>
-    </div>
-    <div class="step">
-      <div class="step-num">2</div>
-      <span>The installer checks for Docker — installs it automatically if missing</span>
-    </div>
-    <div class="step">
-      <div class="step-num">3</div>
-      <span>Your browser opens to <strong>localhost:4001</strong> — dashboard is live</span>
-    </div>
-    <div class="step">
-      <div class="step-num">4</div>
-      <span>Run your agent normally — traces appear in the dashboard automatically</span>
-    </div>
-  </div>
 
   <hr class="divider" />
 
