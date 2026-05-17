@@ -30,11 +30,38 @@ def calculate_cost(model: str, input_tokens: int, output_tokens: int,
     )
 
 
-def parse_transcript(transcript_path: str) -> dict:
-    """Read Claude Code transcript and extract token usage, cost and model call count."""
+def find_transcript_by_session(session_id: str) -> Path | None:
+    """Search ~/.claude/projects/ for a transcript matching session_id."""
     try:
-        p = Path(transcript_path)
-        if not p.exists():
+        projects_dir = Path.home() / ".claude" / "projects"
+        if not projects_dir.exists():
+            return None
+        candidates = sorted(
+            projects_dir.rglob("*.jsonl"),
+            key=lambda p: p.stat().st_mtime,
+            reverse=True,
+        )
+        for c in candidates:
+            if session_id and session_id in c.stem:
+                return c
+        # No session_id match — return the most recently modified file
+        return candidates[0] if candidates else None
+    except Exception:
+        return None
+
+
+def parse_transcript(transcript_path: str | None, session_id: str | None = None) -> dict:
+    """Read Claude Code transcript and extract token usage, cost and model call count.
+    Falls back to searching ~/.claude/projects/ by session_id if path is missing."""
+    try:
+        p = None
+        if transcript_path:
+            p = Path(transcript_path)
+            if not p.exists():
+                p = None
+        if p is None:
+            p = find_transcript_by_session(session_id or "")
+        if p is None or not p.exists():
             return {}
         lines = p.read_text(encoding="utf-8", errors="replace").splitlines()
         total_input = total_output = total_cache_read = total_cache_write = 0
@@ -377,7 +404,8 @@ class ClaudeHookCollector:
                 # Read transcript to get real token/cost/model data
                 turn = state.get("turns", {}).get(self.state_key(payload), {})
                 transcript_path = turn.get("transcript_path") or payload.get("transcript_path")
-                metrics = parse_transcript(transcript_path) if transcript_path else {}
+                session_id = str(payload.get("session_id") or "")
+                metrics = parse_transcript(transcript_path, session_id)
                 self.add_event(
                     task_id,
                     "task_end",
