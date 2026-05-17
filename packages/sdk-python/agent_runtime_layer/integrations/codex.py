@@ -8,6 +8,92 @@ from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
+# Model pricing per million tokens (USD) — shared with claude_code
+MODEL_PRICING = {
+    "claude-opus-4-5":   {"input": 15.0,  "output": 75.0,  "cache_read": 1.50,  "cache_write": 18.75},
+    "claude-sonnet-4-6": {"input": 3.0,   "output": 15.0,  "cache_read": 0.30,  "cache_write": 3.75},
+    "claude-sonnet-4-5": {"input": 3.0,   "output": 15.0,  "cache_read": 0.30,  "cache_write": 3.75},
+    "claude-haiku-4-5":  {"input": 0.8,   "output": 4.0,   "cache_read": 0.08,  "cache_write": 1.0},
+    "claude-3-5-sonnet": {"input": 3.0,   "output": 15.0,  "cache_read": 0.30,  "cache_write": 3.75},
+    "claude-3-5-haiku":  {"input": 0.8,   "output": 4.0,   "cache_read": 0.08,  "cache_write": 1.0},
+    "claude-3-opus":     {"input": 15.0,  "output": 75.0,  "cache_read": 1.50,  "cache_write": 18.75},
+}
+DEFAULT_PRICING = {"input": 3.0, "output": 15.0, "cache_read": 0.30, "cache_write": 3.75}
+
+
+def _calc_cost(model: str, input_tokens: int, output_tokens: int,
+               cache_read: int = 0, cache_write: int = 0) -> float:
+    p = next((v for k, v in MODEL_PRICING.items() if model and k in model), DEFAULT_PRICING)
+    return (
+        input_tokens  * p["input"]       / 1_000_000 +
+        output_tokens * p["output"]      / 1_000_000 +
+        cache_read    * p["cache_read"]  / 1_000_000 +
+        cache_write   * p["cache_write"] / 1_000_000
+    )
+
+
+def parse_codex_session_for_metrics(session_id: str | None) -> dict:
+    """Find the latest Codex session JSONL and extract token/cost metrics."""
+    try:
+        # Codex stores sessions at ~/.codex/sessions/YYYY/MM/DD/<session_id>.jsonl
+        codex_sessions = Path.home() / ".codex" / "sessions"
+        if not codex_sessions.exists():
+            return {}
+        # Find the most recent session file matching session_id or just latest
+        candidates = sorted(codex_sessions.rglob("*.jsonl"), key=lambda p: p.stat().st_mtime, reverse=True)
+        session_file = None
+        if session_id:
+            for c in candidates:
+                if session_id in c.name:
+                    session_file = c
+                    break
+        if not session_file and candidates:
+            session_file = candidates[0]
+        if not session_file:
+            return {}
+
+        total_input = total_output = total_cache_read = total_cache_write = 0
+        total_cost = 0.0
+        model_calls = 0
+        model = "unknown"
+
+        for line in session_file.read_text(encoding="utf-8", errors="replace").splitlines():
+            try:
+                d = json.loads(line)
+                payload = d.get("payload") or {}
+                # token_count records have cumulative usage
+                if payload.get("type") == "token_count":
+                    info = payload.get("info") or {}
+                    usage = info.get("last_token_usage") or {}
+                    if usage:
+                        inp = int(usage.get("input_tokens", 0) or 0)
+                        out = int(usage.get("output_tokens", 0) or 0)
+                        cr  = int(usage.get("cached_input_tokens", 0) or 0)
+                        total_input  += inp
+                        total_output += out
+                        total_cache_read += cr
+                        total_cost   += _calc_cost(model, inp, out, cr)
+                        model_calls  += 1
+                # agent_message records may have model info
+                if payload.get("type") == "agent_message":
+                    info = payload.get("info") or {}
+                    if info.get("role") == "assistant" and info.get("model"):
+                        model = info["model"]
+            except Exception:
+                continue
+
+        return {
+            "model": model,
+            "model_calls": model_calls,
+            "total_input_tokens": total_input,
+            "total_output_tokens": total_output,
+            "total_cache_read_tokens": total_cache_read,
+            "total_cache_write_tokens": total_cache_write,
+            "estimated_cost_usd": round(total_cost, 6),
+        }
+    except Exception:
+        return {}
+
 from agent_runtime_layer.client import AgentRuntimeClient
 from agent_runtime_layer.redaction import redact_text, redact_value
 from agent_runtime_layer.trace import TraceEvent
@@ -497,14 +583,28 @@ class CodexHookCollector:
                 return CodexHookResult(event_name=event_name, task_id=task_id, emitted_events=emitted)
 
             if event_name == "Stop":
+                session_id = str(payload.get("session_id") or "")
+                metrics = parse_codex_session_for_metrics(session_id)
                 self.add_event(
                     task_id,
                     "task_end",
                     task_span_id,
                     "codex_turn_end",
+                    attributes={
+                        "integration": "codex",
+                        "model": metrics.get("model", "unknown"),
+                        "model_calls": metrics.get("model_calls", 0),
+                        "total_input_tokens": metrics.get("total_input_tokens", 0),
+                        "total_output_tokens": metrics.get("total_output_tokens", 0),
+                        "total_cache_read_tokens": metrics.get("total_cache_read_tokens", 0),
+                        "total_cache_write_tokens": metrics.get("total_cache_write_tokens", 0),
+                        "estimated_cost_usd": metrics.get("estimated_cost_usd", 0.0),
+                    },
                     payload={
                         "status": "completed",
-                        "summary": "Codex hook trace completed.",
+                        "summary": f"Codex session: {metrics.get('model_calls', 0)} model calls, "
+                                   f"{metrics.get('total_input_tokens', 0) + metrics.get('total_output_tokens', 0)} total tokens, "
+                                   f"${metrics.get('estimated_cost_usd', 0.0):.4f} cost",
                     },
                 )
                 return CodexHookResult(event_name=event_name, task_id=task_id, emitted_events=1)
