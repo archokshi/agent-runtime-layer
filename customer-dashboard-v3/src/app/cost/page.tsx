@@ -23,6 +23,9 @@ export default async function CostPage() {
         <div>
           <div className="page-title">Cost Explorer</div>
           <div className="page-sub">Cost per task, per failure, and before/after comparison</div>
+          <div style={{ marginTop: 6, fontSize: 11, color: "var(--muted)", background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 6, padding: "5px 10px", display: "inline-block" }}>
+            💡 <strong>Estimated API-equivalent costs</strong> — reflects token usage value even on subscription plans (Claude Code Max, Codex). API users see real charges.
+          </div>
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3,minmax(0,1fr))", gap: 12 }}>

@@ -29,6 +29,9 @@ export default async function RunsPage() {
         <div>
           <div className="page-title">Runs</div>
           <div className="page-sub">{tasks.length} traced runs · {success} succeeded · {failed} failed</div>
+          <div style={{ marginTop: 6, fontSize: 11, color: "var(--muted)", background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 6, padding: "5px 10px", display: "inline-block" }}>
+            💡 Costs shown are <strong>estimated API-equivalent rates</strong> — useful for comparing task complexity and token usage, even on subscription plans.
+          </div>
         </div>
 
         {/* Summary chips */}
