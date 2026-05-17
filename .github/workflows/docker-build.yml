@@ -34,8 +34,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: archokshi/backend:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          no-cache: true
 
       - name: Build & push dashboard (amd64 + arm64)
         uses: docker/build-push-action@v5
@@ -44,5 +43,4 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: archokshi/dashboard:latest
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          no-cache: true
