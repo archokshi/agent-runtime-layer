@@ -43,7 +43,7 @@ export default async function RunDetailPage({ params }: { params: Promise<{ task
   ]);
   const [optimizations, contextReport] = await Promise.all([
     optional(getOptimizations(task_id)),
-    getOptimizedContext(task_id),
+    optional(getOptimizedContext(task_id)),
   ]);
 
   const totalMs   = analysis.total_task_duration_ms;
