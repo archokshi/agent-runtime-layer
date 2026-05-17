@@ -206,25 +206,67 @@ main() {
   run_compose up -d
   log "All services started"
 
+  # ── Install Python if missing ────────────────────────────
+  install_python() {
+    if [[ "$os" == "mac" ]]; then
+      step "🐍 Installing Python..."
+      if command -v brew &>/dev/null; then
+        brew install python --quiet && log "Python installed via Homebrew"
+      else
+        warn "Homebrew not found — installing Homebrew first..."
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        brew install python --quiet && log "Python installed via Homebrew"
+      fi
+    elif [[ "$os" == "linux" ]]; then
+      step "🐍 Installing Python..."
+      if command -v apt-get &>/dev/null; then
+        sudo apt-get install -y -qq python3 python3-pip && log "Python installed"
+      elif command -v yum &>/dev/null; then
+        sudo yum install -y -q python3 python3-pip && log "Python installed"
+      fi
+    fi
+  }
+
   # ── Install SDK ──────────────────────────────────────────
   step "🐍 Installing Agentium SDK..."
-  if command -v pip3 &>/dev/null; then
-    pip3 install agent-runtime-layer --quiet 2>/dev/null && log "SDK installed (pip3)" || warn "SDK install skipped — install manually: pip install agent-runtime-layer"
-  elif command -v pip &>/dev/null; then
-    pip install agent-runtime-layer --quiet 2>/dev/null && log "SDK installed (pip)" || warn "SDK install skipped — install manually: pip install agent-runtime-layer"
+
+  # Auto-install Python if not found
+  if ! command -v pip3 &>/dev/null && ! command -v pip &>/dev/null; then
+    install_python
+  fi
+
+  # Install SDK
+  local pip_cmd=""
+  if command -v pip3 &>/dev/null; then pip_cmd="pip3"
+  elif command -v pip &>/dev/null; then pip_cmd="pip"
+  fi
+
+  if [[ -n "$pip_cmd" ]]; then
+    $pip_cmd install agent-runtime-layer --quiet 2>/dev/null && log "SDK installed" || warn "SDK install failed — run manually: pip3 install agent-runtime-layer"
   else
-    echo ""
-    echo -e "\033[1;31m  ╔══════════════════════════════════════════════════════╗\033[0m"
-    echo -e "\033[1;31m  ║  ⚠️  ACTION REQUIRED: Python pip not found            ║\033[0m"
-    echo -e "\033[1;31m  ║                                                      ║\033[0m"
-    echo -e "\033[1;31m  ║  The Agentium SDK was NOT installed.                 ║\033[0m"
-    echo -e "\033[1;31m  ║  After Python is installed, run:                     ║\033[0m"
-    echo -e "\033[1;31m  ║                                                      ║\033[0m"
-    echo -e "\033[1;31m  ║    pip install agent-runtime-layer                   ║\033[0m"
-    echo -e "\033[1;31m  ║                                                      ║\033[0m"
-    echo -e "\033[1;31m  ║  Install Python: https://python.org/downloads        ║\033[0m"
-    echo -e "\033[1;31m  ╚══════════════════════════════════════════════════════╝\033[0m"
-    echo ""
+    warn "Python still not found. Install from https://python.org/downloads then run: pip3 install agent-runtime-layer"
+  fi
+
+  # ── Install hooks ────────────────────────────────────────
+  step "🔗 Installing agent hooks..."
+  ORIGINAL_DIR="$(pwd)"
+
+  if command -v agent-runtime &>/dev/null; then
+    # If run from inside a git repo, install hooks there
+    if git -C "$ORIGINAL_DIR" rev-parse --is-inside-work-tree &>/dev/null 2>&1; then
+      REPO_ROOT=$(git -C "$ORIGINAL_DIR" rev-parse --show-toplevel)
+      agent-runtime integrations install claude-code --repo "$REPO_ROOT" 2>/dev/null && log "Claude Code hooks installed in $REPO_ROOT" || true
+      agent-runtime integrations install codex --repo "$REPO_ROOT" 2>/dev/null && log "Codex hooks installed in $REPO_ROOT" || true
+    else
+      warn "Not inside a git repo — hooks not installed automatically."
+      echo "  Run this inside your project folder:"
+      echo "    agent-runtime integrations install claude-code --repo ."
+      echo "    agent-runtime integrations install codex --repo ."
+    fi
+  else
+    warn "SDK not in PATH yet — open a new terminal, cd into your project, then run:"
+    echo "    agent-runtime integrations install claude-code --repo ."
+    echo "    agent-runtime integrations install codex --repo ."
   fi
 
   # ── Done ─────────────────────────────────────────────────
@@ -233,18 +275,7 @@ main() {
   echo ""
   echo -e "  Dashboard → ${BOLD}${DASHBOARD_URL}${RESET}"
   echo ""
-  echo "  Next step — connect your coding agent:"
-  echo ""
-  echo "    Claude Code:"
-  echo "    agent-runtime integrations install claude-code --repo /path/to/your/repo"
-  echo ""
-  echo "    Codex:"
-  echo "    agent-runtime integrations install codex --repo /path/to/your/repo"
-  echo ""
-  echo "    Custom Python agent:"
-  echo "    pip install agent-runtime-layer"
-  echo ""
-  echo "  Then run your agent normally. Come back to ${DASHBOARD_URL} to see the data."
+  echo "  Run your agent normally — traces appear in the dashboard automatically."
   echo ""
 
   open_browser "$DASHBOARD_URL"
