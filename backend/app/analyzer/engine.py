@@ -94,19 +94,24 @@ def analyze_events(task_id: str, events: list[Event]) -> AnalysisReport:
     context_tokens  = sum(int(event.attributes.get("size_tokens", 0)) for event in contexts)
 
     # Fallback: read from task_end events (Claude Code / Codex hook integration)
-    # These carry transcript-parsed totals when no model_call_end events exist
+    # These carry transcript-parsed totals when no model_call_end events exist.
+    # Always override repeated_tokens/context_tokens from task_end when in fallback
+    # because context_snapshot size_tokens only counts prompt words, not real context size.
     if total_input == 0 and total_cost == 0.0:
         task_ends = [e for e in sorted_events if e.event_type == "task_end"]
         for e in task_ends:
-            total_input  += int(e.attributes.get("total_input_tokens", 0))
-            total_output += int(e.attributes.get("total_output_tokens", 0))
-            total_cost   += float(e.attributes.get("estimated_cost_usd", 0.0))
+            total_input      += int(e.attributes.get("total_input_tokens", 0))
+            total_output     += int(e.attributes.get("total_output_tokens", 0))
+            total_cost       += float(e.attributes.get("estimated_cost_usd", 0.0))
             if model_call_count == 0:
                 model_call_count += int(e.attributes.get("model_calls", 0))
-            if repeated_tokens == 0:
-                repeated_tokens += int(e.attributes.get("repeated_tokens", 0))
-            if context_tokens == 0:
-                context_tokens += int(e.attributes.get("total_context_tokens", 0))
+            # Always use transcript-level token counts — context_snapshot size_tokens
+            # is just prompt word count and must not be used as the denominator
+            t_repeated = int(e.attributes.get("repeated_tokens", 0))
+            t_context  = int(e.attributes.get("total_context_tokens", 0))
+            if t_context > 0:
+                repeated_tokens = t_repeated
+                context_tokens  = t_context
         total_cost = round(total_cost, 6)
     reusable_tokens = sum(int(event.attributes.get("reusable_tokens_estimate", 0)) for event in cache_events)
     repeated_percent = round((repeated_tokens / context_tokens) * 100, 2) if context_tokens else 0.0
