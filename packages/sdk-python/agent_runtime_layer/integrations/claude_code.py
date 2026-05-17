@@ -6,6 +6,77 @@ from datetime import datetime, timezone
 from pathlib import Path
 from uuid import uuid4
 
+# Model pricing per million tokens (USD)
+MODEL_PRICING = {
+    "claude-opus-4-5":    {"input": 15.0,  "output": 75.0,  "cache_read": 1.50,  "cache_write": 18.75},
+    "claude-sonnet-4-6":  {"input": 3.0,   "output": 15.0,  "cache_read": 0.30,  "cache_write": 3.75},
+    "claude-sonnet-4-5":  {"input": 3.0,   "output": 15.0,  "cache_read": 0.30,  "cache_write": 3.75},
+    "claude-haiku-4-5":   {"input": 0.8,   "output": 4.0,   "cache_read": 0.08,  "cache_write": 1.0},
+    "claude-3-5-sonnet":  {"input": 3.0,   "output": 15.0,  "cache_read": 0.30,  "cache_write": 3.75},
+    "claude-3-5-haiku":   {"input": 0.8,   "output": 4.0,   "cache_read": 0.08,  "cache_write": 1.0},
+    "claude-3-opus":      {"input": 15.0,  "output": 75.0,  "cache_read": 1.50,  "cache_write": 18.75},
+}
+DEFAULT_PRICING = {"input": 3.0, "output": 15.0, "cache_read": 0.30, "cache_write": 3.75}
+
+
+def calculate_cost(model: str, input_tokens: int, output_tokens: int,
+                   cache_read_tokens: int = 0, cache_write_tokens: int = 0) -> float:
+    pricing = next((v for k, v in MODEL_PRICING.items() if model and k in model), DEFAULT_PRICING)
+    return (
+        input_tokens      * pricing["input"]       / 1_000_000 +
+        output_tokens     * pricing["output"]      / 1_000_000 +
+        cache_read_tokens * pricing["cache_read"]  / 1_000_000 +
+        cache_write_tokens* pricing["cache_write"] / 1_000_000
+    )
+
+
+def parse_transcript(transcript_path: str) -> dict:
+    """Read Claude Code transcript and extract token usage, cost and model call count."""
+    try:
+        p = Path(transcript_path)
+        if not p.exists():
+            return {}
+        lines = p.read_text(encoding="utf-8", errors="replace").splitlines()
+        total_input = total_output = total_cache_read = total_cache_write = 0
+        total_cost = 0.0
+        model_calls = 0
+        model = "unknown"
+        for line in lines:
+            try:
+                d = json.loads(line)
+                if d.get("type") != "assistant":
+                    continue
+                msg = d.get("message") or {}
+                usage = msg.get("usage") or {}
+                if not usage:
+                    continue
+                m = msg.get("model") or model
+                if m and m != "unknown":
+                    model = m
+                inp   = int(usage.get("input_tokens", 0) or 0)
+                out   = int(usage.get("output_tokens", 0) or 0)
+                cr    = int(usage.get("cache_read_input_tokens", 0) or 0)
+                cw    = int(usage.get("cache_creation_input_tokens", 0) or 0)
+                total_input       += inp
+                total_output      += out
+                total_cache_read  += cr
+                total_cache_write += cw
+                total_cost        += calculate_cost(model, inp, out, cr, cw)
+                model_calls       += 1
+            except Exception:
+                continue
+        return {
+            "model": model,
+            "model_calls": model_calls,
+            "total_input_tokens": total_input,
+            "total_output_tokens": total_output,
+            "total_cache_read_tokens": total_cache_read,
+            "total_cache_write_tokens": total_cache_write,
+            "estimated_cost_usd": round(total_cost, 6),
+        }
+    except Exception:
+        return {}
+
 from agent_runtime_layer.client import AgentRuntimeClient
 from agent_runtime_layer.redaction import redact_text, redact_value
 from agent_runtime_layer.trace import TraceEvent
@@ -222,6 +293,9 @@ class ClaudeHookCollector:
                 task_id = self.create_turn_task(state, payload)
                 task_span_id = self.task_span_id(state, payload)
                 prompt = redact_text(prompt_text(payload))
+                transcript_path = payload.get("transcript_path")
+                # Store transcript_path so Stop handler can read it
+                state.setdefault("turns", {})[self.state_key(payload)]["transcript_path"] = transcript_path
                 self.add_event(
                     task_id,
                     "task_start",
@@ -231,7 +305,7 @@ class ClaudeHookCollector:
                         "integration": "claude-code",
                         "session_id": payload.get("session_id"),
                         "cwd": payload.get("cwd") or payload.get("CLAUDE_PROJECT_DIR"),
-                        "transcript_path": payload.get("transcript_path"),
+                        "transcript_path": transcript_path,
                     },
                     payload={"goal": prompt, "agent_type": "claude-code"},
                 )
@@ -293,7 +367,32 @@ class ClaudeHookCollector:
                 return ClaudeHookResult(event_name, task_id, emitted)
 
             if event_name in {"Stop", "SessionEnd"}:
-                self.add_event(task_id, "task_end", task_span_id, "claude_code_turn_end", payload={"status": "completed", "summary": "Claude Code hook trace completed."})
+                # Read transcript to get real token/cost/model data
+                turn = state.get("turns", {}).get(self.state_key(payload), {})
+                transcript_path = turn.get("transcript_path") or payload.get("transcript_path")
+                metrics = parse_transcript(transcript_path) if transcript_path else {}
+                self.add_event(
+                    task_id,
+                    "task_end",
+                    task_span_id,
+                    "claude_code_turn_end",
+                    attributes={
+                        "integration": "claude-code",
+                        "model": metrics.get("model", "unknown"),
+                        "model_calls": metrics.get("model_calls", 0),
+                        "total_input_tokens": metrics.get("total_input_tokens", 0),
+                        "total_output_tokens": metrics.get("total_output_tokens", 0),
+                        "total_cache_read_tokens": metrics.get("total_cache_read_tokens", 0),
+                        "total_cache_write_tokens": metrics.get("total_cache_write_tokens", 0),
+                        "estimated_cost_usd": metrics.get("estimated_cost_usd", 0.0),
+                    },
+                    payload={
+                        "status": "completed",
+                        "summary": f"Claude Code session: {metrics.get('model_calls', 0)} model calls, "
+                                   f"{metrics.get('total_input_tokens', 0) + metrics.get('total_output_tokens', 0)} total tokens, "
+                                   f"${metrics.get('estimated_cost_usd', 0.0):.4f} cost",
+                    },
+                )
                 return ClaudeHookResult(event_name, task_id, 1)
 
             return ClaudeHookResult(event_name, task_id, 0, skipped=True)
