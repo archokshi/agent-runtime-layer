@@ -84,9 +84,22 @@ def analyze_events(task_id: str, events: list[Event]) -> AnalysisReport:
     contexts = [event for event in sorted_events if event.event_type == "context_snapshot"]
     cache_events = [event for event in sorted_events if event.event_type == "cache_event"]
 
+    # Primary: read from model_call_end events (native tracing)
     total_input = sum(int(event.attributes.get("input_tokens", 0)) for event in model_ends)
     total_output = sum(int(event.attributes.get("output_tokens", 0)) for event in model_ends)
     total_cost = round(sum(float(event.attributes.get("cost_dollars", 0.0)) for event in model_ends), 6)
+
+    # Fallback: read from task_end events (Claude Code / Codex hook integration)
+    # These carry transcript-parsed totals when no model_call_end events exist
+    if total_input == 0 and total_cost == 0.0:
+        task_ends = [e for e in sorted_events if e.event_type == "task_end"]
+        for e in task_ends:
+            total_input  += int(e.attributes.get("total_input_tokens", 0))
+            total_output += int(e.attributes.get("total_output_tokens", 0))
+            total_cost   += float(e.attributes.get("estimated_cost_usd", 0.0))
+            if model_call_count == 0:
+                model_call_count += int(e.attributes.get("model_calls", 0))
+        total_cost = round(total_cost, 6)
     repeated_tokens = sum(int(event.attributes.get("repeated_tokens_estimate", 0)) for event in contexts)
     context_tokens = sum(int(event.attributes.get("size_tokens", 0)) for event in contexts)
     reusable_tokens = sum(int(event.attributes.get("reusable_tokens_estimate", 0)) for event in cache_events)
