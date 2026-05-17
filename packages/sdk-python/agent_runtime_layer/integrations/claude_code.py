@@ -27,7 +27,9 @@ def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="milliseconds").replace("+00:00", "Z")
 
 
-def config_path(repo_path: Path) -> Path:
+def config_path(repo_path: Path, global_install: bool = False) -> Path:
+    if global_install:
+        return Path.home() / ".claude" / "settings.json"
     return repo_path / ".claude" / "settings.local.json"
 
 
@@ -94,8 +96,8 @@ def managed_entry(event_name: str, base_url: str, project_id: str | None = None)
     return entry
 
 
-def install_claude_hooks(repo_path: Path, base_url: str = "http://localhost:8000/api", project_id: str | None = None) -> Path:
-    path = config_path(repo_path)
+def install_claude_hooks(repo_path: Path, base_url: str = "http://localhost:8000/api", project_id: str | None = None, global_install: bool = False) -> Path:
+    path = config_path(repo_path, global_install)
     config = read_json(path, {})
     hooks = config.setdefault("hooks", {})
     for event_name in CLAUDE_HOOK_EVENTS:
@@ -107,8 +109,8 @@ def install_claude_hooks(repo_path: Path, base_url: str = "http://localhost:8000
     return path
 
 
-def uninstall_claude_hooks(repo_path: Path) -> Path:
-    path = config_path(repo_path)
+def uninstall_claude_hooks(repo_path: Path, global_install: bool = False) -> Path:
+    path = config_path(repo_path, global_install)
     config = read_json(path, {})
     hooks = config.get("hooks", {})
     for event_name in list(hooks):
@@ -123,8 +125,8 @@ def uninstall_claude_hooks(repo_path: Path) -> Path:
     return path
 
 
-def claude_hook_status(repo_path: Path) -> dict:
-    path = config_path(repo_path)
+def claude_hook_status(repo_path: Path, global_install: bool = False) -> dict:
+    path = config_path(repo_path, global_install)
     config = read_json(path, {})
     hooks = config.get("hooks", {})
     installed_events = []

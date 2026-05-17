@@ -75,6 +75,7 @@ def main() -> None:
         claude_parser = action_subparsers.add_parser("claude-code")
         claude_parser.add_argument("--repo", default=".")
         claude_parser.add_argument("--project", default=None)
+        claude_parser.add_argument("--global", dest="global_install", action="store_true")
         cursor_parser = action_subparsers.add_parser("cursor")
         cursor_parser.add_argument("--repo", default=".")
         cursor_parser.add_argument("--project", default=None)
@@ -179,14 +180,17 @@ def main() -> None:
             print(json.dumps(status, indent=2))
     if args.command == "integrations" and args.integration == "claude-code":
         repo_path = Path(args.repo)
+        global_install = getattr(args, "global_install", False)
         if args.action == "install":
-            config_path = install_claude_hooks(repo_path=repo_path, base_url=args.base_url, project_id=args.project)
-            print(f"Installed Claude Code hooks at {config_path}")
+            config_path = install_claude_hooks(repo_path=repo_path, base_url=args.base_url, project_id=args.project, global_install=global_install)
+            scope = "global" if global_install else "repo-local"
+            print(f"Installed {scope} Claude Code hooks at {config_path}")
         if args.action == "uninstall":
-            config_path = uninstall_claude_hooks(repo_path=repo_path)
-            print(f"Removed Agent Runtime Claude Code hooks from {config_path}")
+            config_path = uninstall_claude_hooks(repo_path=repo_path, global_install=global_install)
+            scope = "global" if global_install else "repo-local"
+            print(f"Removed Agent Runtime {scope} Claude Code hooks from {config_path}")
         if args.action == "status":
-            status = claude_hook_status(repo_path=repo_path)
+            status = claude_hook_status(repo_path=repo_path, global_install=global_install)
             print(json.dumps(status, indent=2))
     if args.command == "integrations" and args.integration == "cursor":
         repo_path = Path(args.repo)

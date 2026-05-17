@@ -247,26 +247,16 @@ main() {
     warn "Python still not found. Install from https://python.org/downloads then run: pip3 install agentium-tracer"
   fi
 
-  # ── Install hooks ────────────────────────────────────────
-  step "🔗 Installing agent hooks..."
-  ORIGINAL_DIR="$(pwd)"
+  # ── Install hooks globally ───────────────────────────────
+  step "🔗 Installing agent hooks globally..."
 
   if command -v agent-runtime &>/dev/null; then
-    # If run from inside a git repo, install hooks there
-    if git -C "$ORIGINAL_DIR" rev-parse --is-inside-work-tree &>/dev/null 2>&1; then
-      REPO_ROOT=$(git -C "$ORIGINAL_DIR" rev-parse --show-toplevel)
-      agent-runtime integrations install claude-code --repo "$REPO_ROOT" 2>/dev/null && log "Claude Code hooks installed in $REPO_ROOT" || true
-      agent-runtime integrations install codex --repo "$REPO_ROOT" 2>/dev/null && log "Codex hooks installed in $REPO_ROOT" || true
-    else
-      warn "Not inside a git repo — hooks not installed automatically."
-      echo "  Run this inside your project folder:"
-      echo "    agent-runtime integrations install claude-code --repo ."
-      echo "    agent-runtime integrations install codex --repo ."
-    fi
+    agent-runtime integrations install claude-code --global 2>/dev/null && log "Claude Code hooks installed globally (~/.claude/settings.json)" || true
+    agent-runtime integrations install codex --global 2>/dev/null && log "Codex hooks installed globally" || true
   else
-    warn "SDK not in PATH yet — open a new terminal, cd into your project, then run:"
-    echo "    agent-runtime integrations install claude-code --repo ."
-    echo "    agent-runtime integrations install codex --repo ."
+    warn "SDK not in PATH yet — open a new terminal and run:"
+    echo "    agent-runtime integrations install claude-code --global"
+    echo "    agent-runtime integrations install codex --global"
   fi
 
   # ── Done ─────────────────────────────────────────────────
