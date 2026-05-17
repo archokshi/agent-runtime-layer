@@ -40,7 +40,7 @@
 
   <div class="cmd-wrap">
     <span class="cmd" id="cmd-text">curl -sSL https://agent-runtime-layer.vercel.app/install.sh | bash</span>
-    <button class="copy-btn" id="copy-btn" onclick="copyCmd()">Copy</button>
+    <button class="copy-btn" id="copy-btn" onclick="copyCmd('cmd-text', this)">Copy</button>
   </div>
   <div class="note">Works on macOS and Linux. See below for Windows.</div>
 
@@ -59,8 +59,22 @@
     </div>
     <div class="step">
       <div class="step-num">4</div>
-      <span>Connect Claude Code or Codex with one command shown in the dashboard</span>
+      <span>Connect your agent — run one command in your repo:</span>
     </div>
+  </div>
+
+  <div style="margin-top:16px;display:flex;flex-direction:column;gap:10px;">
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#A3A3A3;">Claude Code</div>
+    <div class="cmd-wrap" style="margin-bottom:0;">
+      <span class="cmd" id="cmd-claude">agent-runtime integrations install claude-code --repo /path/to/your/repo</span>
+      <button class="copy-btn" onclick="copyCmd('cmd-claude', this)">Copy</button>
+    </div>
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:#A3A3A3;margin-top:4px;">Codex</div>
+    <div class="cmd-wrap" style="margin-bottom:0;">
+      <span class="cmd" id="cmd-codex">agent-runtime integrations install codex --repo /path/to/your/repo</span>
+      <button class="copy-btn" onclick="copyCmd('cmd-codex', this)">Copy</button>
+    </div>
+    <div style="font-size:11px;color:#A3A3A3;margin-top:2px;">Then run your agent normally — traces appear in the dashboard automatically.</div>
   </div>
 
   <hr class="divider" />
@@ -104,13 +118,13 @@
 </div>
 
 <script>
-  function copyCmd() {
-    const text = document.getElementById('cmd-text').textContent;
-    navigator.clipboard.writeText(text).then(() => {
-      const btn = document.getElementById('copy-btn');
-      btn.textContent = 'Copied!';
-      btn.classList.add('copied');
-      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 2000);
+  function copyCmd(id, btn) {
+    const el = id ? document.getElementById(id) : document.getElementById('cmd-text');
+    const b  = btn || document.getElementById('copy-btn');
+    navigator.clipboard.writeText(el.textContent).then(() => {
+      b.textContent = 'Copied!';
+      b.classList.add('copied');
+      setTimeout(() => { b.textContent = 'Copy'; b.classList.remove('copied'); }, 2000);
     });
   }
 </script>
