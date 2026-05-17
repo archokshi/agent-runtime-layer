@@ -178,7 +178,7 @@ for task_id in $RECENT_IDS; do
 
   COST=$(echo "$ANALYSIS" | "$PY" -c "import sys,json; d=json.load(sys.stdin); print(d.get('estimated_total_cost_dollars',0))" 2>/dev/null || echo "0")
   CALLS=$(echo "$ANALYSIS" | "$PY" -c "import sys,json; d=json.load(sys.stdin); print(d.get('model_call_count',0))" 2>/dev/null || echo "0")
-  CTX=$(echo "$ANALYSIS" | "$PY" -c "import sys,json; d=json.load(sys.stdin); print(d.get('repeated_context_percent',0))" 2>/dev/null || echo "0")
+  CTX=$(echo "$ANALYSIS" | "$PY" -c "import sys,json; d=json.load(sys.stdin); print(d.get('repeated_context_percent', d.get('repeated_ctx_pct', 0)))" 2>/dev/null || echo "0")
 
   if "$PY" -c "import sys; sys.exit(0 if float('$COST') > 0 else 1)" 2>/dev/null; then COST_COUNT=$((COST_COUNT+1)); fi
   if "$PY" -c "import sys; sys.exit(0 if int('$CALLS') > 0 else 1)" 2>/dev/null; then CALLS_COUNT=$((CALLS_COUNT+1)); fi
