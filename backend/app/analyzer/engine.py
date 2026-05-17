@@ -89,6 +89,10 @@ def analyze_events(task_id: str, events: list[Event]) -> AnalysisReport:
     total_output = sum(int(event.attributes.get("output_tokens", 0)) for event in model_ends)
     total_cost = round(sum(float(event.attributes.get("cost_dollars", 0.0)) for event in model_ends), 6)
 
+    # Repeated context — from native context_snapshot events
+    repeated_tokens = sum(int(event.attributes.get("repeated_tokens_estimate", 0)) for event in contexts)
+    context_tokens  = sum(int(event.attributes.get("size_tokens", 0)) for event in contexts)
+
     # Fallback: read from task_end events (Claude Code / Codex hook integration)
     # These carry transcript-parsed totals when no model_call_end events exist
     if total_input == 0 and total_cost == 0.0:
@@ -99,15 +103,11 @@ def analyze_events(task_id: str, events: list[Event]) -> AnalysisReport:
             total_cost   += float(e.attributes.get("estimated_cost_usd", 0.0))
             if model_call_count == 0:
                 model_call_count += int(e.attributes.get("model_calls", 0))
-            # Repeated context from cache_read tokens
             if repeated_tokens == 0:
                 repeated_tokens += int(e.attributes.get("repeated_tokens", 0))
             if context_tokens == 0:
                 context_tokens += int(e.attributes.get("total_context_tokens", 0))
         total_cost = round(total_cost, 6)
-        repeated_percent = round((repeated_tokens / context_tokens) * 100, 2) if context_tokens else 0.0
-    repeated_tokens = sum(int(event.attributes.get("repeated_tokens_estimate", 0)) for event in contexts)
-    context_tokens = sum(int(event.attributes.get("size_tokens", 0)) for event in contexts)
     reusable_tokens = sum(int(event.attributes.get("reusable_tokens_estimate", 0)) for event in cache_events)
     repeated_percent = round((repeated_tokens / context_tokens) * 100, 2) if context_tokens else 0.0
     cache_percent = round((reusable_tokens / max(1, context_tokens)) * 100, 2) if context_tokens else 0.0
