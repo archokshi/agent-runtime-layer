@@ -218,30 +218,46 @@ Phase 1 sub-phases:
   Purpose:
 
   The gap between seeing a problem and fixing it must be one action. Phase 1.7 closes
-  that gap. The developer clicks Apply — Agentium strips stable context, runs the
-  optimized prompt, captures the before/after delta, and produces a shareable proof card.
+  that gap. For Claude Code and Codex, Agentium cannot intercept API calls directly
+  (agents talk to the provider directly). Phase 1.7 optimizes via CLAUDE.md / system
+  prompt rewriting — reducing the initial context size so the next session starts leaner.
+  For SDK-wrapped agents, auto_optimize strips stable context before each model call.
+
+  Clarification — two modes, one toggle:
+
+  - **Hook-based agents (Claude Code, Codex):** Optimizer rewrites CLAUDE.md /
+    system-prompt config file automatically when CTX% ≥ 55%. Next session starts
+    with a leaner context. Savings measured as token delta between baseline and
+    post-optimization sessions.
+  - **SDK-wrapped agents:** `auto_optimize=True` flag strips stable context blocks
+    before each model call at runtime. True real-time optimization.
+
+  Cross-platform requirements:
+
+  - macOS and Linux: CLAUDE.md written to repo root; works with Claude Code default
+    config path
+  - Windows: same path logic; tested in Git Bash and PowerShell environments
+  - Codex: writes to `.codex/config.toml` system instructions field or equivalent
+  - Claude Code: writes to `CLAUDE.md` in repo root
 
   What it builds:
 
-  - `POST /api/tasks/{task_id}/apply-optimization` backend endpoint that runs the
-    optimizer and stores an OptimizationProofRecord with before/after token and cost delta
+  - `POST /api/tasks/{task_id}/apply-optimization` backend endpoint — stores
+    OptimizationProofRecord with before/after token and cost delta
   - `GET /api/optimization-proof/{proof_id}` to retrieve proof records
-  - `auto_optimize` flag on `AgentRuntimeTracer` — when True, automatically strips
-    stable context blocks before each model call using the optimizer
-  - Before/after proof card in the customer dashboard run detail page showing measured
-    token reduction, cost reduction, and success preservation
-  - Apply Optimization button on run detail page (customer dashboard port 4000)
-  - ⚡ Context Optimizer toggle in the Phase 1.10 Control Plane UI — primary delivery
-    mechanism; CLI flag `auto_optimize=True` remains as developer fallback
-  - /runs page shows ⚡ Fix it badge on any run with ≥20% repeated context tokens
+  - Auto-apply: when optimizer is enabled + run completes with CTX% ≥ 55%,
+    automatically generate and write lean CLAUDE.md / Codex config
+  - `auto_optimize` flag on `AgentRuntimeTracer` for SDK-wrapped agents
+  - Before/after proof card in dashboard run detail showing measured delta
+  - ⚡ Fix it badge on /runs for any run with ≥ 20% repeated context
+  - ⚡ Context Optimizer toggle in Control Plane UI — primary delivery mechanism
 
   What the developer gets:
 
   - One click from "you are wasting 43% of tokens" to "here is the proof it is fixed"
   - Shareable proof card: −44% tokens · −43% cost · success preserved ✓ [measured]
-  - SDK flag for zero-friction automation: `auto_optimize=True`
-  - Toggle in Control Plane: flip ON → every subsequent run auto-optimized
-  - "Gains since enabled" delta card on overview showing cumulative savings
+  - Auto-apply: toggle ON → next run uses lean context automatically
+  - Works on macOS, Linux, Windows for both Claude Code and Codex
 
   Evidence quality rule:
 
@@ -253,7 +269,8 @@ Phase 1 sub-phases:
   ```text
   At least one OptimizationProofRecord stored in the database
   Before/after proof card visible in the customer dashboard
-  auto_optimize flag tested on at least one real agent run
+  Auto-apply tested on Claude Code (macOS + Windows) and Codex
+  CLAUDE.md and Codex config rewrite both verified
   ```
 
 - **Phase 1.8 Budget Governor**
@@ -301,49 +318,104 @@ Phase 1 sub-phases:
 - **Phase 1.9 Agent Context Fabric**
   Persist stable agent context across sessions using a local context memory store and
   a lightweight API proxy. Agentium learns which context blocks are stable across runs
-  and automatically adds Anthropic cache_control markers so the developer pays
-  $0.30/MTok instead of $3.00/MTok on repeated prefixes. One environment variable
-  change. Zero agent code changes.
+  and automatically adds cache_control markers so the developer pays $0.30/MTok instead
+  of $3.00/MTok on repeated prefixes. One toggle. Zero agent code changes.
 
   Purpose:
 
   Every cold-start agent run re-sends the same system prompt, tool definitions, and
-  repo summary at full price. Phase 1.9 makes that cost disappear. The more runs
-  Agentium captures, the more context blocks it recognizes, and the more it saves.
-  The developer's trace history becomes their switching cost.
+  repo summary at full price. Phase 1.9 makes that cost disappear. Same tokens sent,
+  same model quality — but Anthropic stores the stable 95% at 10× cheaper cache rates.
+  The more runs Agentium captures, the more context blocks it recognizes, and the more
+  it saves. The developer's trace history becomes their switching cost.
+
+  Why this approach (not token stripping):
+
+  Claude Code and Codex talk to the provider API directly — Agentium cannot remove
+  content from the request without breaking model coherence. Phase 1.9 uses Approach B:
+  inject cache_control markers into the request so the provider caches stable content
+  at $0.30/MTok. Same request, same quality, 10× cheaper rate on the 95% that repeats.
+
+  Implementation plan — four steps:
+
+  Step 1 — Proxy as a docker-compose service (auto-starts with every install):
+  - Add proxy service to docker-compose.yml on port 8100
+  - Proxy already built in proxy.py — just needs wiring into the stack
+  - Runs automatically; developer does not need to start it manually
+
+  Step 2 — ANTHROPIC_BASE_URL set by installer (cross-platform):
+  - install.sh appends `export ANTHROPIC_BASE_URL=http://localhost:8100` to
+    ~/.bashrc and ~/.zshrc (macOS/Linux)
+  - install.ps1 sets `$env:ANTHROPIC_BASE_URL` in Windows profile
+    ($PROFILE / system environment for PowerShell)
+  - Every new terminal → Claude Code and Codex route through proxy transparently
+
+  Step 3 — Cache TTL and warm-up:
+  - Proxy uses 1-hour cache window (re-inject cache_control on every request so
+    Anthropic automatically extends the cache on each hit; cold-start cost is
+    one full-price request only)
+  - SessionStart hook triggers cache warm-up ping before first real request arrives
+  - For sessions > 5 min with gaps: proxy re-injects cache_control on next request
+    automatically — at most one full-price request per gap period
+
+  Step 4 — Provider abstraction layer (Anthropic + OpenAI):
+  - Proxy detects provider from request URL
+  - Anthropic: injects `cache_control: {"type": "ephemeral"}` on system prefix
+  - OpenAI: applies equivalent caching mechanism when supported
+  - Fallback: local KV store (fingerprint → content) for providers without
+    native caching — avoids repeated sends for sessions managed by the proxy
+
+  Cross-platform requirements:
+
+  - macOS (Claude Code + Codex): ANTHROPIC_BASE_URL set in ~/.zshrc and ~/.bashrc
+  - Windows PowerShell: ANTHROPIC_BASE_URL set in $PROFILE and system environment
+  - Windows Git Bash / WSL: same as macOS/Linux path
+  - Proxy runs in Docker (cross-platform by design) — no platform-specific binary
+  - Verified: macOS Apple Silicon (arm64), macOS Intel (amd64), Windows x86-64
+
+  Multi-agent requirements:
+
+  - Claude Code: routes through proxy via ANTHROPIC_BASE_URL env var automatically
+  - Codex (OpenAI provider): proxy applies OpenAI-equivalent caching on same port
+  - Both agents: savings tracked per session in context_memory table
+  - SessionStart hook: fires for both Claude Code and Codex → both get warm cache
 
   What it builds:
 
-  - `context_memory` table in the existing SQLite database:
-    fingerprint (sha256), content_type, token_count, source_repo, agent_type,
-    first_seen_at, last_seen_at, hit_count
-  - `packages/sdk-python/agent_runtime_layer/proxy.py` — local API proxy on port 8100:
-    intercepts `POST /v1/messages`, extracts stable prefix fingerprints, checks
-    context_memory, injects `cache_control: {"type": "ephemeral"}` on matched blocks,
-    forwards to real Anthropic API, records cache_read_input_tokens from response
-  - `agent-runtime proxy` CLI subcommand to start the proxy (developer fallback)
-  - `GET /api/context-memory/summary` backend endpoint showing hit counts and savings
-  - Context Memory card on customer dashboard overview: estimated $/run caching
-    opportunity shown using existing repeated-context data (value-first empty state)
-  - 🧠 Context Memory toggle in Phase 1.10 Control Plane UI — primary delivery;
-    enabling toggle starts proxy automatically, sets ANTHROPIC_BASE_URL internally
-  - Context Memory section on customer dashboard context page
+  - `context_memory` SQLite table (already exists): fingerprint, content_type,
+    token_count, source_repo, agent_type, first_seen_at, last_seen_at, hit_count,
+    cache_savings_dollars
+  - `proxy.py` (already built): intercepts POST /v1/messages, fingerprints stable
+    system prefix, injects cache_control, forwards to real API, records
+    cache_read_input_tokens savings from response
+  - docker-compose.yml proxy service: starts automatically on port 8100
+  - install.sh / install.ps1: sets ANTHROPIC_BASE_URL cross-platform
+  - SessionStart hook warm-up: pre-warms cache before first request
+  - Provider abstraction layer: Anthropic + OpenAI + local KV fallback
+  - `GET /api/context-memory/summary` backend endpoint: hit counts + savings
+  - 🧠 Context Memory toggle in Control Plane: primary delivery — enabling toggle
+    starts proxy service, sets env var, begins caching from next run
+  - Dashboard context page: real cache_read_input_tokens from API response shown
+    as verified savings (not estimated)
 
   What the developer gets:
 
-  - One toggle in the Control Plane — no env var change, no CLI command required
-  - Stable context cached at $0.30/MTok instead of $3.00/MTok (90% cost reduction)
-  - Savings grow every run — compounding value, increasing switching cost
-  - "24,100 tokens from context memory → saved $0.072 this call" in dashboard
-  - Context memory is local and private — no data leaves their environment
+  - One toggle — no env var, no CLI command, no code changes required
+  - Stable context cached at $0.30/MTok vs $3.00/MTok (10× cheaper)
+  - Works for Claude Code and Codex on macOS and Windows
+  - Savings compound every run: "saved $0.072 this call · $3.38 total"
+  - Context memory is local and private — no data leaves their machine
 
   Exit artifact:
 
   ```text
-  context_memory table populated from at least one real trace
-  Proxy intercepts at least one real agent run with cache_control injection
-  Dashboard shows verified cache_read_input_tokens > 0 from Anthropic API response
+  Proxy service running in docker-compose on port 8100
+  ANTHROPIC_BASE_URL set by installer on macOS and Windows
+  cache_read_input_tokens > 0 confirmed from real Anthropic API response
+  cache_read_input_tokens > 0 confirmed from real OpenAI API response (Codex)
+  SessionStart warm-up tested on Claude Code and Codex
   Cumulative savings visible in dashboard context memory card
+  Verified on: macOS Apple Silicon, macOS Intel, Windows x86-64
   ```
 
 - **Phase 1.10 Control Plane**
