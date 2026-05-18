@@ -121,13 +121,40 @@ else { Warn "Claude Code hook install skipped" }
 if ($LASTEXITCODE -eq 0) { Log "Codex hooks installed globally" }
 else { Warn "Codex hook install skipped" }
 
+# ── Set ANTHROPIC_BASE_URL + OPENAI_BASE_URL (Context Memory proxy) ─────────
+Step "Configuring Context Memory proxy..."
+$PROXY_URL = "http://localhost:8100"
+
+function Set-EnvPermanent($Name, $Value) {
+    # Set for current session
+    [System.Environment]::SetEnvironmentVariable($Name, $Value, "Process")
+    # Set for current user permanently (survives reboots)
+    [System.Environment]::SetEnvironmentVariable($Name, $Value, "User")
+    # Also add to PowerShell profile for terminal sessions
+    $profileDir = Split-Path $PROFILE -Parent
+    if (-not (Test-Path $profileDir)) { New-Item -ItemType Directory -Force -Path $profileDir | Out-Null }
+    if (-not (Test-Path $PROFILE)) { New-Item -ItemType File -Force -Path $PROFILE | Out-Null }
+    $line = "`$env:$Name = '$Value'"
+    if (-not (Select-String -Path $PROFILE -Pattern "env:$Name" -Quiet 2>$null)) {
+        Add-Content -Path $PROFILE -Value "`n# Agentium Context Memory Proxy`n$line"
+    }
+}
+
+Set-EnvPermanent "ANTHROPIC_BASE_URL" $PROXY_URL
+Log "ANTHROPIC_BASE_URL=$PROXY_URL  (Claude Code routes through proxy)"
+Set-EnvPermanent "OPENAI_BASE_URL" $PROXY_URL
+Log "OPENAI_BASE_URL=$PROXY_URL     (Codex routes through proxy)"
+Warn "Restart your terminal for proxy env vars to apply to new sessions"
+
 # ── Done ────────────────────────────────────────────────────
 Write-Host ""
 Write-Host "  [OK] Agentium is live!" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "  Dashboard -> $DASHBOARD_URL" -ForegroundColor White
+Write-Host "  Proxy     -> $PROXY_URL  (caches stable context at `$0.30/MTok)" -ForegroundColor White
 Write-Host ""
-Write-Host "  Run Claude Code or Codex normally — every session" -ForegroundColor Gray
-Write-Host "  appears in the dashboard automatically." -ForegroundColor Gray
+Write-Host "  Run Claude Code or Codex normally — traces appear in" -ForegroundColor Gray
+Write-Host "  the dashboard. Stable context is cached automatically." -ForegroundColor Gray
+Write-Host "  Open a new terminal for the proxy env vars to apply." -ForegroundColor Gray
 Write-Host ""
 Start-Process $DASHBOARD_URL

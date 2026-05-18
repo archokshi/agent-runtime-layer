@@ -236,14 +236,42 @@ step "🔗 Installing hooks for Claude Code + Codex (global)..."
   && log "Codex hooks installed globally" \
   || warn "Codex hook install skipped"
 
+# ── Set ANTHROPIC_BASE_URL + OPENAI_BASE_URL (Context Memory proxy) ──────────
+step "🔀 Configuring Context Memory proxy..."
+PROXY_URL="http://localhost:8100"
+
+set_env_in_rc() {
+  local var="$1" val="$2"
+  for rc in "$HOME/.bashrc" "$HOME/.zshrc" "$HOME/.bash_profile" "$HOME/.profile"; do
+    [[ -f "$rc" ]] || continue
+    if grep -q "^export ${var}=" "$rc" 2>/dev/null; then
+      sed -i.bak "s|^export ${var}=.*|export ${var}=${val}|" "$rc"
+    else
+      printf '\n# Agentium Context Memory Proxy\nexport %s=%s\n' "$var" "$val" >> "$rc"
+    fi
+  done
+  # Create .bashrc if no rc exists at all
+  if [[ ! -f "$HOME/.bashrc" ]] && [[ ! -f "$HOME/.zshrc" ]]; then
+    printf 'export %s=%s\n' "$var" "$val" >> "$HOME/.bashrc"
+  fi
+  export "${var}=${val}"
+}
+
+set_env_in_rc "ANTHROPIC_BASE_URL" "$PROXY_URL"
+set_env_in_rc "OPENAI_BASE_URL"    "$PROXY_URL"
+log "ANTHROPIC_BASE_URL=$PROXY_URL  (Claude Code routes through proxy)"
+log "OPENAI_BASE_URL=$PROXY_URL     (Codex routes through proxy)"
+
 # ── Done ────────────────────────────────────────────────────
 echo ""
 echo -e "${MINT}${BOLD}  ✅  Agentium is live!${RESET}"
 echo ""
 echo -e "  Dashboard → ${BOLD}${DASHBOARD_URL}${RESET}"
+echo -e "  Proxy     → ${BOLD}${PROXY_URL}${RESET}  (caches stable context at \$0.30/MTok)"
 echo ""
-echo "  Run Claude Code or Codex normally — every session"
-echo "  appears in the dashboard automatically."
+echo "  Run Claude Code or Codex normally — traces appear in"
+echo "  the dashboard. Stable context is cached automatically."
+echo "  Open a new terminal for the proxy env vars to apply."
 echo ""
 
 open_browser "$DASHBOARD_URL"

@@ -31,5 +31,23 @@ services:
         condition: service_healthy
     restart: unless-stopped
 
+  proxy:
+    image: archokshi/backend:latest
+    command: python -m agent_runtime_layer.cli proxy --port 8100 --base-url http://backend:8000/api
+    ports:
+      - "8100:8100"
+    environment:
+      AGENTIUM_API_URL: http://backend:8000/api
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8100', timeout=2).read()"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
 volumes:
   agentium_data:

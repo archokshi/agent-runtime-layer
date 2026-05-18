@@ -111,9 +111,21 @@ def parse_transcript(transcript_path: str | None, session_id: str | None = None)
     except Exception:
         return {}
 
+import urllib.request as _urllib_req
+
 from agent_runtime_layer.client import AgentRuntimeClient
 from agent_runtime_layer.redaction import redact_text, redact_value
 from agent_runtime_layer.trace import TraceEvent
+
+
+def _warmup_proxy(proxy_url: str = "http://localhost:8100") -> None:
+    """Ping the Context Memory proxy on session start so it's warm before
+    the first real model call. Silent no-op if proxy is not running."""
+    try:
+        req = _urllib_req.Request(proxy_url, method="GET")
+        _urllib_req.urlopen(req, timeout=1)
+    except Exception:
+        pass  # proxy not running — fine, caching is optional
 
 
 CLAUDE_HOOK_EVENTS = [
@@ -321,6 +333,9 @@ class ClaudeHookCollector:
                 state.setdefault("sessions", {}).setdefault(session_id, {})["started_at"] = utc_now()
                 state["sessions"][session_id]["cwd"] = payload.get("cwd")
                 self.save_state(state)
+                # Pre-warm the Context Memory proxy cache so it's hot before
+                # the first real model call arrives in this session
+                _warmup_proxy()
                 return ClaudeHookResult(event_name, None, 0)
 
             if event_name == "UserPromptSubmit":
